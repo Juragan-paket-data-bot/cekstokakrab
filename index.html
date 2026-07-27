@@ -140,7 +140,8 @@
 
                 <!-- Area Hasil Stok -->
                 <div id="resultAreaStok" class="hidden border-t border-dark-border pt-6 mt-4">
-                    <div id="stokGrid" class="flex flex-col gap-3">
+                    <!-- Mengubah layout list menjadi Grid Kotak -->
+                    <div id="stokGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                         <!-- Item stok disisipkan di sini -->
                     </div>
                     
@@ -444,17 +445,24 @@
                 let stockItems = [];
                 let dataToParse = responseData.data || responseData;
 
+                // KAMUS PAKET BARU (Sesuai List Anda)
                 const kamusPaket = {
-                    'XLA14': 'Akrab Mini 14GB',
-                    'XLA20': 'Akrab Sedang 20GB',
-                    'XLA32': 'Akrab Besar 32GB',
-                    'XLA39': 'Akrab Besar 39GB',
-                    'XLA48': 'Akrab Jumbo 48GB',
-                    'XLA55': 'Akrab Jumbo 55GB',
-                    'XLA64': 'Akrab Super 64GB',
-                    'XLA65': 'Akrab Super 65GB',
-                    'XLA77': 'Akrab Ekstra 77GB',
-                    'XLA89': 'Akrab Ekstra 89GB'
+                    'XLA14': 'SuperMini',
+                    'XLA20': 'SuperMini V2',
+                    'XLA32': 'Mini',
+                    'XLAP39': 'Big (Promo)',
+                    'XLA39': 'Big',
+                    'XLAP48': 'Big V2 (Promo)',
+                    'XLA48': 'Big V2',
+                    'XLAP55': 'Jumbo V2 (Promo)',
+                    'XLA55': 'Jumbo V2',
+                    'XLAP64': 'Jumbo V3 (Promo)',
+                    'XLA64': 'Jumbo V3',
+                    'XLAP77': 'MegaBig v2 (Promo)',
+                    'XLA77': 'Megabig V2',
+                    'XLAP89': 'MegaBig (Promo)',
+                    'XLA65': 'JUMBO',
+                    'XLA89': 'MegaBig'
                 };
 
                 if (Array.isArray(dataToParse)) {
@@ -498,28 +506,41 @@
                     stockItems.forEach(item => {
                         const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia') || String(item.stock).toLowerCase().includes('open');
                         
-                        const statusBadge = isAvailable ? 'READY' : 'KOSONG';
-                        const badgeColor = isAvailable ? 'bg-brand-main/10 text-brand-main border border-brand-main/30' : 'bg-red-500/10 text-red-400 border border-red-500/30';
-                        const stockColor = isAvailable ? 'text-brand-main' : 'text-red-400';
-                        const bgHover = isAvailable ? 'hover:border-brand-main/40' : 'hover:border-red-500/30';
+                        // Menyesuaikan warna dan ikon dengan gambar referensi
+                        const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
+                        const bgHover = isAvailable ? 'hover:border-brand-main/50' : 'hover:border-red-500/50';
+                        
+                        const checkIcon = isAvailable 
+                            ? `<div class="bg-brand-main rounded-full w-5 h-5 flex items-center justify-center shadow-[0_0_10px_rgba(0,244,126,0.4)]"><i class="fa-solid fa-check text-[#041016] text-[10px] font-black"></i></div>`
+                            : `<div class="bg-red-500 rounded-full w-5 h-5 flex items-center justify-center shadow-[0_0_10px_rgba(239,68,68,0.4)]"><i class="fa-solid fa-xmark text-[#041016] text-[10px] font-black"></i></div>`;
+                        
+                        const emptyText = !isAvailable ? `<span class="block text-red-500 text-[11px] italic font-black tracking-wider mt-1.5">HABIS</span>` : '';
 
+                        // Desain Kartu Grid Baru
                         const card = `
-                            <div class="bg-dark-input p-4 rounded-xl border border-dark-border flex flex-row items-center justify-between ${bgHover} transition-all shadow-sm">
-                                <!-- Info Kiri -->
-                                <div class="flex flex-col gap-1.5">
-                                    <h3 class="font-bold text-white text-base md:text-lg leading-none tracking-tight">${item.name}</h3>
-                                    <span class="text-xs text-gray-500 font-medium">Kode : <span class="text-gray-300 font-mono tracking-wider">${item.code}</span></span>
-                                    <div>
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wider ${badgeColor}">
-                                            ${statusBadge}
-                                        </span>
-                                    </div>
+                            <div class="bg-dark-input p-5 rounded-[20px] border border-dark-border ${bgHover} transition-all shadow-lg flex flex-col h-full relative overflow-hidden group">
+                                <!-- Efek Glow Lembut -->
+                                <div class="absolute inset-0 bg-brand-main/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                                
+                                <!-- Baris Judul & Ikon -->
+                                <div class="flex justify-between items-start mb-4 relative z-10 gap-2">
+                                    <h3 class="font-bold text-white text-lg tracking-tight leading-tight">${item.name}</h3>
+                                    <div class="shrink-0 mt-0.5">${checkIcon}</div>
                                 </div>
                                 
-                                <!-- Slot Kanan -->
-                                <div class="text-right flex flex-col justify-center border-l border-dark-border/60 pl-4 min-w-[90px]">
-                                    <span class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Sisa Slot</span>
-                                    <span class="text-2xl font-black ${stockColor} leading-none tracking-tighter">${item.numStock}</span>
+                                <!-- Baris Stok -->
+                                <div class="mb-5 relative z-10">
+                                    <div class="flex items-baseline gap-1.5">
+                                        <span class="text-white font-bold text-base">Stok:</span>
+                                        <span class="text-[22px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
+                                    </div>
+                                    ${emptyText}
+                                </div>
+                                
+                                <!-- Garis Pemisah & Kode Paket -->
+                                <div class="mt-auto pt-3 border-t border-[#1a3245] relative z-10 flex justify-between items-center">
+                                    <span class="text-xs text-gray-500 font-semibold tracking-wider">KODE</span>
+                                    <span class="text-[#e8b923] text-sm font-bold tracking-wider">${item.code}</span>
                                 </div>
                             </div>
                         `;
