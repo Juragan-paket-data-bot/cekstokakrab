@@ -442,21 +442,48 @@
                 
                 stokGrid.innerHTML = ''; 
                 let stockItems = [];
+                let dataToParse = responseData.data || responseData;
 
-                if (responseData.data && typeof responseData.data === 'object' && !Array.isArray(responseData.data)) {
-                    for (const [key, value] of Object.entries(responseData.data)) {
-                        stockItems.push({
-                            name: key,
-                            stock: value.stok || value.stock || value.jumlah || value,
-                            status: value.status || (value.stok > 0 ? 'Tersedia' : 'Habis')
-                        });
+                // SISTEM PELACAK CERDAS (Smart Parser)
+                if (Array.isArray(dataToParse)) {
+                    stockItems = dataToParse.map(item => {
+                        // Mencari letak kolom nama dan stok secara otomatis (Tahan banting terhadap huruf besar/kecil)
+                        const nameKey = Object.keys(item).find(k => /nama|name|paket|produk|product|keterangan|title/i.test(k));
+                        const stockKey = Object.keys(item).find(k => /stok|stock|qty|jumlah|sisa|available/i.test(k));
+                        const statusKey = Object.keys(item).find(k => /status|kondisi/i.test(k));
+
+                        const valName = nameKey ? item[nameKey] : 'Produk Juragan';
+                        const valStock = stockKey ? item[stockKey] : 0;
+                        
+                        // Memisahkan angka murni dari teks (misal: dari "191 unit" menjadi hanya 191)
+                        const numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
+                        const valStatus = statusKey ? item[statusKey] : (numStock > 0 ? 'Tersedia' : 'Habis');
+
+                        return {
+                            name: valName,
+                            stock: valStock, // Tetap tampilkan teks aslinya
+                            numStock: numStock, // Angka murni untuk perhitungan
+                            status: valStatus
+                        };
+                    });
+                } else if (dataToParse && typeof dataToParse === 'object') {
+                    for (const [key, value] of Object.entries(dataToParse)) {
+                        let valStock = 0, numStock = 0, valStatus = 'Habis';
+                        
+                        if (typeof value === 'object' && value !== null) {
+                            const stockKey = Object.keys(value).find(k => /stok|stock|qty|jumlah|sisa/i.test(k));
+                            const statusKey = Object.keys(value).find(k => /status/i.test(k));
+                            valStock = stockKey ? value[stockKey] : (value.stok || value.stock || value.jumlah || 0);
+                            numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
+                            valStatus = statusKey ? value[statusKey] : (numStock > 0 ? 'Tersedia' : 'Habis');
+                        } else {
+                            valStock = value;
+                            numStock = typeof value === 'string' ? (parseInt(value.replace(/\D/g, '')) || 0) : parseInt(value || 0);
+                            valStatus = numStock > 0 ? 'Tersedia' : 'Habis';
+                        }
+                        
+                        stockItems.push({ name: key, stock: valStock, numStock: numStock, status: valStatus });
                     }
-                } else if (Array.isArray(responseData.data)) {
-                    stockItems = responseData.data.map(item => ({
-                        name: item.name || item.paket || item.title || 'Produk',
-                        stock: item.stock || item.stok || item.jumlah || 0,
-                        status: item.status || (item.stock > 0 ? 'Tersedia' : 'Habis')
-                    }));
                 }
 
                 if (stockItems.length > 0) {
@@ -464,7 +491,9 @@
                     stokRawContainer.classList.add('hidden');
 
                     stockItems.forEach(item => {
-                        const isAvailable = parseInt(item.stock) > 0 || String(item.status).toLowerCase().includes('tersedia');
+                        // Menggunakan variabel numStock yang sudah dibersihkan untuk cek ketersediaan
+                        const isAvailable = item.numStock > 0 || String(item.status).toLowerCase().includes('tersedia') || String(item.status).toLowerCase().includes('open') || String(item.status).toLowerCase().includes('ready');
+                        
                         // Warna Kartu Stok Gelap
                         const badgeColor = isAvailable ? 'bg-brand-main/10 text-brand-main border-brand-main/30' : 'bg-red-500/10 text-red-400 border-red-500/30';
                         const iconColor = isAvailable ? 'text-brand-main shadow-[0_0_15px_rgba(0,244,126,0.2)]' : 'text-gray-600';
