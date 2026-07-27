@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Nomor & Kuota</title>
+    <!-- Memanggil Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8 font-sans text-gray-800">
+
+    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-blue-600 p-4 md:p-6 text-white text-center">
+            <h1 class="text-2xl font-bold">Cek Info Kartu & Kuota</h1>
+            <p class="text-sm opacity-80 mt-1">Sistem Pengecekan Cepat</p>
+        </div>
+
+        <!-- Form Input -->
+        <div class="p-6">
+            <form id="cekForm" class="flex flex-col sm:flex-row gap-3">
+                <input type="number" id="inputNomor" placeholder="Masukkan Nomor (contoh: 087812345678)" required
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit" id="btnSubmit" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
+                    Cek Sekarang
+                </button>
+            </form>
+            
+            <!-- Loading Indicator -->
+            <div id="loading" class="hidden mt-4 text-center text-blue-600 font-medium">
+                ⏳ Sedang mengambil data...
+            </div>
+            
+            <!-- Pesan Error -->
+            <div id="errorMsg" class="hidden mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-center">
+            </div>
+        </div>
+
+        <!-- Hasil Pencarian -->
+        <div id="resultArea" class="hidden border-t border-gray-200">
+            
+            <!-- Info Kartu -->
+            <div class="p-6 bg-gray-50">
+                <h2 class="text-lg font-bold text-gray-700 mb-3">📱 Informasi Kartu</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                        <span class="block text-gray-500 text-xs">Nomor</span>
+                        <span id="resNomor" class="font-semibold">-</span>
+                    </div>
+                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                        <span class="block text-gray-500 text-xs">Operator</span>
+                        <span id="resOperator" class="font-semibold">-</span>
+                    </div>
+                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                        <span class="block text-gray-500 text-xs">Jaringan</span>
+                        <span id="resNet" class="font-semibold">-</span>
+                    </div>
+                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
+                        <span class="block text-gray-500 text-xs">Masa Aktif</span>
+                        <span id="resExp" class="font-semibold text-blue-600">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Kuota -->
+            <div class="p-6">
+                <h2 class="text-lg font-bold text-gray-700 mb-1">📦 Detail Kuota</h2>
+                <p id="resPaket" class="text-sm text-gray-500 mb-4">Paket: -</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-blue-50 text-blue-800">
+                                <th class="p-3 rounded-tl-lg font-semibold border-b border-blue-100">Nama Kuota</th>
+                                <th class="p-3 font-semibold border-b border-blue-100">Total</th>
+                                <th class="p-3 rounded-tr-lg font-semibold border-b border-blue-100">Sisa Kuota</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-gray-100">
+                            <!-- Data kuota akan dimunculkan di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Script Logika API -->
+    <script>
+        document.getElementById('cekForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Mencegah halaman reload
+            
+            const nomor = document.getElementById('inputNomor').value;
+            const loading = document.getElementById('loading');
+            const errorMsg = document.getElementById('errorMsg');
+            const resultArea = document.getElementById('resultArea');
+            const btnSubmit = document.getElementById('btnSubmit');
+
+            // Reset UI
+            errorMsg.classList.add('hidden');
+            resultArea.classList.add('hidden');
+            loading.classList.remove('hidden');
+            btnSubmit.disabled = true;
+            btnSubmit.classList.add('opacity-50');
+
+            try {
+               const response = await fetch(`/api/checker?number=${nomor}`);
+                const responseData = await response.json();
+
+                if (responseData.data && responseData.data.subs_info) {
+                    const info = responseData.data.subs_info;
+                    const paketInfo = responseData.data.package_info.packages[0];
+
+                    // Mengisi Info Kartu
+                    document.getElementById('resNomor').textContent = info.msisdn || '-';
+                    document.getElementById('resOperator').textContent = info.operator || '-';
+                    document.getElementById('resNet').textContent = info.net_type || '-';
+                    document.getElementById('resExp').textContent = info.exp_date || '-';
+                    
+                    // Mengisi Nama Paket
+                    document.getElementById('resPaket').textContent = `Paket Utama: ${paketInfo ? paketInfo.name : 'Tidak Ada'}`;
+
+                    // Mengisi Tabel Kuota
+                    const tableBody = document.getElementById('tableBody');
+                    tableBody.innerHTML = ''; // Kosongkan tabel sebelumnya
+
+                    if (paketInfo && paketInfo.quotas.length > 0) {
+                        paketInfo.quotas.forEach(kuota => {
+                            const row = `
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="p-3 text-gray-700">${kuota.name}</td>
+                                    <td class="p-3 text-gray-600">${kuota.total}</td>
+                                    <td class="p-3 font-semibold text-blue-600">${kuota.remaining}</td>
+                                </tr>
+                            `;
+                            tableBody.insertAdjacentHTML('beforeend', row);
+                        });
+                    } else {
+                        tableBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">Data kuota tidak ditemukan.</td></tr>';
+                    }
+
+                    // Tampilkan Hasil
+                    resultArea.classList.remove('hidden');
+                } else {
+                    throw new Error("Nomor tidak ditemukan atau format data tidak sesuai.");
+                }
+
+            } catch (error) {
+                console.error(error);
+                errorMsg.textContent = "Gagal mengambil data. Pastikan nomor benar dan link Vercel sudah diubah di dalam kode HTML.";
+                errorMsg.classList.remove('hidden');
+            } finally {
+                // Kembalikan tombol ke semula
+                loading.classList.add('hidden');
+                btnSubmit.disabled = false;
+                btnSubmit.classList.remove('opacity-50');
+            }
+        });
+    </script>
+</body>
+</html>
