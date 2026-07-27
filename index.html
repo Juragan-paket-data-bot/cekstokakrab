@@ -3,162 +3,559 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cek Nomor & Kuota</title>
-    <!-- Memanggil Tailwind CSS untuk styling -->
+    <title>Sistem Juragan Paket Data</title>
+    
+    <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Memuat Font Google (Poppins) untuk kesan premium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Memuat Ikon FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Konfigurasi Kustom Tailwind (Warna Juragan Paket Data) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: { 
+                        brand: {
+                            main: '#00f47e',   // Hijau Neon Terang
+                            dark: '#00c765',   // Hijau Hover
+                            glow: 'rgba(0, 244, 126, 0.3)'
+                        },
+                        dark: {
+                            bg: '#041016',     // Latar belakang paling gelap
+                            card: '#0b1a24',   // Latar kotak/kartu utama
+                            input: '#122533',  // Latar input dan kartu dalam
+                            border: '#1a3245'  // Garis batas gelap
+                        }
+                    },
+                    animation: {
+                        'marquee': 'marquee 800s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 md:p-8 font-sans text-gray-800">
 
-    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+<body class="bg-dark-bg min-h-screen text-gray-200 antialiased flex flex-col font-sans selection:bg-brand-main selection:text-black">
+
+    <!-- Top Bar Status -->
+    <div class="bg-[#022214] text-brand-main text-[10px] md:text-xs font-bold text-center py-2 tracking-widest border-b border-brand-main/20">
+        <i class="fa-solid fa-circle text-[8px] mr-1.5 animate-pulse"></i> SISTEM AKTIF 24 JAM 
+        <i class="fa-solid fa-circle text-[8px] mx-1.5 opacity-50"></i> PROSES INSTAN DETIK ITU JUGA!
+    </div>
+
+    <!-- Running Text Transaksi (Fake Marquee) -->
+    <div class="w-full bg-dark-bg/80 border-b border-dark-border overflow-hidden py-2.5 flex items-center relative">
+        <!-- Efek bayangan (fade) di kiri dan kanan agar tulisan muncul/hilang dengan mulus -->
+        <div class="absolute left-0 w-12 h-full bg-gradient-to-r from-dark-bg to-transparent z-10"></div>
+        <div class="absolute right-0 w-12 h-full bg-gradient-to-l from-dark-bg to-transparent z-10"></div>
         
-        <!-- Header -->
-        <div class="bg-blue-600 p-4 md:p-6 text-white text-center">
-            <h1 class="text-2xl font-bold">Cek Info Kartu & Kuota</h1>
-            <p class="text-sm opacity-80 mt-1">Sistem Pengecekan Cepat</p>
-        </div>
-
-        <!-- Form Input -->
-        <div class="p-6">
-            <form id="cekForm" class="flex flex-col sm:flex-row gap-3">
-                <input type="number" id="inputNomor" placeholder="Masukkan Nomor (contoh: 087812345678)" required
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <button type="submit" id="btnSubmit" 
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
-                    Cek Sekarang
-                </button>
-            </form>
-            
-            <!-- Loading Indicator -->
-            <div id="loading" class="hidden mt-4 text-center text-blue-600 font-medium">
-                ⏳ Sedang mengambil data...
-            </div>
-            
-            <!-- Pesan Error -->
-            <div id="errorMsg" class="hidden mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-center">
-            </div>
-        </div>
-
-        <!-- Hasil Pencarian -->
-        <div id="resultArea" class="hidden border-t border-gray-200">
-            
-            <!-- Info Kartu -->
-            <div class="p-6 bg-gray-50">
-                <h2 class="text-lg font-bold text-gray-700 mb-3">📱 Informasi Kartu</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
-                        <span class="block text-gray-500 text-xs">Nomor</span>
-                        <span id="resNomor" class="font-semibold">-</span>
-                    </div>
-                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
-                        <span class="block text-gray-500 text-xs">Operator</span>
-                        <span id="resOperator" class="font-semibold">-</span>
-                    </div>
-                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
-                        <span class="block text-gray-500 text-xs">Jaringan</span>
-                        <span id="resNet" class="font-semibold">-</span>
-                    </div>
-                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
-                        <span class="block text-gray-500 text-xs">Masa Aktif</span>
-                        <span id="resExp" class="font-semibold text-blue-600">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Info Kuota -->
-            <div class="p-6">
-                <h2 class="text-lg font-bold text-gray-700 mb-1">📦 Detail Kuota</h2>
-                <p id="resPaket" class="text-sm text-gray-500 mb-4">Paket: -</p>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-blue-50 text-blue-800">
-                                <th class="p-3 rounded-tl-lg font-semibold border-b border-blue-100">Nama Kuota</th>
-                                <th class="p-3 font-semibold border-b border-blue-100">Total</th>
-                                <th class="p-3 rounded-tr-lg font-semibold border-b border-blue-100">Sisa Kuota</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y divide-gray-100">
-                            <!-- Data kuota akan dimunculkan di sini -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
+        <div class="flex whitespace-nowrap animate-marquee" id="runningTextContainer">
+            <!-- Data transaksi akan di-generate oleh JavaScript di bagian bawah -->
         </div>
     </div>
 
-    <!-- Script Logika API -->
+    <!-- Navigasi / Header -->
+    <nav class="w-full max-w-5xl mx-auto px-4 py-6 flex justify-between items-center">
+        <!-- Logo Area -->
+        <div class="flex items-center gap-3.5">
+            <!-- Ikon Petir -->
+            <div class="w-11 h-11 bg-brand-main rounded-xl flex items-center justify-center text-dark-bg shadow-[0_0_15px_rgba(0,244,126,0.5)] transform -rotate-6">
+                <i class="fa-solid fa-bolt text-2xl transform rotate-6"></i>
+            </div>
+            <!-- Teks Logo -->
+            <div class="flex flex-col">
+                <span class="text-white font-extrabold text-lg md:text-xl leading-tight tracking-tight">JURAGAN PAKET DATA</span>
+                <span class="text-brand-main text-[9px] md:text-[10px] font-bold tracking-[0.15em] opacity-80 uppercase">PPOB Automations</span>
+            </div>
+        </div>
+        
+        <!-- Tombol Status Engine -->
+        <div class="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-main/30 bg-brand-main/10 text-brand-main text-sm font-semibold shadow-[0_0_10px_rgba(0,244,126,0.1)]">
+            <i class="fa-solid fa-bolt text-xs"></i>
+            Engine Online
+        </div>
+    </nav>
+
+    <!-- Hero Section (Judul Utama) -->
+    <div class="text-center mt-8 md:mt-12 mb-12 px-4">
+        <h1 class="text-3xl md:text-5xl font-extrabold text-white leading-tight tracking-tight max-w-3xl mx-auto">
+            Cek Stok Akrab dan Kuota <br class="hidden md:block">
+            <span class="text-brand-main">Juragan Paket Data</span>
+        </h1>
+        <p class="text-gray-400 mt-5 max-w-xl mx-auto text-sm md:text-base font-light">
+            Nikmati transaksi otomatis super cepat 24 jam. Gunakan portal di bawah ini untuk mengecek ketersediaan stok atau melihat detail kuota nomor Anda.
+        </p>
+    </div>
+
+    <!-- Kontainer Aplikasi Utama -->
+    <div class="w-full max-w-3xl mx-auto px-4 pb-20">
+        <div class="bg-dark-card rounded-3xl shadow-2xl border border-dark-border overflow-hidden">
+            
+            <!-- Tab Navigasi -->
+            <div class="flex border-b border-dark-border bg-dark-bg/50">
+                <button id="tabBtnStok" class="flex-1 py-4 text-sm md:text-base font-semibold text-brand-main border-b-2 border-brand-main bg-brand-main/5 transition-all">
+                    <i class="fa-solid fa-boxes-stacked mr-2"></i>Stok Akrab
+                </button>
+                <button id="tabBtnKuota" class="flex-1 py-4 text-sm md:text-base font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-300 hover:bg-white/5 transition-all">
+                    <i class="fa-solid fa-mobile-screen mr-2"></i>Cek Kuota
+                </button>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- TAB: STOK AKRAB -->
+            <!-- ============================================== -->
+            <div id="tabContentStok" class="block p-6 md:p-8">
+                <div class="text-center mb-8">
+                    <button id="btnCekStok" class="bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-8 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Muat Data Stok Realtime</span>
+                    </button>
+                    <p class="text-gray-500 text-xs mt-4"><i class="fa-solid fa-shield-halved mr-1 text-brand-main/70"></i> Terhubung langsung dengan server Juragan</p>
+                </div>
+
+                <!-- Animasi Loading Stok -->
+                <div id="loadingStok" class="hidden my-8 flex flex-col items-center justify-center gap-3">
+                    <i class="fa-solid fa-boxes-packing fa-bounce text-4xl text-brand-main"></i>
+                    <span class="text-brand-main font-medium animate-pulse tracking-wide">Mengambil data stok...</span>
+                </div>
+
+                <!-- Notifikasi Error Stok -->
+                <div id="errorMsgStok" class="hidden mt-6 bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm flex items-center gap-3">
+                    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+                    <span id="errorTextStok">Gagal mengambil data stok.</span>
+                </div>
+
+                <!-- Area Hasil Stok -->
+                <div id="resultAreaStok" class="hidden border-t border-dark-border pt-6 mt-4">
+                    <div id="stokGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Item stok disisipkan di sini -->
+                    </div>
+                    
+                    <div id="stokRawContainer" class="hidden bg-dark-bg rounded-xl p-4 overflow-x-auto border border-dark-border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fa-solid fa-code text-gray-500 text-xs"></i>
+                            <span class="text-xs text-gray-500 font-medium uppercase tracking-wider">Respons Server (Raw)</span>
+                        </div>
+                        <pre id="stokRawOutput" class="text-brand-main text-xs font-mono"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- TAB: CEK KUOTA -->
+            <!-- ============================================== -->
+            <div id="tabContentKuota" class="hidden">
+                <div class="p-6 md:p-8">
+                    <form id="cekForm" class="relative max-w-lg mx-auto">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <input type="number" id="inputNomor" placeholder="Contoh: 087812345678" required
+                                class="flex-1 px-5 py-3.5 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main/50 focus:border-brand-main transition-all font-medium text-white placeholder-gray-500">
+                            <button type="submit" id="btnSubmit" 
+                                class="bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-6 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center min-w-[140px]">
+                                <span>Cek Nomor</span>
+                                <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                
+                    <!-- Animasi Loading -->
+                    <div id="loading" class="hidden mt-8 flex flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-main"></i>
+                        <span class="text-brand-main font-medium animate-pulse tracking-wide">Menghubungkan ke server...</span>
+                    </div>
+                    
+                    <!-- Notifikasi Error -->
+                    <div id="errorMsg" class="hidden mt-6 max-w-lg mx-auto bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm flex items-center gap-3">
+                        <i class="fa-solid fa-circle-exclamation text-lg"></i>
+                        <span id="errorText">Terjadi kesalahan. Silakan coba lagi.</span>
+                    </div>
+                </div>
+
+                <!-- Area Hasil Kuota -->
+                <div id="resultArea" class="hidden border-t border-dark-border bg-dark-card">
+                    
+                    <!-- Bagian Info Kartu -->
+                    <div class="p-6 md:p-8 border-b border-dark-border bg-dark-bg/30">
+                        <div class="flex items-center gap-2 mb-6">
+                            <i class="fa-solid fa-address-card text-brand-main text-xl"></i>
+                            <h2 class="text-xl font-bold text-white">Informasi Kartu</h2>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-dark-input p-4 rounded-2xl border border-dark-border">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-solid fa-phone text-xs"></i>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Nomor</span>
+                                </div>
+                                <span id="resNomor" class="font-bold text-white text-lg">-</span>
+                            </div>
+                            
+                            <div class="bg-dark-input p-4 rounded-2xl border border-dark-border">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-solid fa-tower-broadcast text-xs"></i>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Operator</span>
+                                </div>
+                                <span id="resOperator" class="font-bold text-brand-main text-lg">-</span>
+                            </div>
+                            
+                            <div class="bg-dark-input p-4 rounded-2xl border border-dark-border">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-solid fa-wifi text-xs"></i>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Jaringan</span>
+                                </div>
+                                <span id="resNet" class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-brand-main/10 text-brand-main border border-brand-main/20 mt-0.5">-</span>
+                            </div>
+                            
+                            <div class="bg-dark-input p-4 rounded-2xl border border-dark-border">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-regular fa-calendar-check text-xs"></i>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Masa Aktif</span>
+                                </div>
+                                <span id="resExp" class="font-bold text-white text-sm md:text-base">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bagian Info Detail Kuota -->
+                    <div class="p-6 md:p-8">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-box-open text-brand-main text-xl"></i>
+                                <h2 class="text-xl font-bold text-white">Detail Kuota</h2>
+                            </div>
+                            <div class="bg-dark-input px-4 py-2 rounded-lg border border-brand-main/20 flex items-center gap-2">
+                                <i class="fa-solid fa-tag text-brand-main"></i>
+                                <span id="resPaket" class="text-sm font-semibold text-brand-main">Paket: -</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Grid Kuota -->
+                        <div id="quotaGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Item kuota akan disisipkan di sini oleh JavaScript -->
+                        </div>
+                    </div>
+                </div> <!-- Penutup resultArea -->
+            </div> <!-- Penutup tabContentKuota -->
+        </div>
+    </div>
+    
+    <!-- Script Logika Aplikasi -->
     <script>
+        // Data Mock untuk Preview (Agar UI bisa dites tanpa API Vercel)
+        const mockDataPreview = {
+            "success":true,"code":"000","message":"Gagal mengambil data nomor.","data":{"subs_info":{"msisdn":"6287812345678","operator":"XL","id_verified":"Sudah","net_type":"4G","tenure":"0 Tahun 4 Bulan","exp_date":"06-03-2037","grace_until":"31-12-2035","volte":{"device":false,"area":false,"simcard":false}},"package_info":{"error_message":null,"packages":[{"name":"PRIO Gold","expiry":"31-12-2049","timestamp":2524582799,"quotas":[{"name":"Nelpon (ke XL & AXIS)","percent":100,"total":"50000 Menit","remaining":"50000 Menit"},{"name":"SMS (ke XL & AXIS)","percent":100,"total":"1000 SMS","remaining":"1000 SMS"},{"name":"SMS (ke Operator Lain)","percent":100,"total":"150 SMS","remaining":"150 SMS"},{"name":"Nelpon (ke Operator Lain)","percent":100,"total":"150 Menit","remaining":"150 Menit"},{"name":"24jam di 2G3G4G","percent":100,"total":"20GB","remaining":"20GB"},{"name":"24 Jam Medsos dan Online Shop","percent":100,"total":"2GB","remaining":"2GB"}]}]}},"meta":{"provider":"xl-ku.my.id","normalizedNumber":"087812345678","checkType":"package"}
+        };
+
+        const mockStokPreview = {
+            "success": true,
+            "data": {
+                "Akrab Mini 10GB": { "stok": 150, "status": "Tersedia", "harga": "Rp 25.000" },
+                "Akrab Sedang 25GB": { "stok": 45, "status": "Tersedia", "harga": "Rp 40.000" },
+                "Akrab Besar 65GB": { "stok": 0, "status": "Habis", "harga": "Rp 75.000" },
+                "Akrab Jumbo 147GB": { "stok": 12, "status": "Tersedia", "harga": "Rp 110.000" }
+            }
+        };
+
+        // Logika Tab Navigasi
+        const tabBtnKuota = document.getElementById('tabBtnKuota');
+        const tabBtnStok = document.getElementById('tabBtnStok');
+        const tabContentKuota = document.getElementById('tabContentKuota');
+        const tabContentStok = document.getElementById('tabContentStok');
+
+        function switchTab(activeBtn, inactiveBtn, activeContent, inactiveContent) {
+            // Ubah gaya tombol aktif (Tema Gelap)
+            activeBtn.classList.add('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
+            activeBtn.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-300', 'hover:bg-white/5');
+            
+            // Ubah gaya tombol pasif (Tema Gelap)
+            inactiveBtn.classList.remove('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
+            inactiveBtn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-300', 'hover:bg-white/5');
+
+            // Tampilkan/Sembunyikan konten
+            activeContent.classList.remove('hidden');
+            activeContent.classList.add('block');
+            inactiveContent.classList.add('hidden');
+            inactiveContent.classList.remove('block');
+        }
+
+        tabBtnKuota.addEventListener('click', () => switchTab(tabBtnKuota, tabBtnStok, tabContentKuota, tabContentStok));
+        tabBtnStok.addEventListener('click', () => switchTab(tabBtnStok, tabBtnKuota, tabContentStok, tabContentKuota));
+
+        // Logika Form Cek Kuota
         document.getElementById('cekForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Mencegah halaman reload
+            e.preventDefault();
             
             const nomor = document.getElementById('inputNomor').value;
             const loading = document.getElementById('loading');
             const errorMsg = document.getElementById('errorMsg');
+            const errorText = document.getElementById('errorText');
             const resultArea = document.getElementById('resultArea');
             const btnSubmit = document.getElementById('btnSubmit');
+            const btnIcon = btnSubmit.querySelector('i');
 
             // Reset UI
             errorMsg.classList.add('hidden');
             resultArea.classList.add('hidden');
             loading.classList.remove('hidden');
             btnSubmit.disabled = true;
-            btnSubmit.classList.add('opacity-50');
+            btnSubmit.classList.add('opacity-70', 'cursor-not-allowed');
+            btnIcon.classList.remove('fa-arrow-right');
+            btnIcon.classList.add('fa-spinner', 'fa-spin');
 
             try {
-               const response = await fetch(`/api/checker?number=${nomor}`);
-                const responseData = await response.json();
+                let responseData;
+                
+                // Deteksi apakah sedang di Vercel/Local atau di Preview Editor
+                const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                if (isVercel) {
+                    const response = await fetch(`/api/checker?number=${nomor}`);
+                    if (!response.ok) throw new Error("Gagal terhubung ke API Vercel.");
+                    responseData = await response.json();
+                } else {
+                    await new Promise(r => setTimeout(r, 1500));
+                    responseData = mockDataPreview; 
+                    responseData.data.subs_info.msisdn = nomor;
+                }
 
                 if (responseData.data && responseData.data.subs_info) {
                     const info = responseData.data.subs_info;
                     const paketInfo = responseData.data.package_info.packages[0];
 
-                    // Mengisi Info Kartu
                     document.getElementById('resNomor').textContent = info.msisdn || '-';
                     document.getElementById('resOperator').textContent = info.operator || '-';
                     document.getElementById('resNet').textContent = info.net_type || '-';
                     document.getElementById('resExp').textContent = info.exp_date || '-';
-                    
-                    // Mengisi Nama Paket
-                    document.getElementById('resPaket').textContent = `Paket Utama: ${paketInfo ? paketInfo.name : 'Tidak Ada'}`;
+                    document.getElementById('resPaket').textContent = paketInfo ? paketInfo.name : 'Tidak Ada Paket Utama';
 
-                    // Mengisi Tabel Kuota
-                    const tableBody = document.getElementById('tableBody');
-                    tableBody.innerHTML = ''; // Kosongkan tabel sebelumnya
+                    const quotaGrid = document.getElementById('quotaGrid');
+                    quotaGrid.innerHTML = ''; 
 
-                    if (paketInfo && paketInfo.quotas.length > 0) {
+                    if (paketInfo && paketInfo.quotas && paketInfo.quotas.length > 0) {
                         paketInfo.quotas.forEach(kuota => {
-                            const row = `
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="p-3 text-gray-700">${kuota.name}</td>
-                                    <td class="p-3 text-gray-600">${kuota.total}</td>
-                                    <td class="p-3 font-semibold text-blue-600">${kuota.remaining}</td>
-                                </tr>
-                            `;
-                            tableBody.insertAdjacentHTML('beforeend', row);
-                        });
-                    } else {
-                        tableBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">Data kuota tidak ditemukan.</td></tr>';
-                    }
+                            const percent = kuota.percent || 100;
+                            let barColor = 'bg-brand-main shadow-[0_0_8px_rgba(0,244,126,0.6)]';
+                            if(percent <= 20) barColor = 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]';
+                            else if(percent <= 50) barColor = 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]';
 
-                    // Tampilkan Hasil
+                            const card = `
+                                <div class="bg-dark-input border border-dark-border rounded-xl p-4 hover:border-brand-main/40 transition-all group shadow-sm">
+                                    <h3 class="text-sm font-semibold text-gray-200 mb-3 group-hover:text-brand-main transition-colors line-clamp-1" title="${kuota.name}">${kuota.name}</h3>
+                                    
+                                    <div class="flex justify-between items-end mb-2">
+                                        <div>
+                                            <span class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Sisa Kuota</span>
+                                            <span class="text-lg font-extrabold text-brand-main leading-none">${kuota.remaining}</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Total</span>
+                                            <span class="text-sm font-medium text-gray-400">${kuota.total}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="w-full bg-dark-bg rounded-full h-1.5 mt-3 border border-white/5">
+                                        <div class="${barColor} h-1.5 rounded-full transition-all duration-1000 ease-out" style="width: 0%" data-target-width="${percent}%"></div>
+                                    </div>
+                                </div>
+                            `;
+                            quotaGrid.insertAdjacentHTML('beforeend', card);
+                        });
+
+                        setTimeout(() => {
+                            document.querySelectorAll('#quotaGrid .rounded-full[data-target-width]').forEach(bar => {
+                                bar.style.width = bar.getAttribute('data-target-width');
+                            });
+                        }, 100);
+
+                    } else {
+                        quotaGrid.innerHTML = `
+                            <div class="col-span-full p-6 text-center border border-dashed border-dark-border rounded-xl bg-dark-input/50 text-gray-500">
+                                <i class="fa-solid fa-inbox text-2xl mb-2 opacity-50"></i>
+                                <p>Tidak ada detail kuota yang ditemukan untuk nomor ini.</p>
+                            </div>
+                        `;
+                    }
                     resultArea.classList.remove('hidden');
                 } else {
-                    throw new Error("Nomor tidak ditemukan atau format data tidak sesuai.");
+                    throw new Error("Data tidak lengkap atau nomor salah.");
                 }
 
             } catch (error) {
                 console.error(error);
-                errorMsg.textContent = "Gagal mengambil data. Pastikan nomor benar dan link Vercel sudah diubah di dalam kode HTML.";
+                errorText.textContent = isVercel ? "Gagal mengambil data dari server. Pastikan nomor valid." : "Terjadi kesalahan pada sistem.";
                 errorMsg.classList.remove('hidden');
             } finally {
-                // Kembalikan tombol ke semula
                 loading.classList.add('hidden');
                 btnSubmit.disabled = false;
-                btnSubmit.classList.remove('opacity-50');
+                btnSubmit.classList.remove('opacity-70', 'cursor-not-allowed');
+                btnIcon.classList.remove('fa-spinner', 'fa-spin');
+                btnIcon.classList.add('fa-arrow-right');
             }
         });
+
+        // Logika Tombol Cek Stok
+        document.getElementById('btnCekStok').addEventListener('click', async function() {
+            const loadingStok = document.getElementById('loadingStok');
+            const errorMsgStok = document.getElementById('errorMsgStok');
+            const errorTextStok = document.getElementById('errorTextStok');
+            const resultAreaStok = document.getElementById('resultAreaStok');
+            const btnCekStok = document.getElementById('btnCekStok');
+            const btnIcon = btnCekStok.querySelector('i');
+
+            errorMsgStok.classList.add('hidden');
+            resultAreaStok.classList.add('hidden');
+            loadingStok.classList.remove('hidden');
+            
+            btnCekStok.disabled = true;
+            btnCekStok.classList.add('opacity-70', 'cursor-not-allowed');
+            btnIcon.classList.add('fa-spin');
+
+            try {
+                let responseData;
+                const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                if (isVercel) {
+                    const response = await fetch(`/api/stok-akrab`);
+                    if (!response.ok) throw new Error("Gagal terhubung ke API Vercel (Stok).");
+                    responseData = await response.json();
+                } else {
+                    await new Promise(r => setTimeout(r, 1200));
+                    responseData = mockStokPreview; 
+                }
+
+                const stokGrid = document.getElementById('stokGrid');
+                const stokRawContainer = document.getElementById('stokRawContainer');
+                const stokRawOutput = document.getElementById('stokRawOutput');
+                
+                stokGrid.innerHTML = ''; 
+                let stockItems = [];
+
+                if (responseData.data && typeof responseData.data === 'object' && !Array.isArray(responseData.data)) {
+                    for (const [key, value] of Object.entries(responseData.data)) {
+                        stockItems.push({
+                            name: key,
+                            stock: value.stok || value.stock || value.jumlah || value,
+                            status: value.status || (value.stok > 0 ? 'Tersedia' : 'Habis')
+                        });
+                    }
+                } else if (Array.isArray(responseData.data)) {
+                    stockItems = responseData.data.map(item => ({
+                        name: item.name || item.paket || item.title || 'Produk',
+                        stock: item.stock || item.stok || item.jumlah || 0,
+                        status: item.status || (item.stock > 0 ? 'Tersedia' : 'Habis')
+                    }));
+                }
+
+                if (stockItems.length > 0) {
+                    stokGrid.classList.remove('hidden');
+                    stokRawContainer.classList.add('hidden');
+
+                    stockItems.forEach(item => {
+                        const isAvailable = parseInt(item.stock) > 0 || String(item.status).toLowerCase().includes('tersedia');
+                        // Warna Kartu Stok Gelap
+                        const badgeColor = isAvailable ? 'bg-brand-main/10 text-brand-main border-brand-main/30' : 'bg-red-500/10 text-red-400 border-red-500/30';
+                        const iconColor = isAvailable ? 'text-brand-main shadow-[0_0_15px_rgba(0,244,126,0.2)]' : 'text-gray-600';
+                        const icon = isAvailable ? 'fa-box-open' : 'fa-box-archive';
+
+                        const card = `
+                            <div class="bg-dark-input p-5 rounded-2xl border border-dark-border flex items-start gap-4 hover:border-brand-main/30 transition-colors relative overflow-hidden group">
+                                <div class="w-12 h-12 rounded-xl bg-dark-bg flex items-center justify-center flex-shrink-0 border border-dark-border relative z-10 transition-all group-hover:scale-105">
+                                    <i class="fa-solid ${icon} ${iconColor} text-xl transition-all"></i>
+                                </div>
+                                <div class="flex-1 relative z-10">
+                                    <h3 class="font-bold text-white text-base leading-tight mb-2">${item.name}</h3>
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${badgeColor}">
+                                            ${item.status}
+                                        </span>
+                                    </div>
+                                    <div class="bg-dark-bg rounded-lg p-2.5 border border-dark-border inline-flex flex-col min-w-[80px]">
+                                        <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-0.5">Sisa Stok</span>
+                                        <span class="font-black text-xl ${isAvailable ? 'text-brand-main' : 'text-red-400'} leading-none">${typeof item.stock === 'object' ? JSON.stringify(item.stock) : item.stock}</span>
+                                    </div>
+                                </div>
+                                ${!isAvailable ? `<div class="absolute inset-0 bg-dark-bg/60 z-0"></div>` : ''}
+                            </div>
+                        `;
+                        stokGrid.insertAdjacentHTML('beforeend', card);
+                    });
+                } else {
+                    stokGrid.classList.add('hidden');
+                    stokRawContainer.classList.remove('hidden');
+                    stokRawOutput.textContent = JSON.stringify(responseData, null, 2);
+                }
+
+                resultAreaStok.classList.remove('hidden');
+
+            } catch (error) {
+                console.error(error);
+                errorTextStok.textContent = isVercel ? "Gagal mengambil data stok dari server." : "Terjadi kesalahan sistem.";
+                errorMsgStok.classList.remove('hidden');
+            } finally {
+                loadingStok.classList.add('hidden');
+                btnCekStok.disabled = false;
+                btnCekStok.classList.remove('opacity-70', 'cursor-not-allowed');
+                btnIcon.classList.remove('fa-spin');
+            }
+        });
+
+        // ==============================================
+        // Logika Fake Running Text Transaksi
+        // ==============================================
+        function generateFakeTransactions() {
+            // Daftar nama pasaran
+            const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra", "Tari", "Bayu", "Rini", "Fajar", "Maya", "Iwan", "Sari", "Gilang", "Nisa", "Rio", "Dina", "Kevin", "Indah", "Aris", "Wulan", "Surya", "Suci", "Rafi", "Intan", "Yudi", "Mega", "Aditya", "Nurul", "Farhan", "Nadia", "Fikri", "Siska", "Ilham", "Kiki", "Ari", "Ratih"];
+            
+            // Daftar Paket
+            const packages = ["Akrab Mini 10GB", "Akrab Sedang 25GB", "Akrab Besar 65GB", "Akrab Jumbo 147GB", "Akrab Mini 10GB", "Akrab Sedang 25GB"]; 
+            
+            // Prefix Nomor Telepon
+            const prefixes = ["0812", "0813", "0852", "0853", "0811", "0857", "0856", "0815", "0878", "0877", "0859", "0817", "0819", "0838", "0896", "0895", "0898", "0882"];
+
+            let marqueeHTML = "";
+            
+            // Generate 150 transaksi sekaligus
+            for (let i = 0; i < 150; i++) {
+                let name = names[Math.floor(Math.random() * names.length)];
+                let pkg = packages[Math.floor(Math.random() * packages.length)];
+                let prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+                
+                // Sensor nama pembeli (Menyisakan 2 huruf depan + **)
+                let maskedName = name.substring(0, 2) + "**";
+                
+                // Format sensor bintang (Contoh: 0812****4321)
+                let suffix = Math.floor(1000 + Math.random() * 9000); 
+                let phone = `${prefix}****${suffix}`;
+                
+                marqueeHTML += `
+                    <span class="mx-6 text-[11px] md:text-xs text-gray-400 font-medium tracking-wide">
+                        <i class="fa-solid fa-cart-shopping text-brand-main mr-2"></i>
+                        <span class="text-gray-200">${maskedName}</span> <span class="opacity-70">(${phone})</span> sukses membeli <span class="text-brand-main font-bold">${pkg}</span>
+                    </span>
+                    <span class="text-dark-border text-[10px]">●</span>
+                `;
+            }
+            
+            // Suntikkan ke dalam kontainer running text
+            const container = document.getElementById('runningTextContainer');
+            if (container) container.innerHTML = marqueeHTML;
+        }
+
+        // Eksekusi pembuat data palsu saat halaman diakses
+        generateFakeTransactions();
     </script>
 </body>
 </html>
