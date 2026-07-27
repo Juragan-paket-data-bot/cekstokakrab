@@ -444,52 +444,50 @@
                 let stockItems = [];
                 let dataToParse = responseData.data || responseData;
 
+                const kamusPaket = {
+                    'XLA14': 'Akrab Mini 14GB',
+                    'XLA20': 'Akrab Sedang 20GB',
+                    'XLA32': 'Akrab Besar 32GB',
+                    'XLA39': 'Akrab Besar 39GB',
+                    'XLA48': 'Akrab Jumbo 48GB',
+                    'XLA55': 'Akrab Jumbo 55GB',
+                    'XLA64': 'Akrab Super 64GB',
+                    'XLA65': 'Akrab Super 65GB',
+                    'XLA77': 'Akrab Ekstra 77GB',
+                    'XLA89': 'Akrab Ekstra 89GB'
+                };
+
                 if (Array.isArray(dataToParse)) {
                     stockItems = dataToParse.map(item => {
                         let valCode = item.sku || item.kode || item.code || item.id || '-';
-                        let valName = item.nama || item.name || item.paket || item.title || item.produk || '';
-                        let valDesc = item.keterangan || item.desc || item.description || item.catatan || '';
                         let valStock = item.stok || item.stock || item.qty || item.sisa || item.slot || item.jumlah || null;
+                        let valName = item.nama || item.name || item.paket || item.title || '';
                         
-                        if (!valName) {
-                            let longestString = "";
-                            for (let key in item) {
-                                if (typeof item[key] === 'string' && key.toLowerCase() !== 'sku' && key.toLowerCase() !== 'kode' && item[key].length > longestString.length && !item[key].match(/^\d+$/)) {
-                                    longestString = item[key];
-                                }
-                            }
-                            valName = longestString || 'Produk Juragan';
+                        // Jika dari API tidak ada nama, ambil dari Kamus
+                        if (!valName || valName === valStock) {
+                            valName = kamusPaket[valCode] || (valCode !== '-' ? 'Paket ' + valCode : 'Produk Juragan');
                         }
                         
-                        let numStock = 0;
-                        if (valStock !== null) {
-                            numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
-                        } else {
-                            valStock = 'Cek';
-                        }
-                        
-                        if (!valDesc) valDesc = 'Paket Akrab / Injeksi Data';
+                        // Mengekstrak angka murni dari teks "191 unit" menjadi 191
+                        let numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
 
-                        return { code: valCode, name: valName, desc: valDesc, stock: valStock, numStock: numStock };
+                        return { code: valCode, name: valName, stock: valStock, numStock: numStock };
                     });
                 } else if (dataToParse && typeof dataToParse === 'object') {
                     for (const [key, value] of Object.entries(dataToParse)) {
-                        let valCode = key.length <= 10 && !key.includes(' ') ? key : '-';
-                        let valName = (valCode === key) ? 'Paket Data' : key;
-                        let valDesc = 'Status ketersediaan layanan';
+                        let valCode = key;
                         let valStock = value;
-                        let numStock = 0;
+                        let valName = kamusPaket[key] || 'Paket ' + key;
                         
                         if (typeof value === 'object' && value !== null) {
-                            valCode = value.sku || value.kode || value.code || valCode;
-                            valName = value.nama || value.name || value.paket || valName;
-                            valDesc = value.keterangan || value.desc || value.description || value.catatan || valDesc;
-                            valStock = value.stok || value.stock || value.qty || value.sisa || value.slot || 0;
+                            valCode = value.sku || value.kode || key;
+                            valName = value.nama || value.name || valName;
+                            valStock = value.stok || value.stock || value.sisa || 0;
                         }
                         
-                        numStock = typeof valStock === 'string' ? (parseInt(String(valStock).replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
+                        let numStock = typeof valStock === 'string' ? (parseInt(String(valStock).replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
                         
-                        stockItems.push({ code: valCode, name: valName, desc: valDesc, stock: valStock, numStock: numStock });
+                        stockItems.push({ code: valCode, name: valName, stock: valStock, numStock: numStock });
                     }
                 }
 
@@ -499,28 +497,29 @@
 
                     stockItems.forEach(item => {
                         const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia') || String(item.stock).toLowerCase().includes('open');
+                        
+                        const statusBadge = isAvailable ? 'READY' : 'KOSONG';
+                        const badgeColor = isAvailable ? 'bg-brand-main/10 text-brand-main border border-brand-main/30' : 'bg-red-500/10 text-red-400 border border-red-500/30';
                         const stockColor = isAvailable ? 'text-brand-main' : 'text-red-400';
-                        const bgHover = isAvailable ? 'hover:border-brand-main/50' : 'hover:border-red-500/30';
-                        const codeBadge = item.code !== '-' ? item.code : 'SKU';
+                        const bgHover = isAvailable ? 'hover:border-brand-main/40' : 'hover:border-red-500/30';
 
                         const card = `
-                            <div class="bg-dark-input p-4 rounded-xl border border-dark-border flex flex-row items-center justify-between ${bgHover} transition-all group relative overflow-hidden shadow-sm">
-                                ${!isAvailable ? '<div class="absolute inset-0 bg-dark-bg/60 z-0"></div>' : ''}
-                                
-                                <div class="flex flex-col flex-1 pr-4 relative z-10">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="px-2 py-0.5 bg-dark-bg border border-dark-border rounded text-[10px] font-mono text-gray-400 group-hover:text-white transition-colors" title="Kode Produk">${codeBadge}</span>
-                                        <h3 class="font-bold text-white text-sm md:text-base leading-tight truncate">${item.name}</h3>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 text-[11px] md:text-xs text-gray-500">
-                                        <i class="fa-solid fa-circle-info text-[10px] opacity-70"></i>
-                                        <span class="truncate" title="${item.desc}">${item.desc}</span>
+                            <div class="bg-dark-input p-4 rounded-xl border border-dark-border flex flex-row items-center justify-between ${bgHover} transition-all shadow-sm">
+                                <!-- Info Kiri -->
+                                <div class="flex flex-col gap-1.5">
+                                    <h3 class="font-bold text-white text-base md:text-lg leading-none tracking-tight">${item.name}</h3>
+                                    <span class="text-xs text-gray-500 font-medium">Kode : <span class="text-gray-300 font-mono tracking-wider">${item.code}</span></span>
+                                    <div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wider ${badgeColor}">
+                                            ${statusBadge}
+                                        </span>
                                     </div>
                                 </div>
                                 
-                                <div class="flex flex-col items-end justify-center text-right border-l border-dark-border pl-4 relative z-10 min-w-[80px] md:min-w-[100px]">
-                                    <span class="text-[9px] uppercase tracking-widest text-gray-500 font-bold mb-1">Sisa Slot</span>
-                                    <span class="text-lg md:text-xl font-black ${stockColor} leading-none tracking-tight">${item.stock}</span>
+                                <!-- Slot Kanan -->
+                                <div class="text-right flex flex-col justify-center border-l border-dark-border/60 pl-4 min-w-[90px]">
+                                    <span class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Sisa Slot</span>
+                                    <span class="text-2xl font-black ${stockColor} leading-none tracking-tighter">${item.numStock}</span>
                                 </div>
                             </div>
                         `;
