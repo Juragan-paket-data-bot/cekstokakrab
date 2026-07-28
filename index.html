@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport mengizinkan zoom in, tapi mencegah zoom out melebihi skala awal -->
+    <!-- Viewport mengizinkan zoom in (sampai 5x), tapi mencegah zoom out melebihi skala awal (1.0) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#041016">
     <title>Sistem Juragan Paket Data</title>
@@ -68,8 +68,6 @@
             overflow-x: hidden; 
             margin: 0;
             padding: 0;
-            /* Aturan overflow-y, overscroll-behavior, dan touch-action telah dihapus 
-               agar usapan (swipe) atas-bawah di layar berfungsi normal */
         }
         
         /* Modifikasi Scrollbar Custom */
@@ -79,7 +77,6 @@
     </style>
 </head>
 
-<!-- STRUKTUR UTAMA -->
 <!-- Menggunakan min-h-[100dvh] agar menyesuaikan tinggi layar HP asli (termasuk address bar) -->
 <body class="bg-dark-bg text-gray-200 antialiased flex flex-col font-sans selection:bg-brand-main selection:text-black w-full relative min-h-[100dvh]">
 
@@ -120,13 +117,16 @@
         
         <div class="bg-dark-card rounded-2xl md:rounded-3xl shadow-2xl border border-dark-border flex flex-col overflow-hidden relative w-full mb-8">
             
-            <!-- Tab Navigasi -->
+            <!-- Tab Navigasi - Ditambahkan Tab ke-3 (Cek Area) -->
             <div class="flex border-b border-dark-border bg-dark-bg/50 h-12 md:h-14 w-full">
-                <button id="tabBtnStok" class="flex-1 text-xs md:text-base font-semibold text-brand-main border-b-2 border-brand-main bg-brand-main/5 transition-all flex items-center justify-center gap-1.5 outline-none">
+                <button id="tabBtnStok" class="flex-1 text-[10px] md:text-base font-semibold text-brand-main border-b-2 border-brand-main bg-brand-main/5 transition-all flex items-center justify-center gap-1 md:gap-1.5 outline-none">
                     <i class="fa-solid fa-boxes-stacked"></i>Stok Akrab
                 </button>
-                <button id="tabBtnKuota" class="flex-1 text-xs md:text-base font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-all flex items-center justify-center gap-1.5 outline-none">
+                <button id="tabBtnKuota" class="flex-1 text-[10px] md:text-base font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-all flex items-center justify-center gap-1 md:gap-1.5 outline-none">
                     <i class="fa-solid fa-mobile-screen"></i>Cek Kuota
+                </button>
+                <button id="tabBtnArea" class="flex-1 text-[10px] md:text-base font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-all flex items-center justify-center gap-1 md:gap-1.5 outline-none">
+                    <i class="fa-solid fa-map-location-dot"></i>Cek Area
                 </button>
             </div>
 
@@ -177,14 +177,13 @@
                     <span class="text-brand-main text-xs animate-pulse tracking-wide">Mencari...</span>
                 </div>
                 
-                <div id="errorMsg" class="hidden mt-4 w-full max-w-lg mx-auto bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-xs items-center gap-2">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <span id="errorText">Terjadi kesalahan. Silakan coba lagi.</span>
+                <div id="errorMsg" class="hidden mt-4 w-full max-w-lg mx-auto bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-[11px] md:text-xs items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation shrink-0"></i>
+                    <span id="errorText">Nomor yang diinput salah atau sistem sedang dalam gangguan.</span>
                 </div>
 
                 <!-- Hasil Cek Kuota -->
                 <div id="resultArea" class="hidden flex-col gap-4 w-full mt-2">
-                    
                     <!-- Info Kartu -->
                     <div class="bg-dark-card p-4 rounded-2xl border border-dark-border shadow-lg w-full">
                         <h2 class="text-sm font-bold text-white mb-3 border-b border-dark-border pb-2 flex items-center gap-2">
@@ -224,11 +223,41 @@
                 </div>
             </div> <!-- Akhir Tab Cek Kuota -->
 
+            <!-- ============================================== -->
+            <!-- TAB: CEK AREA (FITUR BARU) -->
+            <!-- ============================================== -->
+            <div id="tabContentArea" class="hidden flex-col p-4 md:p-6 bg-dark-bg/30 w-full relative">
+                
+                <!-- Kolom Pencarian -->
+                <div class="relative w-full max-w-4xl mx-auto mb-4">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    <input type="text" id="inputSearchArea" placeholder="Ketik Kota, Kabupaten, atau Provinsi..." 
+                        class="w-full pl-10 pr-4 py-3 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-1 focus:ring-brand-main focus:border-brand-main transition-all font-medium text-white placeholder-gray-500 text-xs md:text-sm">
+                </div>
+
+                <!-- Container Hasil Pencarian (Berbentuk Tabel Klasik) -->
+                <div class="w-full max-w-4xl mx-auto mt-2 overflow-x-auto rounded-xl border border-dark-border bg-dark-card shadow-lg mb-8">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead class="bg-[#122533] border-b border-dark-border">
+                            <tr>
+                                <th class="px-4 py-3.5 text-brand-main text-xs font-bold uppercase tracking-wider w-1/4">Provinsi</th>
+                                <th class="px-4 py-3.5 text-brand-main text-xs font-bold uppercase tracking-wider w-2/4">Kota / Kabupaten</th>
+                                <th class="px-4 py-3.5 text-brand-main text-xs font-bold uppercase tracking-wider text-center w-1/4">Area</th>
+                            </tr>
+                        </thead>
+                        <tbody id="areaTableBody" class="divide-y divide-dark-border/50">
+                            <!-- Item area di-inject via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div> <!-- Akhir Tab Cek Area -->
+
         </div>
     </div>
 
     <script>
-        // Data Mockup Preview
+        // Data Mockup Preview Kuota & Stok
         const mockDataPreview = {
             "success":true,"code":"000","message":"Sukses",
             "data":{
@@ -248,13 +277,6 @@
                                 {"name":"Kuota Bersama","percent":80,"total":"15GB","remaining":"12GB"},
                                 {"name":"Kuota Pribadi","percent":50,"total":"2GB","remaining":"1GB"}
                             ]
-                        },
-                        {
-                            "name":"Extra Kuota Tiktok",
-                            "expiry":"31-12-2024",
-                            "quotas":[
-                                {"name":"Kuota Tiktok 24 Jam","percent":20,"total":"5GB","remaining":"1GB"}
-                            ]
                         }
                     ]
                 }
@@ -266,42 +288,169 @@
             "data": [
                 { "sku": "XLA14", "nama": "SuperMini", "stok": "71" },
                 { "sku": "XLA20", "nama": "SuperMini V2", "stok": "0" },
-                { "sku": "XLA32", "nama": "Mini", "stok": "282" },
-                { "sku": "XLA39", "nama": "Big", "stok": "816" },
-                { "sku": "XLA48", "nama": "Big V2", "stok": "247" },
-                { "sku": "XLA55", "nama": "Jumbo V2", "stok": "515" },
-                { "sku": "XLA64", "nama": "Jumbo V3", "stok": "349" },
-                { "sku": "XLA65", "nama": "JUMBO", "stok": "0" },
-                { "sku": "XLA77", "nama": "Megabig V2", "stok": "306" },
-                { "sku": "XLA89", "nama": "MegaBig", "stok": "317" }
+                { "sku": "XLA32", "nama": "Mini", "stok": "282" }
             ]
         };
 
-        // --- Logika Tab ---
-        const tabBtnKuota = document.getElementById('tabBtnKuota');
-        const tabBtnStok = document.getElementById('tabBtnStok');
-        const tabContentKuota = document.getElementById('tabContentKuota');
-        const tabContentStok = document.getElementById('tabContentStok');
+        // --- Data Cek Area (Data Asli dari Anda) ---
+        const dataArea = [
+            {"prov": "Banten", "kota": "Kota Tangerang Selatan, Kota Tangerang, Kab. Tangerang, Kab. Pandeglang, Kab. Lebak, Kab. Serang, Kota Serang, Kota Cilegon", "area": "2"},
+            {"prov": "DI Yogyakarta", "kota": "Kab. Kulon Progo, Kota Yogyakarta, Kab. Sleman, Kab. Bantul, Kab. Gunungkidul", "area": "1"},
+            {"prov": "DKI Jakarta", "kota": "Kota Jakarta Pusat, Kota Jakarta Selatan, Kota Jakarta Barat, Kota Jakarta Timur, Kota Jakarta Utara", "area": "2"},
+            {"prov": "DKI Jakarta", "kota": "Kab. Kepulauan Seribu", "area": "3"},
+            {"prov": "Jawa Barat", "kota": "Kab. Bandung, Kab. Kuningan, Kab. Purwakarta, Kota Bandung", "area": "1"},
+            {"prov": "Jawa Barat", "kota": "Kab. Bandung Barat, Kota Cimahi, Kab. Cirebon, Kota Cirebon, Kab. Indramayu, Kab. Subang", "area": "2"},
+            {"prov": "Jawa Barat", "kota": "Kab. Bogor, Kota Bogor, Kota Depok, Kota Bekasi, Kota Banjar, Kab. Ciamis, Kota Tasikmalaya, Kab. Majalengka, Kab. Sumedang, Kab. Bekasi, Kab. Tasikmalaya, Kab. Garut", "area": "3"},
+            {"prov": "Jawa Barat", "kota": "Kab. Cianjur, Kab. Pangandaran, Kab. Karawang, Kota Sukabumi, Kab. Sukabumi", "area": "4"},
+            {"prov": "Jawa Tengah", "kota": "Kab. Tegal, Kota Surakarta, Kota Tegal, Kab. Brebes, Kab. Kebumen, Kab. Pemalang, Kota Semarang", "area": "2"},
+            {"prov": "Jawa Tengah", "kota": "Kab. Boyolali, Kota Salatiga, Kab. Semarang, Kab. Cilacap, Kab. Grobogan, Kab. Kendal, Kab. Rembang", "area": "3"},
+            {"prov": "Jawa Tengah", "kota": "Kota Pekalongan, Kab. Pekalongan, Kab. Batang, Kab. Purbalingga, Kab. Kudus, Kab. Sukoharjo, Kab. Klaten, Kota Magelang, Kab. Banyumas, Kab. Magelang, Kab. Temanggung, Kab. Sragen, Kab. Banjarnegara, Kab. Karanganyar, Kab. Wonosobo, Kab. Jepara, Kab. Demak, Kab. Purworejo, Kab. Blora, Kab. Wonogiri, Kab. Pati", "area": "4"},
+            {"prov": "Jawa Timur", "kota": "Kota Probolinggo, Kab. Bangkalan, Kab. Sidoarjo, Kab. Banyuwangi, Kota Surabaya, Kab. Sampang, Kab. Pamekasan, Kab. Sumenep, Kab. Pacitan", "area": "2"},
+            {"prov": "Jawa Timur", "kota": "Kab. Lumajang, Kab. Probolinggo", "area": "3"},
+            {"prov": "Jawa Timur", "kota": "Kab. Jombang, Kota Blitar, Kab. Blitar, Kota Kediri, Kab. Lamongan, Kab. Kediri, Kab. Ngawi, Kab. Mojokerto, Kota Mojokerto, Kab. Magetan, Kab. Gresik, Kab. Tulungagung, Kab. Nganjuk, Kab. Pasuruan, Kota Pasuruan, Kab. Bojonegoro, Kab. Madiun, Kab. Bondowoso, Kab. Tuban, Kota Madiun, Kab. Situbondo, Kab. Jember, Kota Malang, Kab. Malang, Kab. Ponorogo, Kota Batu, Kab. Trenggalek", "area": "4"},
+            {"prov": "Bengkulu", "kota": "Kab. Seluma", "area": "3"},
+            {"prov": "Bengkulu", "kota": "Kab. Bengkulu Selatan, Kab. Kaur, Kab. Lebong, Kab. Rejang Lebong, Kab. Bengkulu Tengah, Kota Bengkulu, Kab. Bengkulu Utara, Kab. Kepahiang, Kab. Muko Muko", "area": "4"},
+            {"prov": "Jambi", "kota": "Kab. Batanghari, Kota Jambi, Kab. Tanjung Jabung Barat, Kab. Muaro Jambi, Kab. Sarolangun", "area": "3"},
+            {"prov": "Jambi", "kota": "Kab. Tanjung Jabung Timur, Kab. Kerinci, Kab. Bungo, Kab. Tebo, Kab. Merangin, Kota Sungai Penuh", "area": "4"},
+            {"prov": "Kepulauan Bangka Belitung", "kota": "Kab. Bangka Selatan, Kota Pangkal Pinang, Kab. Belitung, Kab. Belitung Timur", "area": "2"},
+            {"prov": "Kepulauan Bangka Belitung", "kota": "Kab. Bangka, Kab. Bangka Tengah, Kab. Bangka Barat", "area": "3"},
+            {"prov": "Kepulauan Riau", "kota": "Kota Batam", "area": "2"},
+            {"prov": "Kepulauan Riau", "kota": "Kab. Karimun, Kab. Bintan, Kota Tanjung Pinang", "area": "3"},
+            {"prov": "Kepulauan Riau", "kota": "Kab. Lingga, Kab. Kepulauan Anambas, Kab. Natuna", "area": "4"},
+            {"prov": "Lampung", "kota": "Kab. Lampung Tengah, Kab. Pringsewu, Kota Metro, Kab. Pesawaran, Kab. Lampung Selatan, Kota Bandar Lampung", "area": "3"},
+            {"prov": "Lampung", "kota": "Kab. Lampung Barat, Kab. Lampung Timur, Kab. Tulang Bawang Barat, Kab. Way Kanan, Kab. Tulang Bawang, Kab. Tanggamus, Kab. Pesisir Barat, Kab. Lampung Utara, Kab. Mesuji", "area": "4"},
+            {"prov": "Nanggroe Aceh Darussalam", "kota": "Kab. Aceh Barat Daya, Kab. Aceh Besar, Kota Sabang, Kab. Gayo Lues", "area": "2"},
+            {"prov": "Nanggroe Aceh Darussalam", "kota": "Kab. Aceh Jaya, Kab. Aceh Selatan, Kab. Aceh Tenggara, Kab. Nagan Raya, Kota Banda Aceh", "area": "3"},
+            {"prov": "Nanggroe Aceh Darussalam", "kota": "Kab. Aceh Barat, Kab. Aceh Singkil, Kab. Aceh Tamiang, Kab. Aceh Tengah, Kota Subulussalam, Kab. Bener Meriah, Kab. Aceh Utara, Kota Lhokseumawe, Kab. Pidie, Kab. Aceh Timur, Kab. Simeulue, Kota Langsa, Kab. Bireuen, Kab. Pidie Jaya", "area": "4"},
+            {"prov": "Riau", "kota": "Kota Pekanbaru", "area": "2"},
+            {"prov": "Riau", "kota": "Kab. Kuantan Singingi, Kab. Pelalawan, Kab. Kampar, Kab. Siak, Kota Dumai, Kab. Rokan Hilir, Kab. Indragiri Hulu, Kab. Kepulauan Meranti, Kab. Bengkalis", "area": "3"},
+            {"prov": "Riau", "kota": "Kab. Rokan Hulu, Kab. Indragiri Hilir", "area": "4"},
+            {"prov": "Sumatera Barat", "kota": "Kab. Kepulauan Mentawai", "area": "2"},
+            {"prov": "Sumatera Barat", "kota": "Kota Payakumbuh, Kota Padang Panjang, Kab. Sijunjung, Kab. Padang Pariaman, Kota Padang, Kab. Solok Selatan", "area": "3"},
+            {"prov": "Sumatera Barat", "kota": "Kab. Pasaman Barat, Kab. Pasaman, Kab. Lima Puluh Kota, Kab. Tanah Datar, Kab. Dharmasraya, Kota Solok, Kab. Agam, Kab. Solok, Kota Bukittinggi, Kota Pariaman, Kota Sawahlunto, Kab. Pesisir Selatan", "area": "4"},
+            {"prov": "Sumatera Selatan", "kota": "Kab. Ogan Komering Ilir, Kab. Penukal Abab Lematang Ilir, Kab. Banyuasin, Kota Palembang, Kab. Ogan Ilir", "area": "3"},
+            {"prov": "Sumatera Selatan", "kota": "Kab. Ogan Komering Ulu Timur, Kab. Ogan Komering Ulu Selatan, Kab. Ogan Komering Ulu, Kab. Musi Rawas, Kab. Musi Rawas Utara, Kab. Empat Lawang, Kota Pagar Alam, Kota Lubuk Linggau, Kab. Musi Banyuasin, Kab. Muara Enim, Kab. Lahat, Kota Prabumulih", "area": "4"},
+            {"prov": "Sumatera Utara", "kota": "Kab. Karo, Kota Medan, Kab. Dairi", "area": "2"},
+            {"prov": "Sumatera Utara", "kota": "Kota Binjai, Kota Tebing Tinggi, Kab. Serdang Bedagai, Kab. Langkat, Kab. Deli Serdang, Kab. Batu Bara, Kota Tanjung Balai, Kab. Asahan, Kota Gunungsitoli, Kab. Nias Barat, Kab. Nias Selatan, Kab. Nias Utara", "area": "3"},
+            {"prov": "Sumatera Utara", "kota": "Kab. Pakpak Bharat, Kab. Mandailing Natal, Kab. Padang Lawas, Kab. Labuhanbatu Utara, Kota Padangsidimpuan, Kab. Tapanuli Selatan, Kab. Labuhanbatu Selatan, Kab. Labuhanbatu, Kab. Tapanuli Utara, Kab. Padang Lawas Utara, Kab. Humbang Hasundutan, Kab. Simalungun, Kab. Toba Samosir, Kota Pematangsiantar, Kab. Tapanuli Tengah, Kab. Samosir, Kota Sibolga, Kab. Nias", "area": "4"},
+            {"prov": "Kalimantan Barat", "kota": "Kab. Sekadau, Kab. Kapuas Hulu, Kab. Sintang, Kab. Bengkayang, Kab. Melawi, Kab. Sambas, Kab. Sanggau, Kab. Kubu Raya, Kota Pontianak, Kab. Kayong Utara, Kab. Landak, Kab. Mempawah, Kota Singkawang, Kab. Ketapang", "area": "4"},
+            {"prov": "Kalimantan Selatan", "kota": "Kab. Hulu Sungai Tengah, Kab. Tapin, Kab. Hulu Sungai Utara, Kab. Tabalong, Kota Banjarmasin, Kab. Banjar, Kab. Tanah Bumbu, Kota Banjarbaru, Kab. Hulu Sungai Selatan", "area": "2"},
+            {"prov": "Kalimantan Selatan", "kota": "Kab. Balangan, Kab. Barito Kuala, Kab. Tanah Laut, Kab. Kotabaru", "area": "3"},
+            {"prov": "Kalimantan Tengah", "kota": "Kab. Kapuas, Kab. Pulang Pisau, Kota Palangkaraya", "area": "3"},
+            {"prov": "Kalimantan Tengah", "kota": "Kab. Seruyan, Kab. Kotawaringin Barat, Kab. Katingan, Kab. Kotawaringin Timur, Kab. Sukamara, Kab. Lamandau, Kab. Murung Raya, Kab. Barito Timur, Kab. Barito Utara, Kab. Barito Selatan, Kab. Gunung Mas", "area": "4"},
+            {"prov": "Kalimantan Timur", "kota": "Kab. Penajam Paser Utara, Kota Balikpapan, Kab. Paser, Kab. Kutai Kartanegara, Kota Samarinda, Kota Bontang, Kab. Berau, Kab. Kutai Timur, Kab. Kutai Barat, Kab. Mahakam Ulu", "area": "4"},
+            {"prov": "Kalimantan Utara", "kota": "Kab. Tana Tidung, Kab. Malinau, Kab. Bulungan, Kota Tarakan, Kab. Nunukan", "area": "4"},
+            {"prov": "Gorontalo", "kota": "Kab. Pahuwato, Kab. Boalemo, Kab. Gorontalo, Kota Gorontalo, Kab. Gorontalo Utara, Kab. Bone Bolango", "area": "4"},
+            {"prov": "Sulawesi Barat", "kota": "Kab. Mamuju Tengah", "area": "2"},
+            {"prov": "Sulawesi Barat", "kota": "Kab. Majene, Kab. Polewali Mandar, Kab. Mamuju Utara", "area": "3"},
+            {"prov": "Sulawesi Barat", "kota": "Kab. Mamuju, Kab. Mamasa", "area": "4"},
+            {"prov": "Sulawesi Selatan", "kota": "Kab. Barru, Kota Pare Pare, Kab. Pinrang", "area": "2"},
+            {"prov": "Sulawesi Selatan", "kota": "Kab. Sinjai, Kab. Enrekang, Kab. Sidenreng Rappang, Kab. Luwu Timur, Kab. Soppeng, Kab. Tana Toraja", "area": "3"},
+            {"prov": "Sulawesi Selatan", "kota": "Kab. Kepulauan Selayar, Kab. Takalar, Kab. Jeneponto, Kab. Bulukumba, Kab. Pangkajene Kepulauan, Kota Makassar, Kab. Gowa, Kab. Maros, Kab. Bone, Kab. Wajo, Kab. Luwu, Kab. Luwu Utara, Kota Palopo, Kab. Toraja Utara", "area": "4"},
+            {"prov": "Sulawesi Tengah", "kota": "Kab. Banggai Kepulauan, Kab. Banggai Laut, Kota Palu, Kab. Toli Toli, Kab. Tojo Una Una, Kab. Morowali, Kab. Morowali Utara", "area": "3"},
+            {"prov": "Sulawesi Tengah", "kota": "Kab. Banggai, Kab. Parigi Moutong, Kab. Donggala, Kab. Sigi, Kab. Poso, Kab. Buol", "area": "4"},
+            {"prov": "Sulawesi Tenggara", "kota": "Kab. Konawe Kepulauan, Kab. Konawe Utara, Kab. Buton Utara, Kab. Wakatobi", "area": "2"},
+            {"prov": "Sulawesi Tenggara", "kota": "Kota Bau Bau, Kab. Muna, Kab. Buton Selatan, Kab. Buton Tengah, Kab. Muna Barat", "area": "3"},
+            {"prov": "Sulawesi Tenggara", "kota": "Kab. Kolaka, Kab. Kolaka Utara, Kab. Konawe, Kab. Konawe Selatan, Kota Kendari, Kab. Kolaka Timur, Kab. Buton, Kab. Bombana", "area": "4"},
+            {"prov": "Sulawesi Utara", "kota": "Kab. Bolaang Mongondow, Kab. Bolaang Mongondow Selatan, Kota Kotamobagu, Kab. Minahasa Selatan, Kab. Bolaang Mongondow Timur, Kab. Minahasa Tenggara, Kab. Bolaang Mongondow Utara, Kota Tomohon, Kab. Minahasa, Kota Manado, Kab. Minahasa Utara, Kota Bitung, Kab. Kepulauan Sangihe, Kab. Kepulauan Talaud, Kab. Siau Tagulandang Biaro", "area": "4"},
+            {"prov": "Bali", "kota": "Kab. Jembrana, Kab. Buleleng", "area": "1"},
+            {"prov": "Bali", "kota": "Kab. Badung, Kab. Karangasem, Kab. Tabanan, Kab. Bangli, Kab. Gianyar, Kab. Klungkung, Kota Denpasar", "area": "2"},
+            {"prov": "Nusa Tenggara Barat", "kota": "Kab. Lombok Barat, Kab. Lombok Timur, Kota Mataram, Kab. Lombok Tengah, Kab. Lombok Utara, Kab. Sumbawa Barat, Kab. Sumbawa, Kota Bima, Kab. Dompu", "area": "2"},
+            {"prov": "Nusa Tenggara Barat", "kota": "Kab. Bima", "area": "4"},
+            {"prov": "Nusa Tenggara Timur", "kota": "Kab. Alor, Kota Kupang, Kab. Kupang, Kab. Malaka, Kab. Manggarai Barat, Kab. Timor Tengah Selatan, Kab. Belu, Kab. Sikka, Kab. Timor Tengah Utara, Kab. Lembata, Kab. Manggarai Timur, Kab. Ende, Kab. Sumba Barat Daya, Kab. Rote Ndao, Kab. Nagekeo, Kab. Flores Timur, Kab. Ngada, Kab. Sumba Tengah, Kab. Manggarai, Kab. Sumba Barat, Kab. Sumba Timur, Kab. Sabu Raijua", "area": "4"},
+            {"prov": "Maluku", "kota": "Kab. Maluku Tenggara Barat, Kab. Kepulauan Aru, Kota Tual, Kab. Seram Bagian Barat, Kab. Maluku Tengah, Kab. Seram Bagian Timur, Kota Ambon, Kab. Maluku Tenggara, Kab. Maluku Barat Daya, Kab. Buru Selatan, Kab. Buru", "area": "1"},
+            {"prov": "Maluku Utara", "kota": "Kab. Halmahera Barat, Kab. Halmahera Utara, Kab. Kepulauan Sula, Kab. Halmahera Timur, Kab. Pulau Taliabu, Kab. Halmahera Selatan, Kota Tidore Kepulauan, Kota Ternate, Kab. Halmahera Tengah, Kab. Pulau Morotai", "area": "1"},
+            {"prov": "Papua", "kota": "Kab. Asmat, Kab. Jayapura, Kab. Mimika, Kab. Keerom, Kab. Biak Numfor, Kota Jayapura, Kab. Kepulauan Yapen, Kab. Boven Digoel, Kab. Merauke, Kab. Deiyai, Kab. Dogiyai, Kab. Intan Jaya, Kab. Jayawijaya, Kab. Lanny Jaya, Kab. Mamberamo Raya, Kab. Mamberamo Tengah, Kab. Mappi, Kab. Nabire, Kab. Nduga, Kab. Paniai, Kab. Pegunungan Bintang, Kab. Puncak, Kab. Puncak Jaya, Kab. Sarmi, Kab. Supiori, Kab. Tolikara, Kab. Waropen, Kab. Yahukimo, Kab. Yalimo", "area": "1"},
+            {"prov": "Papua Barat", "kota": "Kab. Teluk Bintuni, Kab. Sorong Selatan, Kab. Sorong, Kab. Teluk Wondama, Kota Sorong, Kab. Manokwari, Kab. Fak Fak, Kab. Kaimana, Kab. Manokwari Selatan, Kab. Maybrat, Kab. Pegunungan Arfak, Kab. Raja Ampat, Kab. Tambrauw", "area": "1"}
+        ];
 
-        function switchTab(activeBtn, inactiveBtn, activeContent, inactiveContent) {
-            activeBtn.classList.add('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
-            activeBtn.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-300');
-            inactiveBtn.classList.remove('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
-            inactiveBtn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-300');
-            
-            activeContent.classList.remove('hidden');
-            inactiveContent.classList.add('hidden');
-            
-            if(activeContent.id === 'tabContentStok' || activeContent.id === 'tabContentKuota') {
-                activeContent.classList.add('flex');
-            }
-            inactiveContent.classList.remove('flex');
+        // --- Logika Multi-Tab System ---
+        const tabs = [
+            { btn: document.getElementById('tabBtnStok'), content: document.getElementById('tabContentStok') },
+            { btn: document.getElementById('tabBtnKuota'), content: document.getElementById('tabContentKuota') },
+            { btn: document.getElementById('tabBtnArea'), content: document.getElementById('tabContentArea') }
+        ];
+
+        function switchTab(activeBtnId) {
+            tabs.forEach(tab => {
+                if (tab.btn.id === activeBtnId) {
+                    tab.btn.classList.add('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
+                    tab.btn.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-300');
+                    tab.content.classList.remove('hidden');
+                    tab.content.classList.add('flex');
+                } else {
+                    tab.btn.classList.remove('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
+                    tab.btn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-300');
+                    tab.content.classList.add('hidden');
+                    tab.content.classList.remove('flex');
+                }
+            });
         }
 
-        tabBtnKuota.addEventListener('click', () => switchTab(tabBtnKuota, tabBtnStok, tabContentKuota, tabContentStok));
-        tabBtnStok.addEventListener('click', () => switchTab(tabBtnStok, tabBtnKuota, tabContentStok, tabContentKuota));
+        tabs.forEach(tab => {
+            tab.btn.addEventListener('click', () => switchTab(tab.btn.id));
+        });
 
-        // --- Logika Cek Kuota (Membaca Multi Paket) ---
+        // --- LOGIKA CEK AREA ---
+        function renderTableArea(data, keyword = '') {
+            const container = document.getElementById('areaTableBody');
+            
+            if (data.length === 0) {
+                container.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500 text-xs py-8 italic">Area tidak ditemukan. Silakan coba kata kunci lain.</td></tr>`;
+                return;
+            }
+
+            // Fungsi untuk mengamankan karakter khusus agar pencarian tidak error (misal jika mengetik tanda kurung)
+            const escapeRegExp = (string) => {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            };
+
+            // Fungsi untuk memberikan warna kuning pada kata yang sedang dicari
+            const highlight = (text, kw) => {
+                if (!kw || kw.trim() === '') return text;
+                const safeKw = escapeRegExp(kw);
+                const regex = new RegExp(`(${safeKw})`, 'gi');
+                // Mengganti kata yang cocok dengan span berwarna kuning tebal
+                return text.replace(regex, `<span class="text-yellow-400 font-black bg-yellow-400/10 px-0.5 rounded shadow-sm">$1</span>`);
+            };
+            
+            // Render menjadi desain Tabel Klasik
+            container.innerHTML = data.map(item => `
+                <tr class="hover:bg-[#122533]/60 transition-colors">
+                    <td class="px-4 py-4 text-white text-[11.5px] md:text-sm font-bold align-top whitespace-nowrap">
+                        <i class="fa-solid fa-map-location-dot text-gray-500 mr-1.5"></i>${highlight(item.prov, keyword)}
+                    </td>
+                    <td class="px-4 py-4 text-gray-300 text-[11px] md:text-xs leading-[1.7] align-top">
+                        ${highlight(item.kota, keyword)}
+                    </td>
+                    <td class="px-4 py-4 align-top text-center">
+                        <span class="inline-block bg-brand-main/10 text-brand-main border border-brand-main/30 px-2.5 py-1 rounded-md text-[11px] md:text-xs font-bold whitespace-nowrap shadow-[0_0_8px_rgba(0,244,126,0.15)]">
+                            Area ${highlight(item.area, keyword)}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 1. Tampilkan semua data saat dimuat pertama kali
+        renderTableArea(dataArea);
+
+        // 2. Filter saat pengguna mengetik huruf
+        document.getElementById('inputSearchArea').addEventListener('input', (e) => {
+            const keyword = e.target.value; // Simpan kata kunci asli (untuk dikirim ke fungsi highlight)
+            const keywordLower = keyword.toLowerCase(); // Kata kunci huruf kecil (hanya untuk proses filter)
+            
+            const filteredData = dataArea.filter(item => 
+                item.prov.toLowerCase().includes(keywordLower) || 
+                item.kota.toLowerCase().includes(keywordLower) || 
+                item.area.toLowerCase().includes(keywordLower)
+            );
+            
+            // Render ulang tabel dengan menyisipkan kata kunci untuk disorot
+            renderTableArea(filteredData, keyword);
+        });
+
+        // --- Logika Cek Kuota ---
         document.getElementById('cekForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const nomor = document.getElementById('inputNomor').value;
@@ -346,7 +495,6 @@
                     const packagesContainer = document.getElementById('packagesContainer');
                     packagesContainer.innerHTML = ''; 
 
-                    // Looping SEMUA paket aktif
                     if (packagesArray && packagesArray.length > 0) {
                         packagesArray.forEach(paket => {
                             let packageHTML = `
@@ -390,6 +538,7 @@
                     resultArea.classList.add('flex');
                 } else { throw new Error("Invalid"); }
             } catch (error) {
+                document.getElementById('errorText').textContent = "Nomor yang diinput salah atau sistem sedang dalam gangguan.";
                 errorMsg.classList.remove('hidden');
                 errorMsg.classList.add('flex');
             } finally {
@@ -439,13 +588,7 @@
                     "SuperMini": [{ area: "Area1", quota: "13-15 GB" }, { area: "Area2", quota: "15-17 GB" }, { area: "Area3", quota: "20-22 GB" }, { area: "Area4", quota: "30-32 GB" }],
                     "SuperMini V2": [{ area: "Area1", quota: "19-21 GB" }, { area: "Area2", quota: "21-23 GB" }, { area: "Area3", quota: "26-28 GB" }, { area: "Area4", quota: "36-38 GB" }],
                     "Mini": [{ area: "Area1", quota: "31-32 GB" }, { area: "Area2", quota: "33-34 GB" }, { area: "Area3", quota: "38-39 GB" }, { area: "Area4", quota: "48-49 GB" }],
-                    "Big": [{ area: "Area1", quota: "38-40 GB" }, { area: "Area2", quota: "40-42 GB" }, { area: "Area3", quota: "45-47 GB" }, { area: "Area4", quota: "55-57 GB" }],
-                    "Big V2": [{ area: "Area1", quota: "48 GB" }, { area: "Area2", quota: "50 GB" }, { area: "Area3", quota: "55 GB" }, { area: "Area4", quota: "65 GB" }],
-                    "Jumbo V2": [{ area: "Area1", quota: "55 GB" }, { area: "Area2", quota: "57 GB" }, { area: "Area3", quota: "62 GB" }, { area: "Area4", quota: "72 GB" }],
-                    "Jumbo V3": [{ area: "Area1", quota: "63-65 GB" }, { area: "Area2", quota: "65-67 GB" }, { area: "Area3", quota: "70-72 GB" }, { area: "Area4", quota: "80-82 GB" }],
-                    "JUMBO": [{ area: "Area1", quota: "65 GB" }, { area: "Area2", quota: "70 GB" }, { area: "Area3", quota: "83 GB" }, { area: "Area4", quota: "123 GB" }],
-                    "Megabig V2": [{ area: "Area1", quota: "76-78 GB" }, { area: "Area2", quota: "78-80 GB" }, { area: "Area3", quota: "83-85 GB" }, { area: "Area4", quota: "93-95 GB" }],
-                    "MegaBig": [{ area: "Area1", quota: "88-90 GB" }, { area: "Area2", quota: "90-92 GB" }, { area: "Area3", quota: "95-97 GB" }, { area: "Area4", quota: "105-107 GB" }]
+                    "Big": [{ area: "Area1", quota: "38-40 GB" }, { area: "Area2", quota: "40-42 GB" }, { area: "Area3", quota: "45-47 GB" }, { area: "Area4", quota: "55-57 GB" }]
                 };
 
                 if (Array.isArray(dataToParse)) {
@@ -530,9 +673,7 @@
         // --- Logika Animasi Running Text ---
         function generateFakeTransactions() {
             const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra"];
-            
             const packages = ["SuperMini", "SuperMini V2", "Mini", "Big", "Big V2", "Jumbo V2", "Jumbo V3", "JUMBO", "Megabig V2", "MegaBig"]; 
-            
             const prefixes = ["0817", "0818", "0819", "0859", "0877", "0878", "0831", "0832", "0833", "0838"];
             
             let marqueeHTML = "";
