@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Viewport ini yang memastikan layar pas di HP dan tidak bisa di-zoom sembarangan -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Juragan Paket Data</title>
     
     <!-- Memuat Tailwind CSS -->
@@ -67,7 +68,6 @@
         </div>
     </div>
 
-    <!-- Navigasi / Header -->
     <nav class="w-full max-w-5xl mx-auto px-4 py-6 flex justify-between items-center">
         <!-- Logo Area -->
         <div class="flex items-center gap-3.5">
@@ -90,18 +90,18 @@
     </nav>
 
     <!-- Hero Section (Judul Utama) -->
-    <div class="text-center mt-8 md:mt-12 mb-12 px-4">
+    <div class="text-center mt-6 md:mt-12 mb-10 px-4">
         <h1 class="text-3xl md:text-5xl font-extrabold text-white leading-tight tracking-tight max-w-3xl mx-auto">
             Cek Stok Akrab dan Kuota <br class="hidden md:block">
             <span class="text-brand-main">Juragan Paket Data</span>
         </h1>
-        <p class="text-gray-400 mt-5 max-w-xl mx-auto text-sm md:text-base font-light">
+        <p class="text-gray-400 mt-5 max-w-xl mx-auto text-sm md:text-base font-light px-2">
             Nikmati transaksi otomatis super cepat 24 jam. Gunakan portal di bawah ini untuk mengecek ketersediaan stok atau melihat detail kuota nomor Anda.
         </p>
     </div>
 
     <!-- Kontainer Aplikasi Utama -->
-    <div class="w-full max-w-3xl mx-auto px-4 pb-20">
+    <div class="w-full max-w-3xl mx-auto px-3 pb-20">
         <div class="bg-dark-card rounded-3xl shadow-2xl border border-dark-border overflow-hidden">
             
             <!-- Tab Navigasi -->
@@ -117,15 +117,8 @@
             <!-- ============================================== -->
             <!-- TAB: STOK AKRAB -->
             <!-- ============================================== -->
-            <div id="tabContentStok" class="block p-6 md:p-8">
-                <div class="text-center mb-8">
-                    <button id="btnCekStok" class="bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-8 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto">
-                        <i class="fa-solid fa-rotate"></i>
-                        <span>Muat Data Stok Realtime</span>
-                    </button>
-                    <p class="text-gray-500 text-xs mt-4"><i class="fa-solid fa-shield-halved mr-1 text-brand-main/70"></i> Terhubung langsung dengan server Juragan</p>
-                </div>
-
+            <div id="tabContentStok" class="block p-5 md:p-8">
+                
                 <!-- Animasi Loading Stok -->
                 <div id="loadingStok" class="hidden my-8 flex flex-col items-center justify-center gap-3">
                     <i class="fa-solid fa-boxes-packing fa-bounce text-4xl text-brand-main"></i>
@@ -133,19 +126,18 @@
                 </div>
 
                 <!-- Notifikasi Error Stok -->
-                <div id="errorMsgStok" class="hidden mt-6 bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm flex items-center gap-3">
+                <div id="errorMsgStok" class="hidden mb-6 bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm flex items-center gap-3">
                     <i class="fa-solid fa-circle-exclamation text-lg"></i>
                     <span id="errorTextStok">Gagal mengambil data stok.</span>
                 </div>
 
-                <!-- Area Hasil Stok -->
-                <div id="resultAreaStok" class="hidden border-t border-dark-border pt-6 mt-4">
-                    <!-- Mengubah layout list menjadi Grid Kotak -->
-                    <div id="stokGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                <!-- Area Hasil Stok (Grid) -->
+                <div id="resultAreaStok" class="hidden border-b border-dark-border pb-8 mb-6">
+                    <div id="stokGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         <!-- Item stok disisipkan di sini -->
                     </div>
                     
-                    <div id="stokRawContainer" class="hidden bg-dark-bg rounded-xl p-4 overflow-x-auto border border-dark-border">
+                    <div id="stokRawContainer" class="hidden bg-dark-bg rounded-xl p-4 overflow-x-auto border border-dark-border mt-4">
                         <div class="flex items-center gap-2 mb-2">
                             <i class="fa-solid fa-code text-gray-500 text-xs"></i>
                             <span class="text-xs text-gray-500 font-medium uppercase tracking-wider">Respons Server (Raw)</span>
@@ -153,19 +145,28 @@
                         <pre id="stokRawOutput" class="text-brand-main text-xs font-mono"></pre>
                     </div>
                 </div>
+
+                <!-- Tombol Cek Stok ditaruh di Bawah -->
+                <div class="text-center mt-4">
+                    <button id="btnCekStok" class="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-8 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Muat Data Stok Realtime</span>
+                    </button>
+                    <p class="text-gray-500 text-[11px] md:text-xs mt-4"><i class="fa-solid fa-shield-halved mr-1 text-brand-main/70"></i> Terhubung langsung dengan server Juragan</p>
+                </div>
             </div>
 
             <!-- ============================================== -->
             <!-- TAB: CEK KUOTA -->
             <!-- ============================================== -->
             <div id="tabContentKuota" class="hidden">
-                <div class="p-6 md:p-8">
+                <div class="p-5 md:p-8">
                     <form id="cekForm" class="relative max-w-lg mx-auto">
-                        <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
                             <input type="number" id="inputNomor" placeholder="Contoh: 087812345678" required
                                 class="flex-1 px-5 py-3.5 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main/50 focus:border-brand-main transition-all font-medium text-white placeholder-gray-500">
                             <button type="submit" id="btnSubmit" 
-                                class="bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-6 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center min-w-[140px]">
+                                class="bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-6 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center sm:min-w-[140px]">
                                 <span>Cek Nomor</span>
                                 <i class="fa-solid fa-arrow-right ml-2"></i>
                             </button>
@@ -189,62 +190,72 @@
                 <div id="resultArea" class="hidden border-t border-dark-border bg-dark-card">
                     
                     <!-- Bagian Info Kartu -->
-                    <div class="p-6 md:p-8 border-b border-dark-border bg-dark-bg/30">
+                    <div class="p-5 md:p-8 border-b border-dark-border bg-dark-bg/30">
                         <div class="flex items-center gap-2 mb-6">
                             <i class="fa-solid fa-address-card text-brand-main text-xl"></i>
                             <h2 class="text-xl font-bold text-white">Informasi Kartu</h2>
                         </div>
                         
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="bg-dark-input p-4 rounded-2xl border border-dark-border">
+                        <!-- Grid 5 Kolom agar mencakup Masa Tenggang -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
                                 <div class="flex items-center gap-2 text-gray-500 mb-1">
                                     <i class="fa-solid fa-phone text-xs"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Nomor</span>
+                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Nomor</span>
                                 </div>
-                                <span id="resNomor" class="font-bold text-white text-lg">-</span>
+                                <span id="resNomor" class="font-bold text-white text-sm md:text-base">-</span>
                             </div>
                             
-                            <div class="bg-dark-input p-4 rounded-2xl border border-dark-border">
+                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
                                 <div class="flex items-center gap-2 text-gray-500 mb-1">
                                     <i class="fa-solid fa-tower-broadcast text-xs"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Operator</span>
+                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Operator</span>
                                 </div>
-                                <span id="resOperator" class="font-bold text-brand-main text-lg">-</span>
+                                <span id="resOperator" class="font-bold text-brand-main text-sm md:text-base">-</span>
                             </div>
                             
-                            <div class="bg-dark-input p-4 rounded-2xl border border-dark-border">
+                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
                                 <div class="flex items-center gap-2 text-gray-500 mb-1">
                                     <i class="fa-solid fa-wifi text-xs"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Jaringan</span>
+                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Jaringan</span>
                                 </div>
-                                <span id="resNet" class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-brand-main/10 text-brand-main border border-brand-main/20 mt-0.5">-</span>
+                                <span id="resNet" class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] md:text-xs font-bold bg-brand-main/10 text-brand-main border border-brand-main/20 mt-0.5">-</span>
                             </div>
                             
-                            <div class="bg-dark-input p-4 rounded-2xl border border-dark-border">
+                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
                                 <div class="flex items-center gap-2 text-gray-500 mb-1">
                                     <i class="fa-regular fa-calendar-check text-xs"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Masa Aktif</span>
+                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Masa Aktif</span>
                                 </div>
                                 <span id="resExp" class="font-bold text-white text-sm md:text-base">-</span>
+                            </div>
+
+                            <!-- Kolom Masa Tenggang Baru -->
+                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border col-span-2 md:col-span-1 lg:col-span-1">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-regular fa-calendar-xmark text-xs"></i>
+                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Masa Tenggang</span>
+                                </div>
+                                <span id="resGrace" class="font-bold text-red-400 text-sm md:text-base">-</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Bagian Info Detail Kuota -->
-                    <div class="p-6 md:p-8">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div class="p-5 md:p-8">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                             <div class="flex items-center gap-2">
                                 <i class="fa-solid fa-box-open text-brand-main text-xl"></i>
                                 <h2 class="text-xl font-bold text-white">Detail Kuota</h2>
                             </div>
-                            <div class="bg-dark-input px-4 py-2 rounded-lg border border-brand-main/20 flex items-center gap-2">
+                            <div class="bg-dark-input px-4 py-2 rounded-lg border border-brand-main/20 flex items-center gap-2 self-start md:self-auto">
                                 <i class="fa-solid fa-tag text-brand-main"></i>
-                                <span id="resPaket" class="text-sm font-semibold text-brand-main">Paket: -</span>
+                                <span id="resPaket" class="text-xs md:text-sm font-semibold text-brand-main">Paket: -</span>
                             </div>
                         </div>
                         
-                        <!-- Grid Kuota -->
-                        <div id="quotaGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Grid Kuota (Multi Paket) -->
+                        <div id="quotaGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                             <!-- Item kuota akan disisipkan di sini oleh JavaScript -->
                         </div>
                     </div>
@@ -255,9 +266,9 @@
     
     <!-- Script Logika Aplikasi -->
     <script>
-        // Data Mock untuk Preview (Agar UI bisa dites tanpa API Vercel)
+        // Data Mock untuk Preview (Dimodifikasi dengan 2 paket agar terlihat fitur Multi-Paket nya)
         const mockDataPreview = {
-            "success":true,"code":"000","message":"Gagal mengambil data nomor.","data":{"subs_info":{"msisdn":"6287812345678","operator":"XL","id_verified":"Sudah","net_type":"4G","tenure":"0 Tahun 4 Bulan","exp_date":"06-03-2037","grace_until":"31-12-2035","volte":{"device":false,"area":false,"simcard":false}},"package_info":{"error_message":null,"packages":[{"name":"PRIO Gold","expiry":"31-12-2049","timestamp":2524582799,"quotas":[{"name":"Nelpon (ke XL & AXIS)","percent":100,"total":"50000 Menit","remaining":"50000 Menit"},{"name":"SMS (ke XL & AXIS)","percent":100,"total":"1000 SMS","remaining":"1000 SMS"},{"name":"SMS (ke Operator Lain)","percent":100,"total":"150 SMS","remaining":"150 SMS"},{"name":"Nelpon (ke Operator Lain)","percent":100,"total":"150 Menit","remaining":"150 Menit"},{"name":"24jam di 2G3G4G","percent":100,"total":"20GB","remaining":"20GB"},{"name":"24 Jam Medsos dan Online Shop","percent":100,"total":"2GB","remaining":"2GB"}]}]}},"meta":{"provider":"xl-ku.my.id","normalizedNumber":"087812345678","checkType":"package"}
+            "success":true,"code":"000","message":"Berhasil.","data":{"subs_info":{"msisdn":"6287812345678","operator":"XL","id_verified":"Sudah","net_type":"4G","tenure":"0 Tahun 4 Bulan","exp_date":"06-03-2037","grace_until":"06-04-2037","volte":{"device":false,"area":false,"simcard":false}},"package_info":{"error_message":null,"packages":[{"name":"PRIO Gold","expiry":"31-12-2049","timestamp":2524582799,"quotas":[{"name":"Nelpon (ke XL & AXIS)","percent":100,"total":"50000 Menit","remaining":"50000 Menit"},{"name":"SMS (ke XL & AXIS)","percent":100,"total":"1000 SMS","remaining":"1000 SMS"},{"name":"SMS (ke Operator Lain)","percent":100,"total":"150 SMS","remaining":"150 SMS"},{"name":"Nelpon (ke Operator Lain)","percent":100,"total":"150 Menit","remaining":"150 Menit"},{"name":"24jam di 2G3G4G","percent":100,"total":"20GB","remaining":"20GB"}]}, {"name":"Akrab Sedang 20GB","expiry":"06-04-2027","timestamp":1712390400,"quotas":[{"name":"Kuota Bersama (Akrab)","percent":45,"total":"20GB","remaining":"9GB"},{"name":"Kuota Pribadi","percent":80,"total":"5GB","remaining":"4GB"}]}]}},"meta":{"provider":"xl-ku.my.id","normalizedNumber":"087812345678","checkType":"package"}
         };
 
         const mockStokPreview = {
@@ -277,15 +288,12 @@
         const tabContentStok = document.getElementById('tabContentStok');
 
         function switchTab(activeBtn, inactiveBtn, activeContent, inactiveContent) {
-            // Ubah gaya tombol aktif (Tema Gelap)
             activeBtn.classList.add('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
             activeBtn.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-300', 'hover:bg-white/5');
             
-            // Ubah gaya tombol pasif (Tema Gelap)
             inactiveBtn.classList.remove('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
             inactiveBtn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-300', 'hover:bg-white/5');
 
-            // Tampilkan/Sembunyikan konten
             activeContent.classList.remove('hidden');
             activeContent.classList.add('block');
             inactiveContent.classList.add('hidden');
@@ -318,13 +326,11 @@
 
             try {
                 let responseData;
-                
-                // Deteksi apakah sedang di Vercel/Local atau di Preview Editor
                 const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
                 
                 if (isVercel) {
                     const response = await fetch(`/api/checker?number=${nomor}`);
-                    if (!response.ok) throw new Error("Gagal terhubung ke API Vercel.");
+                    if (!response.ok) throw new Error("Gagal terhubung ke API.");
                     responseData = await response.json();
                 } else {
                     await new Promise(r => setTimeout(r, 1500));
@@ -334,47 +340,73 @@
 
                 if (responseData.data && responseData.data.subs_info) {
                     const info = responseData.data.subs_info;
-                    const paketInfo = responseData.data.package_info.packages[0];
+                    const allPackages = responseData.data.package_info.packages;
 
                     document.getElementById('resNomor').textContent = info.msisdn || '-';
                     document.getElementById('resOperator').textContent = info.operator || '-';
                     document.getElementById('resNet').textContent = info.net_type || '-';
                     document.getElementById('resExp').textContent = info.exp_date || '-';
-                    document.getElementById('resPaket').textContent = paketInfo ? paketInfo.name : 'Tidak Ada Paket Utama';
+                    // Render Masa Tenggang
+                    document.getElementById('resGrace').textContent = info.grace_until || '-';
 
                     const quotaGrid = document.getElementById('quotaGrid');
                     quotaGrid.innerHTML = ''; 
 
-                    if (paketInfo && paketInfo.quotas && paketInfo.quotas.length > 0) {
-                        paketInfo.quotas.forEach(kuota => {
-                            const percent = kuota.percent || 100;
-                            let barColor = 'bg-brand-main shadow-[0_0_8px_rgba(0,244,126,0.6)]';
-                            if(percent <= 20) barColor = 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]';
-                            else if(percent <= 50) barColor = 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]';
-
-                            const card = `
-                                <div class="bg-dark-input border border-dark-border rounded-xl p-4 hover:border-brand-main/40 transition-all group shadow-sm">
-                                    <h3 class="text-sm font-semibold text-gray-200 mb-3 group-hover:text-brand-main transition-colors line-clamp-1" title="${kuota.name}">${kuota.name}</h3>
-                                    
-                                    <div class="flex justify-between items-end mb-2">
-                                        <div>
-                                            <span class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Sisa Kuota</span>
-                                            <span class="text-lg font-extrabold text-brand-main leading-none">${kuota.remaining}</span>
-                                        </div>
-                                        <div class="text-right">
-                                            <span class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Total</span>
-                                            <span class="text-sm font-medium text-gray-400">${kuota.total}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="w-full bg-dark-bg rounded-full h-1.5 mt-3 border border-white/5">
-                                        <div class="${barColor} h-1.5 rounded-full transition-all duration-1000 ease-out" style="width: 0%" data-target-width="${percent}%"></div>
-                                    </div>
+                    if (allPackages && allPackages.length > 0) {
+                        let activeNames = [];
+                        
+                        allPackages.forEach(paket => {
+                            activeNames.push(paket.name);
+                            
+                            // Tambahkan Judul Pembatas Setiap Paket
+                            const titleBar = `
+                                <div class="col-span-full border-b border-[#1a3245] pb-2 mt-4 mb-1">
+                                    <h3 class="text-white font-bold text-sm md:text-base flex items-center">
+                                        <i class="fa-solid fa-cube text-brand-main mr-2"></i> ${paket.name} 
+                                        <span class="text-[10px] md:text-xs text-gray-500 font-normal ml-3 bg-dark-bg px-2 py-1 rounded-md">Exp: ${paket.expiry || '-'}</span>
+                                    </h3>
                                 </div>
                             `;
-                            quotaGrid.insertAdjacentHTML('beforeend', card);
-                        });
+                            quotaGrid.insertAdjacentHTML('beforeend', titleBar);
+                            
+                            // Looping Rincian Kuota di Dalam Paket Tersebut
+                            if(paket.quotas && paket.quotas.length > 0) {
+                                paket.quotas.forEach(kuota => {
+                                    const percent = kuota.percent || 100;
+                                    let barColor = 'bg-brand-main shadow-[0_0_8px_rgba(0,244,126,0.6)]';
+                                    if(percent <= 20) barColor = 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]';
+                                    else if(percent <= 50) barColor = 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]';
 
+                                    const card = `
+                                        <div class="bg-dark-input border border-dark-border rounded-xl p-4 hover:border-brand-main/40 transition-all group shadow-sm">
+                                            <h3 class="text-xs md:text-sm font-semibold text-gray-200 mb-3 group-hover:text-brand-main transition-colors line-clamp-1" title="${kuota.name}">${kuota.name}</h3>
+                                            
+                                            <div class="flex justify-between items-end mb-2">
+                                                <div>
+                                                    <span class="block text-[9px] md:text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Sisa Kuota</span>
+                                                    <span class="text-base md:text-lg font-extrabold text-brand-main leading-none">${kuota.remaining}</span>
+                                                </div>
+                                                <div class="text-right">
+                                                    <span class="block text-[9px] md:text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Total</span>
+                                                    <span class="text-xs md:text-sm font-medium text-gray-400">${kuota.total}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="w-full bg-dark-bg rounded-full h-1.5 mt-3 border border-white/5">
+                                                <div class="${barColor} h-1.5 rounded-full transition-all duration-1000 ease-out" style="width: 0%" data-target-width="${percent}%"></div>
+                                            </div>
+                                        </div>
+                                    `;
+                                    quotaGrid.insertAdjacentHTML('beforeend', card);
+                                });
+                            } else {
+                                quotaGrid.insertAdjacentHTML('beforeend', `<div class="col-span-full text-xs text-gray-500 italic pl-6">Tidak ada rincian kuota di paket ini.</div>`);
+                            }
+                        });
+                        
+                        document.getElementById('resPaket').textContent = activeNames.length > 1 ? `${activeNames.length} Paket Aktif` : activeNames[0];
+
+                        // Trigger Animasi Progress Bar
                         setTimeout(() => {
                             document.querySelectorAll('#quotaGrid .rounded-full[data-target-width]').forEach(bar => {
                                 bar.style.width = bar.getAttribute('data-target-width');
@@ -382,10 +414,11 @@
                         }, 100);
 
                     } else {
+                        document.getElementById('resPaket').textContent = 'Tidak Ada Paket Utama';
                         quotaGrid.innerHTML = `
                             <div class="col-span-full p-6 text-center border border-dashed border-dark-border rounded-xl bg-dark-input/50 text-gray-500">
                                 <i class="fa-solid fa-inbox text-2xl mb-2 opacity-50"></i>
-                                <p>Tidak ada detail kuota yang ditemukan untuk nomor ini.</p>
+                                <p class="text-sm">Tidak ada detail kuota / paket Akrab yang ditemukan untuk nomor ini.</p>
                             </div>
                         `;
                     }
@@ -417,7 +450,9 @@
             const btnIcon = btnCekStok.querySelector('i');
 
             errorMsgStok.classList.add('hidden');
-            resultAreaStok.classList.add('hidden');
+            // Jika mau grid hilang sebelum load selesai, uncomment di bawah
+            // resultAreaStok.classList.add('hidden'); 
+            
             loadingStok.classList.remove('hidden');
             
             btnCekStok.disabled = true;
@@ -430,7 +465,7 @@
                 
                 if (isVercel) {
                     const response = await fetch(`/api/stok-akrab`);
-                    if (!response.ok) throw new Error("Gagal terhubung ke API Vercel (Stok).");
+                    if (!response.ok) throw new Error("Gagal terhubung ke API.");
                     responseData = await response.json();
                 } else {
                     await new Promise(r => setTimeout(r, 1200));
@@ -445,7 +480,6 @@
                 let stockItems = [];
                 let dataToParse = responseData.data || responseData;
 
-                // KAMUS PAKET BARU (Sesuai List Anda)
                 const kamusPaket = {
                     'XLA14': 'SuperMini',
                     'XLA20': 'SuperMini V2',
@@ -471,14 +505,11 @@
                         let valStock = item.stok || item.stock || item.qty || item.sisa || item.slot || item.jumlah || null;
                         let valName = item.nama || item.name || item.paket || item.title || '';
                         
-                        // Jika dari API tidak ada nama, ambil dari Kamus
                         if (!valName || valName === valStock) {
                             valName = kamusPaket[valCode] || (valCode !== '-' ? 'Paket ' + valCode : 'Produk Juragan');
                         }
                         
-                        // Mengekstrak angka murni dari teks "191 unit" menjadi 191
                         let numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
-
                         return { code: valCode, name: valName, stock: valStock, numStock: numStock };
                     });
                 } else if (dataToParse && typeof dataToParse === 'object') {
@@ -494,7 +525,6 @@
                         }
                         
                         let numStock = typeof valStock === 'string' ? (parseInt(String(valStock).replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
-                        
                         stockItems.push({ code: valCode, name: valName, stock: valStock, numStock: numStock });
                     }
                 }
@@ -506,7 +536,6 @@
                     stockItems.forEach(item => {
                         const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia') || String(item.stock).toLowerCase().includes('open');
                         
-                        // Menyesuaikan warna dan ikon dengan gambar referensi
                         const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
                         const bgHover = isAvailable ? 'hover:border-brand-main/50' : 'hover:border-red-500/50';
                         
@@ -516,31 +545,26 @@
                         
                         const emptyText = !isAvailable ? `<span class="block text-red-500 text-[11px] italic font-black tracking-wider mt-1.5">HABIS</span>` : '';
 
-                        // Desain Kartu Grid Baru
                         const card = `
-                            <div class="bg-dark-input p-5 rounded-[20px] border border-dark-border ${bgHover} transition-all shadow-lg flex flex-col h-full relative overflow-hidden group">
-                                <!-- Efek Glow Lembut -->
+                            <div class="bg-dark-input p-4 md:p-5 rounded-[20px] border border-dark-border ${bgHover} transition-all shadow-lg flex flex-col h-full relative overflow-hidden group">
                                 <div class="absolute inset-0 bg-brand-main/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                                 
-                                <!-- Baris Judul & Ikon -->
                                 <div class="flex justify-between items-start mb-4 relative z-10 gap-2">
-                                    <h3 class="font-bold text-white text-lg tracking-tight leading-tight">${item.name}</h3>
+                                    <h3 class="font-bold text-white text-base md:text-lg tracking-tight leading-tight">${item.name}</h3>
                                     <div class="shrink-0 mt-0.5">${checkIcon}</div>
                                 </div>
                                 
-                                <!-- Baris Stok -->
                                 <div class="mb-5 relative z-10">
                                     <div class="flex items-baseline gap-1.5">
-                                        <span class="text-white font-bold text-base">Stok:</span>
-                                        <span class="text-[22px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
+                                        <span class="text-white font-bold text-sm md:text-base">Stok:</span>
+                                        <span class="text-lg md:text-[22px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
                                     </div>
                                     ${emptyText}
                                 </div>
                                 
-                                <!-- Garis Pemisah & Kode Paket -->
                                 <div class="mt-auto pt-3 border-t border-[#1a3245] relative z-10 flex justify-between items-center">
-                                    <span class="text-xs text-gray-500 font-semibold tracking-wider">KODE</span>
-                                    <span class="text-[#e8b923] text-sm font-bold tracking-wider">${item.code}</span>
+                                    <span class="text-[10px] md:text-xs text-gray-500 font-semibold tracking-wider">KODE</span>
+                                    <span class="text-[#e8b923] text-xs md:text-sm font-bold tracking-wider">${item.code}</span>
                                 </div>
                             </div>
                         `;
@@ -566,49 +590,52 @@
             }
         });
 
+        // Trigger otomatis tombol Load Stok pertama kali halaman dibuka
+        window.addEventListener('DOMContentLoaded', () => {
+             document.getElementById('btnCekStok').click();
+        });
+
         // ==============================================
         // Logika Fake Running Text Transaksi
         // ==============================================
         function generateFakeTransactions() {
-            // Daftar nama pasaran
             const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra", "Tari", "Bayu", "Rini", "Fajar", "Maya", "Iwan", "Sari", "Gilang", "Nisa", "Rio", "Dina", "Kevin", "Indah", "Aris", "Wulan", "Surya", "Suci", "Rafi", "Intan", "Yudi", "Mega", "Aditya", "Nurul", "Farhan", "Nadia", "Fikri", "Siska", "Ilham", "Kiki", "Ari", "Ratih"];
             
-            // Daftar Paket
-            const packages = ["Akrab Mini 10GB", "Akrab Sedang 25GB", "Akrab Besar 65GB", "Akrab Jumbo 147GB", "Akrab Mini 10GB", "Akrab Sedang 25GB"]; 
+            // Nama paket mutlak sesuai daftar stok (Sesuai List Anda)
+            const packages = [
+                "SuperMini", "SuperMini V2", "Mini", "Big (Promo)", "Big", 
+                "Big V2 (Promo)", "Big V2", "Jumbo V2 (Promo)", "Jumbo V2", 
+                "Jumbo V3 (Promo)", "Jumbo V3", "MegaBig v2 (Promo)", 
+                "Megabig V2", "MegaBig (Promo)", "JUMBO", "MegaBig"
+            ]; 
             
-            // Prefix Nomor Telepon
-            const prefixes = ["0812", "0813", "0852", "0853", "0811", "0857", "0856", "0815", "0878", "0877", "0859", "0817", "0819", "0838", "0896", "0895", "0898", "0882"];
+            // Prefix Nomor Telepon Mutlak sesuai permintaan (XL & AXIS Saja)
+            const prefixes = ["0817", "0818", "0819", "0859", "0877", "0878", "0831", "0832", "0833", "0838"];
 
             let marqueeHTML = "";
             
-            // Generate 150 transaksi sekaligus
             for (let i = 0; i < 150; i++) {
                 let name = names[Math.floor(Math.random() * names.length)];
                 let pkg = packages[Math.floor(Math.random() * packages.length)];
                 let prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
                 
-                // Sensor nama pembeli (Menyisakan 2 huruf depan + **)
                 let maskedName = name.substring(0, 2) + "**";
-                
-                // Format sensor bintang (Contoh: 0812****4321)
                 let suffix = Math.floor(1000 + Math.random() * 9000); 
                 let phone = `${prefix}****${suffix}`;
                 
                 marqueeHTML += `
-                    <span class="mx-6 text-[11px] md:text-xs text-gray-400 font-medium tracking-wide">
+                    <span class="mx-4 md:mx-6 text-[10px] md:text-xs text-gray-400 font-medium tracking-wide">
                         <i class="fa-solid fa-cart-shopping text-brand-main mr-2"></i>
                         <span class="text-gray-200">${maskedName}</span> <span class="opacity-70">(${phone})</span> sukses membeli <span class="text-brand-main font-bold">${pkg}</span>
                     </span>
-                    <span class="text-dark-border text-[10px]">●</span>
+                    <span class="text-dark-border text-[8px] md:text-[10px]">●</span>
                 `;
             }
             
-            // Suntikkan ke dalam kontainer running text
             const container = document.getElementById('runningTextContainer');
             if (container) container.innerHTML = marqueeHTML;
         }
 
-        // Eksekusi pembuat data palsu saat halaman diakses
         generateFakeTransactions();
     </script>
 </body>
