@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta tag khusus Mobile Web: Mencegah zoom, memastikan skala 100% -->
+    <!-- Meta tag wajib untuk aplikasi full layar anti-zoom -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#041016">
     <title>Sistem Juragan Paket Data</title>
@@ -19,14 +19,14 @@
                     fontFamily: { sans: ['Poppins', 'sans-serif'] },
                     colors: { 
                         brand: {
-                            main: '#00f47e',   // Hijau Neon Terang
-                            dark: '#00c765',   // Hijau Hover
+                            main: '#00f47e', 
+                            dark: '#00c765', 
                         },
                         dark: {
-                            bg: '#041016',     // Latar belakang utama
-                            card: '#0b1a24',   // Latar kotak/kartu
-                            input: '#122533',  // Latar input
-                            border: '#1a3245'  // Garis batas
+                            bg: '#041016', 
+                            card: '#0b1a24',
+                            input: '#122533',
+                            border: '#1a3245' 
                         }
                     },
                     animation: { 'marquee': 'marquee 800s linear infinite' },
@@ -42,7 +42,7 @@
     </script>
 
     <style>
-        /* Mematikan Spinner/Panah pada input angka */
+        /* Mematikan Spinner pada input angka */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -53,157 +53,139 @@
             appearance: textfield;
         }
 
-        /* Memastikan tidak ada horizontal scroll yang bocor */
+        /* RESET TOTAL: Halaman tidak bisa di-scroll, full screen lock */
         body {
-            overflow-x: hidden;
+            overflow: hidden !important; 
+            overscroll-behavior: none; /* Anti pull-to-refresh */
+            touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
 
-<body class="bg-dark-bg min-h-screen text-gray-200 antialiased font-sans w-full selection:bg-brand-main selection:text-black">
+<!-- STRUKTUR UTAMA: Flex Column, Tinggi 100% dari layar perangkat (100dvh) -->
+<body class="bg-dark-bg h-[100dvh] w-screen flex flex-col text-gray-200 antialiased font-sans selection:bg-brand-main selection:text-black m-0 p-0 overflow-hidden">
 
-    <!-- Top Bar -->
-    <div class="w-full bg-[#022214] text-brand-main text-[10px] md:text-xs font-bold text-center py-2 tracking-widest border-b border-brand-main/20">
-        <i class="fa-solid fa-circle text-[8px] mr-1.5 animate-pulse"></i> SISTEM AKTIF 24 JAM 
-        <i class="fa-solid fa-circle text-[8px] mx-1.5 opacity-50"></i> PROSES INSTAN DETIK ITU JUGA!
+    <!-- 1. Top Bar Status (Super Tipis) -->
+    <div class="shrink-0 w-full bg-[#022214] text-brand-main text-[8px] md:text-[9px] font-bold text-center py-1 tracking-widest border-b border-brand-main/20">
+        <i class="fa-solid fa-circle text-[6px] mr-1.5 animate-pulse"></i> SISTEM AKTIF 24 JAM 
+        <i class="fa-solid fa-circle text-[6px] mx-1.5 opacity-50"></i> PROSES INSTAN
     </div>
 
-    <!-- Running Text -->
-    <div class="w-full bg-dark-bg/80 border-b border-dark-border overflow-hidden py-2.5 flex items-center relative z-10">
-        <div class="absolute left-0 w-12 h-full bg-gradient-to-r from-dark-bg to-transparent z-10 pointer-events-none"></div>
-        <div class="absolute right-0 w-12 h-full bg-gradient-to-l from-dark-bg to-transparent z-10 pointer-events-none"></div>
-        <div class="flex whitespace-nowrap animate-marquee" id="runningTextContainer"></div>
+    <!-- 2. Running Text Transaksi (Super Tipis) -->
+    <div class="shrink-0 w-full bg-dark-bg/80 border-b border-dark-border overflow-hidden py-1 flex items-center relative z-10 h-6">
+        <div class="absolute left-0 w-8 h-full bg-gradient-to-r from-dark-bg to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute right-0 w-8 h-full bg-gradient-to-l from-dark-bg to-transparent z-10 pointer-events-none"></div>
+        <div class="flex whitespace-nowrap animate-marquee items-center h-full" id="runningTextContainer"></div>
     </div>
 
-    <!-- Navigasi / Header -->
-    <nav class="w-full max-w-5xl mx-auto px-4 py-5 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 md:w-11 md:h-11 bg-brand-main rounded-xl flex items-center justify-center text-dark-bg shadow-[0_0_15px_rgba(0,244,126,0.5)] transform -rotate-6">
-                <i class="fa-solid fa-bolt text-xl md:text-2xl transform rotate-6"></i>
+    <!-- 3. Navigasi / Header (Minimalis) -->
+    <nav class="shrink-0 w-full px-3 py-1.5 flex justify-between items-center border-b border-dark-border bg-dark-card h-12">
+        <div class="flex items-center gap-2">
+            <div class="w-7 h-7 bg-brand-main rounded-md flex items-center justify-center text-dark-bg shadow-[0_0_10px_rgba(0,244,126,0.5)] transform -rotate-6">
+                <i class="fa-solid fa-bolt text-sm transform rotate-6"></i>
             </div>
-            <div class="flex flex-col">
-                <span class="text-white font-extrabold text-lg md:text-xl leading-tight tracking-tight">JURAGAN PAKET DATA</span>
-                <span class="text-brand-main text-[9px] md:text-[10px] font-bold tracking-[0.15em] opacity-80 uppercase">PPOB Automations</span>
+            <div class="flex flex-col justify-center">
+                <span class="text-white font-extrabold text-[13px] leading-none tracking-tight">JURAGAN PAKET DATA</span>
+                <span class="text-brand-main text-[7px] font-bold tracking-widest opacity-80 uppercase mt-0.5">PPOB Automations</span>
             </div>
         </div>
-        <div class="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-main/30 bg-brand-main/10 text-brand-main text-sm font-semibold shadow-[0_0_10px_rgba(0,244,126,0.1)]">
-            <i class="fa-solid fa-bolt text-xs"></i> Engine Online
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded-md border border-brand-main/30 bg-brand-main/10 text-brand-main text-[9px] font-semibold">
+            <i class="fa-solid fa-bolt"></i> Online
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <div class="text-center mt-4 md:mt-8 mb-8 px-4 w-full">
-        <h1 class="text-2xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight max-w-3xl mx-auto leading-snug">
-            Cek Stok Akrab dan Kuota <br>
-            <span class="text-brand-main">Juragan Paket Data</span>
-        </h1>
-        <p class="hidden sm:block text-gray-400 mt-4 max-w-xl mx-auto text-sm font-light">
-            Nikmati transaksi otomatis super cepat 24 jam. Gunakan portal di bawah ini untuk mengecek ketersediaan stok atau melihat detail kuota nomor Anda.
-        </p>
+    <!-- 4. Tab Navigasi (Super Tipis) -->
+    <div class="shrink-0 flex border-b border-dark-border bg-dark-bg/50 w-full h-9">
+        <button id="tabBtnStok" class="flex-1 text-[11px] font-bold text-brand-main border-b-[3px] border-brand-main bg-brand-main/5 transition-all outline-none uppercase tracking-wider">
+            Stok Akrab
+        </button>
+        <button id="tabBtnKuota" class="flex-1 text-[11px] font-bold text-gray-500 border-b-[3px] border-transparent hover:text-gray-300 transition-all outline-none uppercase tracking-wider">
+            Cek Kuota
+        </button>
     </div>
 
-    <!-- Kontainer Utama: Menggunakan full layar, padding disesuaikan -->
-    <div class="w-full max-w-5xl mx-auto px-3 sm:px-6 mb-16">
-        <div class="bg-dark-card w-full rounded-2xl md:rounded-3xl border border-dark-border overflow-hidden shadow-2xl">
+    <!-- 5. KONTEN UTAMA: Mengambil seluruh sisa ruang kosong (flex-1) -->
+    <div class="flex-1 w-full relative overflow-hidden bg-dark-card min-h-0">
+        
+        <!-- ============================================== -->
+        <!-- TAB: STOK AKRAB (Grid Padat Tanpa Scroll) -->
+        <!-- ============================================== -->
+        <div id="tabContentStok" class="absolute inset-0 flex flex-col p-1.5 md:p-3 overflow-hidden">
             
-            <!-- Tab Navigasi -->
-            <div class="flex border-b border-dark-border bg-dark-bg/50 w-full">
-                <button id="tabBtnStok" class="flex-1 py-4 text-sm md:text-base font-semibold text-brand-main border-b-[3px] border-brand-main bg-brand-main/5 transition-all outline-none">
-                    <i class="fa-solid fa-boxes-stacked mr-2"></i>Stok Akrab
-                </button>
-                <button id="tabBtnKuota" class="flex-1 py-4 text-sm md:text-base font-semibold text-gray-500 border-b-[3px] border-transparent hover:text-gray-300 hover:bg-white/5 transition-all outline-none">
-                    <i class="fa-solid fa-mobile-screen mr-2"></i>Cek Kuota
-                </button>
+            <!-- Loading & Error -->
+            <div id="loadingStok" class="hidden h-full flex-col items-center justify-center gap-2">
+                <i class="fa-solid fa-spinner fa-spin text-2xl text-brand-main"></i>
+                <span class="text-brand-main text-[10px] font-medium">Memuat Data...</span>
+            </div>
+            <div id="errorMsgStok" class="hidden h-full items-center justify-center text-red-400 text-xs text-center p-4">
+                <span id="errorTextStok">Gagal memuat.</span>
             </div>
 
-            <!-- ============================================== -->
-            <!-- TAB: STOK AKRAB -->
-            <!-- ============================================== -->
-            <div id="tabContentStok" class="block p-4 sm:p-6 md:p-8 w-full bg-dark-card">
-                
-                <div id="loadingStok" class="hidden my-12 flex-col items-center justify-center gap-3 w-full">
-                    <i class="fa-solid fa-boxes-packing fa-bounce text-4xl text-brand-main"></i>
-                    <span class="text-brand-main font-medium animate-pulse">Mengambil data stok...</span>
-                </div>
-
-                <div id="errorMsgStok" class="hidden mb-6 bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm items-center gap-3 w-full">
-                    <i class="fa-solid fa-circle-exclamation text-lg"></i>
-                    <span id="errorTextStok">Gagal mengambil data stok.</span>
-                </div>
-
-                <!-- GRID STOK: Mengalir natural ke bawah -->
-                <div id="resultAreaStok" class="hidden w-full pb-6">
-                    <div id="stokGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 w-full">
-                        <!-- Item Disisipkan dari JS -->
-                    </div>
-                </div>
-
-                <!-- TOMBOL MUAT ULANG: Pindah ke paling bawah daftar stok -->
-                <div class="mt-6 border-t border-dark-border pt-6 text-center w-full">
-                    <button id="btnCekStok" class="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-8 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.25)] transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto outline-none">
-                        <i class="fa-solid fa-rotate"></i>
-                        <span>Muat Ulang Stok Realtime</span>
-                    </button>
-                    <p class="text-gray-500 text-xs mt-4"><i class="fa-solid fa-shield-halved mr-1 text-brand-main/70"></i> Terhubung langsung dengan server Juragan</p>
+            <!-- GRID 3 KOLOM 4 BARIS (Membentuk 10 Kotak Penuh di Layar) -->
+            <div id="resultAreaStok" class="flex-1 w-full h-full min-h-0">
+                <div id="stokGrid" class="grid grid-cols-3 grid-rows-4 gap-1.5 h-full w-full">
+                    <!-- Item Disisipkan dari JS -->
                 </div>
             </div>
 
-            <!-- ============================================== -->
-            <!-- TAB: CEK KUOTA -->
-            <!-- ============================================== -->
-            <div id="tabContentKuota" class="hidden p-4 sm:p-6 md:p-8 w-full bg-dark-card">
-                
-                <!-- HEADER TAB KUOTA: Form Pencarian -->
-                <form id="cekForm" class="relative max-w-xl mx-auto w-full mb-8">
-                    <div class="flex flex-col sm:flex-row gap-3 w-full">
-                        <!-- text-[16px] (1rem) DIHARUSKAN agar iOS tidak auto-zoom! -->
-                        <input type="number" id="inputNomor" placeholder="Contoh: 087812345678" required pattern="\d*"
-                            class="flex-1 w-full px-5 py-3.5 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main/50 focus:border-brand-main transition-all font-medium text-white placeholder-gray-500 appearance-none text-[16px]">
-                        <button type="submit" id="btnSubmit" 
-                            class="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-6 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center shrink-0 outline-none">
-                            <span>Cek Nomor</span>
-                            <i class="fa-solid fa-arrow-right ml-2"></i>
-                        </button>
-                    </div>
-                </form>
-
-                <div id="loading" class="hidden my-12 flex-col items-center justify-center gap-3">
-                    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-main"></i>
-                    <span class="text-brand-main font-medium animate-pulse text-sm">Menghubungkan ke server...</span>
-                </div>
-                
-                <div id="errorMsg" class="hidden mb-6 bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm items-center gap-3">
-                    <i class="fa-solid fa-circle-exclamation text-lg flex-shrink-0"></i>
-                    <span id="errorText">Terjadi kesalahan. Silakan coba lagi.</span>
-                </div>
-
-                <!-- HASIL CEK KUOTA -->
-                <div id="resultArea" class="hidden flex-col w-full">
-                    <div class="mb-6 p-5 sm:p-6 rounded-2xl border border-dark-border bg-dark-bg/40">
-                        <h2 class="text-base sm:text-lg font-bold text-white mb-4"><i class="fa-solid fa-address-card text-brand-main mr-2"></i>Informasi Kartu</h2>
-                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 w-full">
-                            <div class="bg-dark-input p-3 sm:p-4 rounded-xl border border-dark-border"><span class="text-[10px] text-gray-500 block">Nomor</span><span id="resNomor" class="font-bold text-white text-sm sm:text-base break-all">-</span></div>
-                            <div class="bg-dark-input p-3 sm:p-4 rounded-xl border border-dark-border"><span class="text-[10px] text-gray-500 block">Operator</span><span id="resOperator" class="font-bold text-brand-main text-sm sm:text-base">-</span></div>
-                            <div class="bg-dark-input p-3 sm:p-4 rounded-xl border border-dark-border"><span class="text-[10px] text-gray-500 block">Jaringan</span><span id="resNet" class="font-bold text-white text-sm sm:text-base">-</span></div>
-                            <div class="bg-dark-input p-3 sm:p-4 rounded-xl border border-dark-border"><span class="text-[10px] text-gray-500 block">Masa Aktif</span><span id="resExp" class="font-bold text-white text-sm sm:text-base">-</span></div>
-                            <div class="bg-dark-input p-3 sm:p-4 rounded-xl border border-red-500/20 col-span-2 md:col-span-1"><span class="text-[10px] text-red-400/80 block">Masa Tenggang</span><span id="resGrace" class="font-bold text-red-400 text-sm sm:text-base">-</span></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h2 class="text-base sm:text-lg font-bold text-white mb-4 px-1"><i class="fa-solid fa-box-open text-brand-main mr-2"></i>Detail Semua Paket</h2>
-                        <div id="packagesContainer" class="flex flex-col gap-6 w-full">
-                            <!-- Paket dinamis disisipkan dari Javascript -->
-                        </div>
-                    </div>
-                </div> 
-                
-            </div> <!-- Akhir Tab Content Kuota -->
-            
+            <!-- TOMBOL REFRESH (Paling Bawah, Tipis) -->
+            <div class="shrink-0 mt-1.5 w-full">
+                <button id="btnCekStok" class="w-full bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-2 rounded-md shadow-[0_0_10px_rgba(0,244,126,0.2)] transition-all active:scale-95 flex items-center justify-center gap-1.5 text-[10px] outline-none">
+                    <i class="fa-solid fa-rotate"></i> Refresh Stok
+                </button>
+            </div>
         </div>
+
+        <!-- ============================================== -->
+        <!-- TAB: CEK KUOTA (Bisa Di-Scroll Normal Jika Panjang) -->
+        <!-- ============================================== -->
+        <div id="tabContentKuota" class="absolute inset-0 hidden overflow-y-auto p-4 pb-10 bg-dark-bg">
+            <!-- Form -->
+            <form id="cekForm" class="w-full mb-5">
+                <div class="flex gap-2">
+                    <input type="number" id="inputNomor" placeholder="Cth: 08781234..." required pattern="\d*"
+                        class="flex-1 w-full px-3 py-2.5 bg-dark-input border border-dark-border rounded-lg focus:outline-none focus:border-brand-main text-white placeholder-gray-500 text-[14px]">
+                    <button type="submit" id="btnSubmit" class="bg-brand-main text-dark-bg font-bold px-4 py-2.5 rounded-lg active:scale-95 flex items-center justify-center shrink-0 text-xs">
+                        Cek <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div id="loading" class="hidden my-8 flex-col items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand-main"></i>
+                <span class="text-brand-main text-xs">Menghubungkan...</span>
+            </div>
+            
+            <div id="errorMsg" class="hidden mb-4 bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg text-xs flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="errorText">Gagal.</span>
+            </div>
+
+            <div id="resultArea" class="hidden flex-col gap-4">
+                <!-- Info Kartu -->
+                <div class="p-3 rounded-xl border border-dark-border bg-dark-card">
+                    <h2 class="text-xs font-bold text-white mb-2 border-b border-dark-border pb-1">Info Kartu</h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-dark-input p-2 rounded-md"><span class="text-[8px] text-gray-500 block">Nomor</span><span id="resNomor" class="font-bold text-white text-[10px] break-all">-</span></div>
+                        <div class="bg-dark-input p-2 rounded-md"><span class="text-[8px] text-gray-500 block">Operator</span><span id="resOperator" class="font-bold text-brand-main text-[10px]">-</span></div>
+                        <div class="bg-dark-input p-2 rounded-md"><span class="text-[8px] text-gray-500 block">Masa Aktif</span><span id="resExp" class="font-bold text-white text-[10px]">-</span></div>
+                        <div class="bg-dark-input p-2 rounded-md border border-red-500/20"><span class="text-[8px] text-red-400/80 block">Masa Tenggang</span><span id="resGrace" class="font-bold text-red-400 text-[10px]">-</span></div>
+                    </div>
+                </div>
+
+                <!-- Detail Paket -->
+                <div>
+                    <h2 class="text-xs font-bold text-white mb-2 px-1">Detail Paket Aktif</h2>
+                    <div id="packagesContainer" class="flex flex-col gap-3">
+                        <!-- Paket di-load via JS -->
+                    </div>
+                </div>
+            </div> 
+        </div> <!-- Akhir Tab Cek Kuota -->
+        
     </div>
-    
+
     <script>
         // Data Mockup Preview
         const mockDataPreview = {
@@ -216,16 +198,16 @@
         const mockStokPreview = {
             "success": true,
             "data": [
-                { "sku": "XLA14", "nama": "SuperMini", "stok": "30" },
+                { "sku": "XLA14", "nama": "SuperMini", "stok": "10" },
                 { "sku": "XLA20", "nama": "SuperMini V2", "stok": "0" },
-                { "sku": "XLA32", "nama": "Mini", "stok": "796" },
-                { "sku": "XLA39", "nama": "Big", "stok": "1008" },
-                { "sku": "XLA48", "nama": "Big V2", "stok": "345" },
-                { "sku": "XLA55", "nama": "Jumbo V2", "stok": "609" },
-                { "sku": "XLA64", "nama": "Jumbo V3", "stok": "433" },
-                { "sku": "XLA65", "nama": "JUMBO", "stok": "0" },
-                { "sku": "XLA77", "nama": "Megabig V2", "stok": "382" },
-                { "sku": "XLA89", "nama": "MegaBig", "stok": "390" }
+                { "sku": "XLA32", "nama": "Mini", "stok": "313" },
+                { "sku": "XLA39", "nama": "Big", "stok": "844" },
+                { "sku": "XLA48", "nama": "Big V2", "stok": "252" },
+                { "sku": "XLA55", "nama": "Jumbo V2", "stok": "525" },
+                { "sku": "XLA64", "nama": "Jumbo V3", "stok": "351" },
+                { "sku": "XLA65", "nama": "JUMBO", "stok": "2" },
+                { "sku": "XLA77", "nama": "Megabig V2", "stok": "313" },
+                { "sku": "XLA89", "nama": "MegaBig", "stok": "279" }
             ]
         };
 
@@ -237,21 +219,24 @@
 
         function switchTab(activeBtn, inactiveBtn, activeContent, inactiveContent) {
             activeBtn.classList.add('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
-            activeBtn.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-300', 'hover:bg-white/5');
-            
+            activeBtn.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-300');
             inactiveBtn.classList.remove('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
-            inactiveBtn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-300', 'hover:bg-white/5');
-
+            inactiveBtn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-300');
             activeContent.classList.remove('hidden');
-            activeContent.classList.add('block');
             inactiveContent.classList.add('hidden');
-            inactiveContent.classList.remove('block');
+            
+            if(activeContent.id === 'tabContentStok') {
+                activeContent.classList.add('flex');
+            } else {
+                activeContent.classList.add('block');
+            }
+            inactiveContent.classList.remove('flex', 'block');
         }
 
         tabBtnKuota.addEventListener('click', () => switchTab(tabBtnKuota, tabBtnStok, tabContentKuota, tabContentStok));
         tabBtnStok.addEventListener('click', () => switchTab(tabBtnStok, tabBtnKuota, tabContentStok, tabContentKuota));
 
-        // EVENT LISTENER: CEK NOMOR
+        // Form Cek Kuota
         document.getElementById('cekForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const nomor = document.getElementById('inputNomor').value;
@@ -267,8 +252,8 @@
             loading.classList.remove('hidden');
             loading.classList.add('flex');
             btnSubmit.disabled = true;
-            btnSubmit.classList.add('opacity-70', 'cursor-not-allowed');
-            btnIcon.className = 'fa-solid fa-spinner fa-spin ml-2';
+            btnSubmit.classList.add('opacity-70');
+            btnIcon.className = 'fa-solid fa-spinner fa-spin ml-1';
 
             try {
                 let responseData;
@@ -290,7 +275,6 @@
 
                     document.getElementById('resNomor').textContent = info.msisdn || '-';
                     document.getElementById('resOperator').textContent = info.operator || '-';
-                    document.getElementById('resNet').textContent = info.net_type || '-';
                     document.getElementById('resExp').textContent = info.exp_date || '-';
                     document.getElementById('resGrace').textContent = info.grace_until || '-';
 
@@ -300,27 +284,25 @@
                     if (packagesArray && packagesArray.length > 0) {
                         packagesArray.forEach(paket => {
                             let packageHTML = `
-                                <div class="bg-dark-input/50 p-4 rounded-2xl border border-dark-border w-full">
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-dark-border">
-                                        <h3 class="text-sm font-bold text-white">${paket.name}</h3>
-                                        <span class="text-[10px] font-semibold text-gray-500 bg-dark-bg px-3 py-1.5 rounded-full border border-dark-border w-fit whitespace-nowrap">Exp: <span class="text-gray-300">${paket.expiry}</span></span>
+                                <div class="bg-dark-input p-3 rounded-lg border border-dark-border">
+                                    <div class="flex justify-between items-center mb-2 pb-1 border-b border-dark-border/50">
+                                        <h3 class="text-[10px] font-bold text-white">${paket.name}</h3>
+                                        <span class="text-[8px] text-gray-400">Exp: ${paket.expiry}</span>
                                     </div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+                                    <div class="grid grid-cols-1 gap-2">
                             `;
                             if (paket.quotas && paket.quotas.length > 0) {
                                 paket.quotas.forEach(kuota => {
                                     const percent = kuota.percent || 100;
-                                    let barColor = percent <= 20 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]' : (percent <= 50 ? 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]' : 'bg-brand-main shadow-[0_0_8px_rgba(0,244,126,0.6)]');
+                                    let barColor = percent <= 20 ? 'bg-red-500' : (percent <= 50 ? 'bg-yellow-400' : 'bg-brand-main');
                                     packageHTML += `
-                                        <div class="bg-dark-bg border border-dark-border rounded-xl p-3 shadow-sm flex flex-col justify-between">
-                                            <h4 class="text-[11px] font-semibold text-gray-200 mb-2 truncate" title="${kuota.name}">${kuota.name}</h4>
-                                            <div>
-                                                <div class="flex justify-between items-end mb-1">
-                                                    <div><span class="text-sm font-extrabold text-brand-main leading-none">${kuota.remaining}</span></div>
-                                                    <div class="text-right"><span class="text-[10px] font-medium text-gray-400">${kuota.total}</span></div>
-                                                </div>
-                                                <div class="w-full bg-dark-input rounded-full h-1.5 mt-1 border border-white/5"><div class="${barColor} h-1.5 rounded-full transition-all duration-1000 ease-out" style="width: 0%" data-target-width="${percent}%"></div></div>
+                                        <div class="bg-dark-bg border border-dark-border rounded-md p-2">
+                                            <h4 class="text-[8px] text-gray-200 mb-1 truncate">${kuota.name}</h4>
+                                            <div class="flex justify-between items-end mb-1">
+                                                <span class="text-[10px] font-bold text-brand-main leading-none">${kuota.remaining}</span>
+                                                <span class="text-[7px] text-gray-400">${kuota.total}</span>
                                             </div>
+                                            <div class="w-full bg-dark-input rounded-full h-1"><div class="${barColor} h-1 rounded-full" style="width: ${percent}%"></div></div>
                                         </div>
                                     `;
                                 });
@@ -328,30 +310,24 @@
                             packageHTML += `</div></div>`;
                             packagesContainer.insertAdjacentHTML('beforeend', packageHTML);
                         });
-
-                        setTimeout(() => {
-                            document.querySelectorAll('#packagesContainer .rounded-full[data-target-width]').forEach(bar => bar.style.width = bar.getAttribute('data-target-width'));
-                        }, 50);
-                    } else {
-                        packagesContainer.innerHTML = `<div class="p-4 text-center border border-dashed border-dark-border rounded-xl text-gray-500 text-xs">Tidak ada detail paket.</div>`;
                     }
                     resultArea.classList.remove('hidden');
                     resultArea.classList.add('flex');
-                } else { throw new Error("Invalid Response"); }
+                } else { throw new Error("Invalid"); }
             } catch (error) {
-                document.getElementById('errorText').textContent = isVercel ? "Gagal. Pastikan nomor valid." : "Terjadi kesalahan sistem.";
+                document.getElementById('errorText').textContent = "Gagal memuat detail nomor.";
                 errorMsg.classList.remove('hidden');
                 errorMsg.classList.add('flex');
             } finally {
                 loading.classList.add('hidden');
                 loading.classList.remove('flex');
                 btnSubmit.disabled = false;
-                btnSubmit.classList.remove('opacity-70', 'cursor-not-allowed');
-                btnIcon.className = 'fa-solid fa-arrow-right ml-2';
+                btnSubmit.classList.remove('opacity-70');
+                btnIcon.className = 'fa-solid fa-arrow-right ml-1';
             }
         });
 
-        // EVENT LISTENER: CEK STOK
+        // Load Data Stok
         async function loadStokData() {
             const loadingStok = document.getElementById('loadingStok');
             const errorMsgStok = document.getElementById('errorMsgStok');
@@ -360,10 +336,9 @@
             const btnIcon = btnCekStok.querySelector('i');
 
             errorMsgStok.classList.add('hidden');
-            resultAreaStok.classList.add('hidden');
+            resultAreaStok.classList.add('invisible'); // Gunakan invisible agar tinggi flex tetap terjaga
             loadingStok.classList.remove('hidden');
             loadingStok.classList.add('flex');
-            btnCekStok.disabled = true;
             btnIcon.classList.add('fa-spin');
 
             try {
@@ -375,7 +350,7 @@
                     if (!response.ok) throw new Error("Gagal");
                     responseData = await response.json();
                 } else {
-                    await new Promise(r => setTimeout(r, 800));
+                    await new Promise(r => setTimeout(r, 600));
                     responseData = mockStokPreview; 
                 }
 
@@ -393,7 +368,6 @@
                     'XLA77': 'Megabig V2', 'XLAP89': 'MegaBig (Promo)', 'XLA65': 'JUMBO', 'XLA89': 'MegaBig'
                 };
 
-                // Area Detail Persis Seperti Permintaan Anda
                 const detailAreaPaket = {
                     "SuperMini": [{ area: "Area1", quota: "13-15 GB" }, { area: "Area2", quota: "15-17 GB" }, { area: "Area3", quota: "20-22 GB" }, { area: "Area4", quota: "30-32 GB" }],
                     "SuperMini V2": [{ area: "Area1", quota: "19-21 GB" }, { area: "Area2", quota: "21-23 GB" }, { area: "Area3", quota: "26-28 GB" }, { area: "Area4", quota: "36-38 GB" }],
@@ -410,9 +384,9 @@
                 if (Array.isArray(dataToParse)) {
                     stockItems = dataToParse.map(item => {
                         let valCode = item.sku || item.kode || item.code || item.id || '-';
-                        let valStock = item.stok || item.stock || item.qty || item.sisa || null;
+                        let valStock = item.stok || item.stock || item.qty || null;
                         let valName = item.nama || item.name || '';
-                        if (!valName || valName === valStock) valName = kamusPaket[valCode] || (valCode !== '-' ? valCode : 'Produk Juragan');
+                        if (!valName || valName === valStock) valName = kamusPaket[valCode] || valCode;
                         let numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
                         return { code: valCode, name: valName, stock: valStock, numStock: numStock };
                     });
@@ -432,11 +406,12 @@
                         const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
                         const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
                         
+                        // Icon Sangat Kecil
                         const checkIcon = isAvailable 
-                            ? `<div class="bg-brand-main rounded-full w-5 h-5 flex items-center justify-center shadow-[0_0_10px_rgba(0,244,126,0.5)]"><i class="fa-solid fa-check text-[#041016] text-[10px] font-black"></i></div>`
-                            : `<div class="bg-red-500 rounded-full w-5 h-5 flex items-center justify-center shadow-[0_0_10px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-xmark text-[#041016] text-[10px] font-black"></i></div>`;
+                            ? `<div class="bg-brand-main rounded-full w-2.5 h-2.5 flex items-center justify-center"><i class="fa-solid fa-check text-black text-[6px]"></i></div>`
+                            : `<div class="bg-red-500 rounded-full w-2.5 h-2.5 flex items-center justify-center"><i class="fa-solid fa-xmark text-black text-[6px]"></i></div>`;
                         
-                        const emptyText = !isAvailable ? `<span class="block text-red-500 text-[11px] italic font-black tracking-wider mt-1.5">HABIS</span>` : '';
+                        const emptyText = !isAvailable ? `<span class="block text-red-500 text-[6px] italic font-black mt-0.5">HABIS</span>` : '';
 
                         let baseNameForArea = item.name.replace(' (Promo)', '').trim();
                         if(baseNameForArea.toLowerCase() === 'megabig v2') baseNameForArea = 'Megabig V2'; 
@@ -444,74 +419,69 @@
                         let areaHTML = '';
                         const areas = detailAreaPaket[baseNameForArea];
                         if (areas) {
-                            areaHTML = `<div class="mt-5 pt-4 border-t border-[#1a3245] flex flex-col gap-2 mb-4 w-full">`;
+                            areaHTML = `<div class="flex flex-col flex-1 mt-1 justify-center">`;
                             areas.forEach(a => {
-                                // Warna abu-abu untuk Area, Emas/Kuning untuk Kuota
-                                areaHTML += `<div class="flex justify-between items-center w-full"><span class="text-[12px] text-gray-400 font-medium tracking-wide">${a.area}</span><span class="text-[#e8b923] text-[12px] font-bold tracking-wide">${a.quota}</span></div>`;
+                                // Teks Abu-abu dan Kuning Emas Super Rapat
+                                areaHTML += `<div class="flex justify-between items-center w-full"><span class="text-[7px] text-gray-400 leading-tight">${a.area}</span><span class="text-[#e8b923] text-[7px] font-bold leading-tight">${a.quota}</span></div>`;
                             });
                             areaHTML += `</div>`;
                         } else { 
-                            areaHTML = `<div class="mb-4 flex-grow"></div>`; 
+                            areaHTML = `<div class="flex-1"></div>`; 
                         }
 
-                        // Kartu Produk
+                        // Kartu Grid Super Tipis (Padding sangat minimal untuk menghemat tinggi)
                         const card = `
-                            <div class="bg-dark-input p-5 rounded-[20px] border border-dark-border shadow-lg flex flex-col relative w-full h-full">
-                                <div class="flex justify-between items-start mb-3 relative z-10 gap-2 w-full">
-                                    <h3 class="font-extrabold text-white text-lg tracking-tight break-words leading-tight">${item.name}</h3>
-                                    <div class="shrink-0 mt-0.5">${checkIcon}</div>
+                            <div class="bg-dark-input p-1.5 rounded-lg border border-dark-border flex flex-col h-full w-full overflow-hidden">
+                                <div class="flex justify-between items-start mb-0.5 gap-1">
+                                    <h3 class="font-extrabold text-white text-[9px] leading-none truncate">${item.name}</h3>
+                                    <div class="shrink-0">${checkIcon}</div>
                                 </div>
-                                <div class="relative z-10 w-full flex-grow flex flex-col">
-                                    <div class="flex items-baseline gap-1.5">
-                                        <span class="text-white font-bold text-base">Stok:</span>
-                                        <span class="text-[22px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
+                                <div class="mb-0.5 relative z-10">
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-white font-bold text-[8px]">Stok:</span>
+                                        <span class="text-[11px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
                                     </div>
                                     ${emptyText}
-                                    ${areaHTML}
                                 </div>
-                                <!-- Baris Kode XLA berada paling bawah kartu -->
-                                <div class="mt-auto pt-4 border-t border-[#1a3245] relative z-10 flex justify-between items-center w-full">
-                                    <span class="text-[11px] text-gray-500 font-bold tracking-wider">KODE</span>
-                                    <span class="text-brand-main text-[13px] font-bold tracking-wider">${item.code}</span>
+                                ${areaHTML}
+                                <div class="mt-auto pt-1 border-t border-[#1a3245] flex justify-between items-center w-full">
+                                    <span class="text-[6px] text-gray-500 font-bold tracking-wider">KODE</span>
+                                    <span class="text-brand-main text-[7px] font-bold tracking-wider">${item.code}</span>
                                 </div>
                             </div>
                         `;
                         stokGrid.insertAdjacentHTML('beforeend', card);
                     });
                 }
-                resultAreaStok.classList.remove('hidden');
+                resultAreaStok.classList.remove('invisible');
             } catch (error) {
-                document.getElementById('errorTextStok').textContent = "Terjadi kesalahan sistem.";
                 errorMsgStok.classList.remove('hidden');
                 errorMsgStok.classList.add('flex');
             } finally {
                 loadingStok.classList.add('hidden');
                 loadingStok.classList.remove('flex');
-                btnCekStok.disabled = false;
                 btnIcon.classList.remove('fa-spin');
             }
         }
 
         document.getElementById('btnCekStok').addEventListener('click', loadStokData);
-        
-        // Auto Load Data Stok Saat Halaman Dibuka
         window.addEventListener('DOMContentLoaded', loadStokData);
 
-        // FAKE TRANSAKSI (Prefix sesuai permintaan)
+        // Fake Transaksi
         function generateFakeTransactions() {
-            const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra", "Tari", "Bayu", "Rini"];
+            const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra"];
             const packages = ["SuperMini", "SuperMini V2", "Mini", "Big", "Big V2", "Jumbo V2", "Jumbo V3", "JUMBO", "Megabig V2", "MegaBig"]; 
             const prefixes = ["0817", "0818", "0819", "0859", "0877", "0878", "0831", "0832", "0833", "0838"];
             
             let marqueeHTML = "";
-            for (let i = 0; i < 150; i++) {
+            for (let i = 0; i < 100; i++) {
                 let name = names[Math.floor(Math.random() * names.length)];
                 let pkg = packages[Math.floor(Math.random() * packages.length)];
                 let prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
                 let maskedName = name.substring(0, 2) + "**";
                 let phone = `${prefix}****${Math.floor(1000 + Math.random() * 9000)}`;
                 
-                marqueeHTML += `<span class="mx-6 text-[10px] sm:text-[11px] text-gray-400 font-medium tracking-wide"><i class="fa-solid fa-cart-shopping text-brand-main mr-2"></i><span class="text-gray-200">${maskedName}</span> <span class="opacity-70">(${phone})</span> sukses membeli <span class="text-brand-main font-bold">${pkg}</span></span><span class="text-dark-border text-[10px]">●</span>`;
+                marqueeHTML += `<span class="mx-4 text-[7px] md:text-[8px] text-gray-400 font-medium"><i class="fa-solid fa-cart-shopping text-brand-main mr-1"></i><span class="text-gray-200">${maskedName}</span> <span class="opacity-70">(${phone})</span> sukses <span class="text-brand-main font-bold">${pkg}</span></span><span class="text-dark-border text-[6px]">●</span>`;
             }
             document.getElementById('runningTextContainer').innerHTML = marqueeHTML;
         }
