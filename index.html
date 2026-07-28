@@ -2,13 +2,27 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport ini yang memastikan layar pas di HP dan tidak bisa di-zoom sembarangan -->
+    <!-- Menambahkan user-scalable=no dan maximum-scale=1.0 agar tidak bisa di-zoom di mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Juragan Paket Data</title>
     
     <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- CSS Tambahan untuk menghilangkan panah (spinner) pada input tipe number -->
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+
     <!-- Memuat Font Google (Poppins) untuk kesan premium -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -49,7 +63,7 @@
     </script>
 </head>
 
-<body class="bg-dark-bg min-h-screen text-gray-200 antialiased flex flex-col font-sans selection:bg-brand-main selection:text-black">
+<body class="bg-dark-bg min-h-screen text-gray-200 antialiased flex flex-col font-sans selection:bg-brand-main selection:text-black overflow-x-hidden">
 
     <!-- Top Bar Status -->
     <div class="bg-[#022214] text-brand-main text-[10px] md:text-xs font-bold text-center py-2 tracking-widest border-b border-brand-main/20">
@@ -59,53 +73,50 @@
 
     <!-- Running Text Transaksi (Fake Marquee) -->
     <div class="w-full bg-dark-bg/80 border-b border-dark-border overflow-hidden py-2.5 flex items-center relative">
-        <!-- Efek bayangan (fade) di kiri dan kanan agar tulisan muncul/hilang dengan mulus -->
         <div class="absolute left-0 w-12 h-full bg-gradient-to-r from-dark-bg to-transparent z-10"></div>
         <div class="absolute right-0 w-12 h-full bg-gradient-to-l from-dark-bg to-transparent z-10"></div>
         
         <div class="flex whitespace-nowrap animate-marquee" id="runningTextContainer">
-            <!-- Data transaksi akan di-generate oleh JavaScript di bagian bawah -->
+            <!-- Data transaksi di-generate oleh JS -->
         </div>
     </div>
 
+    <!-- Navigasi / Header -->
     <nav class="w-full max-w-5xl mx-auto px-4 py-6 flex justify-between items-center">
         <!-- Logo Area -->
         <div class="flex items-center gap-3.5">
-            <!-- Ikon Petir -->
             <div class="w-11 h-11 bg-brand-main rounded-xl flex items-center justify-center text-dark-bg shadow-[0_0_15px_rgba(0,244,126,0.5)] transform -rotate-6">
                 <i class="fa-solid fa-bolt text-2xl transform rotate-6"></i>
             </div>
-            <!-- Teks Logo -->
             <div class="flex flex-col">
                 <span class="text-white font-extrabold text-lg md:text-xl leading-tight tracking-tight">JURAGAN PAKET DATA</span>
                 <span class="text-brand-main text-[9px] md:text-[10px] font-bold tracking-[0.15em] opacity-80 uppercase">PPOB Automations</span>
             </div>
         </div>
         
-        <!-- Tombol Status Engine -->
         <div class="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-main/30 bg-brand-main/10 text-brand-main text-sm font-semibold shadow-[0_0_10px_rgba(0,244,126,0.1)]">
             <i class="fa-solid fa-bolt text-xs"></i>
             Engine Online
         </div>
     </nav>
 
-    <!-- Hero Section (Judul Utama) -->
+    <!-- Hero Section -->
     <div class="text-center mt-6 md:mt-12 mb-10 px-4">
         <h1 class="text-3xl md:text-5xl font-extrabold text-white leading-tight tracking-tight max-w-3xl mx-auto">
             Cek Stok Akrab dan Kuota <br class="hidden md:block">
             <span class="text-brand-main">Juragan Paket Data</span>
         </h1>
-        <p class="text-gray-400 mt-5 max-w-xl mx-auto text-sm md:text-base font-light px-2">
+        <p class="text-gray-400 mt-4 max-w-xl mx-auto text-sm md:text-base font-light px-2">
             Nikmati transaksi otomatis super cepat 24 jam. Gunakan portal di bawah ini untuk mengecek ketersediaan stok atau melihat detail kuota nomor Anda.
         </p>
     </div>
 
     <!-- Kontainer Aplikasi Utama -->
-    <div class="w-full max-w-3xl mx-auto px-3 pb-20">
+    <div class="w-full max-w-5xl mx-auto px-4 pb-20">
         <div class="bg-dark-card rounded-3xl shadow-2xl border border-dark-border overflow-hidden">
             
             <!-- Tab Navigasi -->
-            <div class="flex border-b border-dark-border bg-dark-bg/50">
+            <div class="flex flex-col sm:flex-row border-b border-dark-border bg-dark-bg/50">
                 <button id="tabBtnStok" class="flex-1 py-4 text-sm md:text-base font-semibold text-brand-main border-b-2 border-brand-main bg-brand-main/5 transition-all">
                     <i class="fa-solid fa-boxes-stacked mr-2"></i>Stok Akrab
                 </button>
@@ -117,10 +128,9 @@
             <!-- ============================================== -->
             <!-- TAB: STOK AKRAB -->
             <!-- ============================================== -->
-            <div id="tabContentStok" class="block p-5 md:p-8">
-                
+            <div id="tabContentStok" class="block p-4 md:p-8">
                 <!-- Animasi Loading Stok -->
-                <div id="loadingStok" class="hidden my-8 flex flex-col items-center justify-center gap-3">
+                <div id="loadingStok" class="hidden my-12 flex flex-col items-center justify-center gap-3">
                     <i class="fa-solid fa-boxes-packing fa-bounce text-4xl text-brand-main"></i>
                     <span class="text-brand-main font-medium animate-pulse tracking-wide">Mengambil data stok...</span>
                 </div>
@@ -131,9 +141,10 @@
                     <span id="errorTextStok">Gagal mengambil data stok.</span>
                 </div>
 
-                <!-- Area Hasil Stok (Grid) -->
-                <div id="resultAreaStok" class="hidden border-b border-dark-border pb-8 mb-6">
-                    <div id="stokGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Area Hasil Stok -->
+                <div id="resultAreaStok" class="block mb-8">
+                    <!-- Mengubah layout list menjadi Grid Kotak -->
+                    <div id="stokGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
                         <!-- Item stok disisipkan di sini -->
                     </div>
                     
@@ -146,13 +157,13 @@
                     </div>
                 </div>
 
-                <!-- Tombol Cek Stok ditaruh di Bawah -->
-                <div class="text-center mt-4">
+                <!-- Tombol Load Data dipindah ke bawah list -->
+                <div class="text-center pt-6 border-t border-dark-border/50">
                     <button id="btnCekStok" class="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-8 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto">
                         <i class="fa-solid fa-rotate"></i>
                         <span>Muat Data Stok Realtime</span>
                     </button>
-                    <p class="text-gray-500 text-[11px] md:text-xs mt-4"><i class="fa-solid fa-shield-halved mr-1 text-brand-main/70"></i> Terhubung langsung dengan server Juragan</p>
+                    <p class="text-gray-500 text-xs mt-4"><i class="fa-solid fa-shield-halved mr-1 text-brand-main/70"></i> Terhubung langsung dengan server Juragan</p>
                 </div>
             </div>
 
@@ -160,13 +171,14 @@
             <!-- TAB: CEK KUOTA -->
             <!-- ============================================== -->
             <div id="tabContentKuota" class="hidden">
-                <div class="p-5 md:p-8">
+                <div class="p-4 md:p-8">
                     <form id="cekForm" class="relative max-w-lg mx-auto">
                         <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
+                            <!-- Input Number (Spinner disembunyikan via CSS) -->
                             <input type="number" id="inputNomor" placeholder="Contoh: 087812345678" required
-                                class="flex-1 px-5 py-3.5 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main/50 focus:border-brand-main transition-all font-medium text-white placeholder-gray-500">
+                                class="flex-1 w-full px-5 py-3.5 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main/50 focus:border-brand-main transition-all font-medium text-white placeholder-gray-500 appearance-none">
                             <button type="submit" id="btnSubmit" 
-                                class="bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-6 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center sm:min-w-[140px]">
+                                class="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-6 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center min-w-[140px]">
                                 <span>Cek Nomor</span>
                                 <i class="fa-solid fa-arrow-right ml-2"></i>
                             </button>
@@ -190,51 +202,51 @@
                 <div id="resultArea" class="hidden border-t border-dark-border bg-dark-card">
                     
                     <!-- Bagian Info Kartu -->
-                    <div class="p-5 md:p-8 border-b border-dark-border bg-dark-bg/30">
-                        <div class="flex items-center gap-2 mb-6">
+                    <div class="p-4 md:p-8 border-b border-dark-border bg-dark-bg/30">
+                        <div class="flex items-center gap-2 mb-4 md:mb-6">
                             <i class="fa-solid fa-address-card text-brand-main text-xl"></i>
-                            <h2 class="text-xl font-bold text-white">Informasi Kartu</h2>
+                            <h2 class="text-lg md:text-xl font-bold text-white">Informasi Kartu</h2>
                         </div>
                         
-                        <!-- Grid 5 Kolom agar mencakup Masa Tenggang -->
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+                        <!-- Grid 5 Kolom untuk memuat Masa Tenggang -->
+                        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
                             <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
                                 <div class="flex items-center gap-2 text-gray-500 mb-1">
                                     <i class="fa-solid fa-phone text-xs"></i>
-                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Nomor</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Nomor</span>
                                 </div>
-                                <span id="resNomor" class="font-bold text-white text-sm md:text-base">-</span>
+                                <span id="resNomor" class="font-bold text-white text-base md:text-lg break-all">-</span>
                             </div>
                             
                             <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
                                 <div class="flex items-center gap-2 text-gray-500 mb-1">
                                     <i class="fa-solid fa-tower-broadcast text-xs"></i>
-                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Operator</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Operator</span>
                                 </div>
-                                <span id="resOperator" class="font-bold text-brand-main text-sm md:text-base">-</span>
+                                <span id="resOperator" class="font-bold text-brand-main text-base md:text-lg">-</span>
                             </div>
                             
                             <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
                                 <div class="flex items-center gap-2 text-gray-500 mb-1">
                                     <i class="fa-solid fa-wifi text-xs"></i>
-                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Jaringan</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Jaringan</span>
                                 </div>
-                                <span id="resNet" class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] md:text-xs font-bold bg-brand-main/10 text-brand-main border border-brand-main/20 mt-0.5">-</span>
+                                <span id="resNet" class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-brand-main/10 text-brand-main border border-brand-main/20 mt-0.5">-</span>
                             </div>
                             
                             <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
                                 <div class="flex items-center gap-2 text-gray-500 mb-1">
                                     <i class="fa-regular fa-calendar-check text-xs"></i>
-                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Masa Aktif</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Masa Aktif</span>
                                 </div>
                                 <span id="resExp" class="font-bold text-white text-sm md:text-base">-</span>
                             </div>
-
-                            <!-- Kolom Masa Tenggang Baru -->
-                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border col-span-2 md:col-span-1 lg:col-span-1">
+                            
+                            <!-- Ditambahkan: Masa Tenggang -->
+                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-red-500/20 col-span-2 lg:col-span-1">
                                 <div class="flex items-center gap-2 text-gray-500 mb-1">
                                     <i class="fa-regular fa-calendar-xmark text-xs"></i>
-                                    <span class="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">Masa Tenggang</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-400/80">Masa Tenggang</span>
                                 </div>
                                 <span id="resGrace" class="font-bold text-red-400 text-sm md:text-base">-</span>
                             </div>
@@ -242,21 +254,15 @@
                     </div>
 
                     <!-- Bagian Info Detail Kuota -->
-                    <div class="p-5 md:p-8">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-box-open text-brand-main text-xl"></i>
-                                <h2 class="text-xl font-bold text-white">Detail Kuota</h2>
-                            </div>
-                            <div class="bg-dark-input px-4 py-2 rounded-lg border border-brand-main/20 flex items-center gap-2 self-start md:self-auto">
-                                <i class="fa-solid fa-tag text-brand-main"></i>
-                                <span id="resPaket" class="text-xs md:text-sm font-semibold text-brand-main">Paket: -</span>
-                            </div>
+                    <div class="p-4 md:p-8">
+                        <div class="flex items-center gap-2 mb-6">
+                            <i class="fa-solid fa-box-open text-brand-main text-xl"></i>
+                            <h2 class="text-lg md:text-xl font-bold text-white">Detail Paket & Kuota</h2>
                         </div>
                         
-                        <!-- Grid Kuota (Multi Paket) -->
-                        <div id="quotaGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                            <!-- Item kuota akan disisipkan di sini oleh JavaScript -->
+                        <!-- Kontainer Multi-Paket -->
+                        <div id="packagesContainer" class="flex flex-col gap-8">
+                            <!-- Paket-paket disisipkan secara dinamis oleh JavaScript -->
                         </div>
                     </div>
                 </div> <!-- Penutup resultArea -->
@@ -266,18 +272,43 @@
     
     <!-- Script Logika Aplikasi -->
     <script>
-        // Data Mock untuk Preview (Dimodifikasi dengan 2 paket agar terlihat fitur Multi-Paket nya)
+        // Data Mock untuk Preview (Termasuk 2 paket untuk menguji fitur multi-paket)
         const mockDataPreview = {
-            "success":true,"code":"000","message":"Berhasil.","data":{"subs_info":{"msisdn":"6287812345678","operator":"XL","id_verified":"Sudah","net_type":"4G","tenure":"0 Tahun 4 Bulan","exp_date":"06-03-2037","grace_until":"06-04-2037","volte":{"device":false,"area":false,"simcard":false}},"package_info":{"error_message":null,"packages":[{"name":"PRIO Gold","expiry":"31-12-2049","timestamp":2524582799,"quotas":[{"name":"Nelpon (ke XL & AXIS)","percent":100,"total":"50000 Menit","remaining":"50000 Menit"},{"name":"SMS (ke XL & AXIS)","percent":100,"total":"1000 SMS","remaining":"1000 SMS"},{"name":"SMS (ke Operator Lain)","percent":100,"total":"150 SMS","remaining":"150 SMS"},{"name":"Nelpon (ke Operator Lain)","percent":100,"total":"150 Menit","remaining":"150 Menit"},{"name":"24jam di 2G3G4G","percent":100,"total":"20GB","remaining":"20GB"}]}, {"name":"Akrab Sedang 20GB","expiry":"06-04-2027","timestamp":1712390400,"quotas":[{"name":"Kuota Bersama (Akrab)","percent":45,"total":"20GB","remaining":"9GB"},{"name":"Kuota Pribadi","percent":80,"total":"5GB","remaining":"4GB"}]}]}},"meta":{"provider":"xl-ku.my.id","normalizedNumber":"087812345678","checkType":"package"}
+            "success":true,"code":"000","message":"Sukses mengambil data","data":{"subs_info":{"msisdn":"6287812345678","operator":"XL","id_verified":"Sudah","net_type":"4G","tenure":"0 Tahun 4 Bulan","exp_date":"06-03-2037","grace_until":"31-12-2035","volte":{"device":false,"area":false,"simcard":false}},"package_info":{"error_message":null,"packages":[
+                {
+                    "name":"Akrab Mini 10GB",
+                    "expiry":"31-12-2049",
+                    "timestamp":2524582799,
+                    "quotas":[
+                        {"name":"Kuota Bersama","percent":80,"total":"10GB","remaining":"8GB"},
+                        {"name":"Kuota Pribadi","percent":100,"total":"10GB","remaining":"10GB"},
+                        {"name":"Bonus WhatsApp","percent":100,"total":"Unlim","remaining":"Unlim"}
+                    ]
+                },
+                {
+                    "name":"Extra Kuota Tiktok",
+                    "expiry":"31-12-2024",
+                    "timestamp":1735603199,
+                    "quotas":[
+                        {"name":"Kuota Tiktok 24 Jam","percent":25,"total":"5GB","remaining":"1.2GB"}
+                    ]
+                }
+            ]}},"meta":{"provider":"xl-ku.my.id","normalizedNumber":"087812345678","checkType":"package"}
         };
 
         const mockStokPreview = {
             "success": true,
             "data": [
-                { "sku": "XLA14", "nama": "Akrab Mini 14GB", "keterangan": "Injeksi Kuota Utama & Lokal", "stok": "191 unit" },
-                { "sku": "XLA20", "nama": "Akrab Sedang 20GB", "keterangan": "Proses Instan (Hitungan Detik)", "stok": "98 unit" },
-                { "sku": "XLA32", "nama": "Akrab Besar 32GB", "keterangan": "Kuota Utama Nasional + Medsos", "stok": "796 unit" },
-                { "sku": "XLA65", "nama": "Akrab Jumbo 65GB", "keterangan": "Full 24 Jam Semua Jaringan", "stok": "0 unit" }
+                { "sku": "XLA14", "nama": "SuperMini", "stok": "191 unit" },
+                { "sku": "XLA20", "nama": "SuperMini V2", "stok": "98 unit" },
+                { "sku": "XLA32", "nama": "Mini", "stok": "796 unit" },
+                { "sku": "XLA39", "nama": "Big", "stok": "1008 unit" },
+                { "sku": "XLA48", "nama": "Big V2", "stok": "345 unit" },
+                { "sku": "XLA55", "nama": "Jumbo V2", "stok": "609 unit" },
+                { "sku": "XLA64", "nama": "Jumbo V3", "stok": "433 unit" },
+                { "sku": "XLA65", "nama": "JUMBO", "stok": "0 unit" },
+                { "sku": "XLA77", "nama": "Megabig V2", "stok": "382 unit" },
+                { "sku": "XLA89", "nama": "MegaBig", "stok": "390 unit" }
             ]
         };
 
@@ -340,46 +371,41 @@
 
                 if (responseData.data && responseData.data.subs_info) {
                     const info = responseData.data.subs_info;
-                    const allPackages = responseData.data.package_info.packages;
+                    const packagesArray = responseData.data.package_info.packages;
 
                     document.getElementById('resNomor').textContent = info.msisdn || '-';
                     document.getElementById('resOperator').textContent = info.operator || '-';
                     document.getElementById('resNet').textContent = info.net_type || '-';
                     document.getElementById('resExp').textContent = info.exp_date || '-';
-                    // Render Masa Tenggang
                     document.getElementById('resGrace').textContent = info.grace_until || '-';
 
-                    const quotaGrid = document.getElementById('quotaGrid');
-                    quotaGrid.innerHTML = ''; 
+                    const packagesContainer = document.getElementById('packagesContainer');
+                    packagesContainer.innerHTML = ''; 
 
-                    if (allPackages && allPackages.length > 0) {
-                        let activeNames = [];
-                        
-                        allPackages.forEach(paket => {
-                            activeNames.push(paket.name);
-                            
-                            // Tambahkan Judul Pembatas Setiap Paket
-                            const titleBar = `
-                                <div class="col-span-full border-b border-[#1a3245] pb-2 mt-4 mb-1">
-                                    <h3 class="text-white font-bold text-sm md:text-base flex items-center">
-                                        <i class="fa-solid fa-cube text-brand-main mr-2"></i> ${paket.name} 
-                                        <span class="text-[10px] md:text-xs text-gray-500 font-normal ml-3 bg-dark-bg px-2 py-1 rounded-md">Exp: ${paket.expiry || '-'}</span>
-                                    </h3>
-                                </div>
+                    if (packagesArray && packagesArray.length > 0) {
+                        packagesArray.forEach(paket => {
+                            let packageHTML = `
+                                <div class="package-section bg-dark-bg/40 p-4 md:p-6 rounded-2xl border border-dark-border">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-dark-border">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fa-solid fa-tag text-brand-main"></i>
+                                            <h3 class="text-base md:text-lg font-bold text-white">${paket.name}</h3>
+                                        </div>
+                                        <span class="text-xs font-semibold text-gray-500 bg-dark-input px-3 py-1 rounded-full border border-dark-border inline-block w-fit">Exp: <span class="text-gray-300">${paket.expiry}</span></span>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                             `;
-                            quotaGrid.insertAdjacentHTML('beforeend', titleBar);
-                            
-                            // Looping Rincian Kuota di Dalam Paket Tersebut
-                            if(paket.quotas && paket.quotas.length > 0) {
+
+                            if (paket.quotas && paket.quotas.length > 0) {
                                 paket.quotas.forEach(kuota => {
                                     const percent = kuota.percent || 100;
                                     let barColor = 'bg-brand-main shadow-[0_0_8px_rgba(0,244,126,0.6)]';
                                     if(percent <= 20) barColor = 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]';
                                     else if(percent <= 50) barColor = 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]';
 
-                                    const card = `
+                                    packageHTML += `
                                         <div class="bg-dark-input border border-dark-border rounded-xl p-4 hover:border-brand-main/40 transition-all group shadow-sm">
-                                            <h3 class="text-xs md:text-sm font-semibold text-gray-200 mb-3 group-hover:text-brand-main transition-colors line-clamp-1" title="${kuota.name}">${kuota.name}</h3>
+                                            <h4 class="text-xs md:text-sm font-semibold text-gray-200 mb-3 group-hover:text-brand-main transition-colors line-clamp-1" title="${kuota.name}">${kuota.name}</h4>
                                             
                                             <div class="flex justify-between items-end mb-2">
                                                 <div>
@@ -397,28 +423,29 @@
                                             </div>
                                         </div>
                                     `;
-                                    quotaGrid.insertAdjacentHTML('beforeend', card);
                                 });
                             } else {
-                                quotaGrid.insertAdjacentHTML('beforeend', `<div class="col-span-full text-xs text-gray-500 italic pl-6">Tidak ada rincian kuota di paket ini.</div>`);
+                                packageHTML += `<div class="col-span-full text-sm text-gray-500 italic">Tidak ada rincian kuota di dalam paket ini.</div>`;
                             }
-                        });
-                        
-                        document.getElementById('resPaket').textContent = activeNames.length > 1 ? `${activeNames.length} Paket Aktif` : activeNames[0];
 
-                        // Trigger Animasi Progress Bar
+                            packageHTML += `
+                                    </div>
+                                </div>
+                            `;
+                            packagesContainer.insertAdjacentHTML('beforeend', packageHTML);
+                        });
+
                         setTimeout(() => {
-                            document.querySelectorAll('#quotaGrid .rounded-full[data-target-width]').forEach(bar => {
+                            document.querySelectorAll('#packagesContainer .rounded-full[data-target-width]').forEach(bar => {
                                 bar.style.width = bar.getAttribute('data-target-width');
                             });
                         }, 100);
 
                     } else {
-                        document.getElementById('resPaket').textContent = 'Tidak Ada Paket Utama';
-                        quotaGrid.innerHTML = `
-                            <div class="col-span-full p-6 text-center border border-dashed border-dark-border rounded-xl bg-dark-input/50 text-gray-500">
+                        packagesContainer.innerHTML = `
+                            <div class="p-6 text-center border border-dashed border-dark-border rounded-xl bg-dark-input/50 text-gray-500">
                                 <i class="fa-solid fa-inbox text-2xl mb-2 opacity-50"></i>
-                                <p class="text-sm">Tidak ada detail kuota / paket Akrab yang ditemukan untuk nomor ini.</p>
+                                <p>Tidak ada detail paket atau kuota yang ditemukan untuk nomor ini.</p>
                             </div>
                         `;
                     }
@@ -440,8 +467,8 @@
             }
         });
 
-        // Logika Tombol Cek Stok
-        document.getElementById('btnCekStok').addEventListener('click', async function() {
+        // Logika Load / Reload Data Stok
+        async function loadStokData() {
             const loadingStok = document.getElementById('loadingStok');
             const errorMsgStok = document.getElementById('errorMsgStok');
             const errorTextStok = document.getElementById('errorTextStok');
@@ -450,9 +477,7 @@
             const btnIcon = btnCekStok.querySelector('i');
 
             errorMsgStok.classList.add('hidden');
-            // Jika mau grid hilang sebelum load selesai, uncomment di bawah
-            // resultAreaStok.classList.add('hidden'); 
-            
+            resultAreaStok.classList.add('hidden');
             loadingStok.classList.remove('hidden');
             
             btnCekStok.disabled = true;
@@ -465,10 +490,10 @@
                 
                 if (isVercel) {
                     const response = await fetch(`/api/stok-akrab`);
-                    if (!response.ok) throw new Error("Gagal terhubung ke API.");
+                    if (!response.ok) throw new Error("Gagal terhubung ke API Vercel (Stok).");
                     responseData = await response.json();
                 } else {
-                    await new Promise(r => setTimeout(r, 1200));
+                    await new Promise(r => setTimeout(r, 800));
                     responseData = mockStokPreview; 
                 }
 
@@ -480,25 +505,60 @@
                 let stockItems = [];
                 let dataToParse = responseData.data || responseData;
 
+                // KAMUS PAKET BARU
                 const kamusPaket = {
-                    'XLA14': 'SuperMini',
-                    'XLA20': 'SuperMini V2',
-                    'XLA32': 'Mini',
-                    'XLAP39': 'Big (Promo)',
-                    'XLA39': 'Big',
-                    'XLAP48': 'Big V2 (Promo)',
-                    'XLA48': 'Big V2',
-                    'XLAP55': 'Jumbo V2 (Promo)',
-                    'XLA55': 'Jumbo V2',
-                    'XLAP64': 'Jumbo V3 (Promo)',
-                    'XLA64': 'Jumbo V3',
-                    'XLAP77': 'MegaBig v2 (Promo)',
-                    'XLA77': 'Megabig V2',
-                    'XLAP89': 'MegaBig (Promo)',
-                    'XLA65': 'JUMBO',
-                    'XLA89': 'MegaBig'
+                    'XLA14': 'SuperMini', 'XLA20': 'SuperMini V2', 'XLA32': 'Mini', 
+                    'XLAP39': 'Big (Promo)', 'XLA39': 'Big', 'XLAP48': 'Big V2 (Promo)', 
+                    'XLA48': 'Big V2', 'XLAP55': 'Jumbo V2 (Promo)', 'XLA55': 'Jumbo V2', 
+                    'XLAP64': 'Jumbo V3 (Promo)', 'XLA64': 'Jumbo V3', 'XLAP77': 'MegaBig v2 (Promo)', 
+                    'XLA77': 'Megabig V2', 'XLAP89': 'MegaBig (Promo)', 'XLA65': 'JUMBO', 'XLA89': 'MegaBig'
                 };
 
+                // DATA CATATAN AREA PAKET SESUAI REFERENSI SCREENSHOT
+                const detailAreaPaket = {
+                    "SuperMini": [
+                        { area: "Area1", quota: "13-15 GB" }, { area: "Area2", quota: "15-17 GB" },
+                        { area: "Area3", quota: "20-22 GB" }, { area: "Area4", quota: "30-32 GB" }
+                    ],
+                    "SuperMini V2": [
+                        { area: "Area1", quota: "19-21 GB" }, { area: "Area2", quota: "21-23 GB" },
+                        { area: "Area3", quota: "26-28 GB" }, { area: "Area4", quota: "36-38 GB" }
+                    ],
+                    "Mini": [
+                        { area: "Area1", quota: "31-32 GB" }, { area: "Area2", quota: "33-34 GB" },
+                        { area: "Area3", quota: "38-39 GB" }, { area: "Area4", quota: "48-49 GB" }
+                    ],
+                    "Big": [
+                        { area: "Area1", quota: "38-40 GB" }, { area: "Area2", quota: "40-42 GB" },
+                        { area: "Area3", quota: "45-47 GB" }, { area: "Area4", quota: "55-57 GB" }
+                    ],
+                    "Big V2": [
+                        { area: "Area1", quota: "48 GB" }, { area: "Area2", quota: "50 GB" },
+                        { area: "Area3", quota: "55 GB" }, { area: "Area4", quota: "65 GB" }
+                    ],
+                    "Jumbo V2": [
+                        { area: "Area1", quota: "55 GB" }, { area: "Area2", quota: "57 GB" },
+                        { area: "Area3", quota: "62 GB" }, { area: "Area4", quota: "72 GB" }
+                    ],
+                    "Jumbo V3": [
+                        { area: "Area1", quota: "63-65 GB" }, { area: "Area2", quota: "65-67 GB" },
+                        { area: "Area3", quota: "70-72 GB" }, { area: "Area4", quota: "80-82 GB" }
+                    ],
+                    "JUMBO": [
+                        { area: "Area1", quota: "65 GB" }, { area: "Area2", quota: "70 GB" },
+                        { area: "Area3", quota: "83 GB" }, { area: "Area4", quota: "123 GB" }
+                    ],
+                    "Megabig V2": [
+                        { area: "Area1", quota: "76-78 GB" }, { area: "Area2", quota: "78-80 GB" },
+                        { area: "Area3", quota: "83-85 GB" }, { area: "Area4", quota: "93-95 GB" }
+                    ],
+                    "MegaBig": [
+                        { area: "Area1", quota: "88-90 GB" }, { area: "Area2", quota: "90-92 GB" },
+                        { area: "Area3", quota: "95-97 GB" }, { area: "Area4", quota: "105-107 GB" }
+                    ]
+                };
+
+                // Parsing logic
                 if (Array.isArray(dataToParse)) {
                     stockItems = dataToParse.map(item => {
                         let valCode = item.sku || item.kode || item.code || item.id || '-';
@@ -529,6 +589,7 @@
                     }
                 }
 
+                // Render UI Stok
                 if (stockItems.length > 0) {
                     stokGrid.classList.remove('hidden');
                     stokRawContainer.classList.add('hidden');
@@ -545,27 +606,52 @@
                         
                         const emptyText = !isAvailable ? `<span class="block text-red-500 text-[11px] italic font-black tracking-wider mt-1.5">HABIS</span>` : '';
 
+                        // Menyiapkan rincian Area
+                        let baseNameForArea = item.name.replace(' (Promo)', '').trim();
+                        if(baseNameForArea.toLowerCase() === 'megabig v2') baseNameForArea = 'Megabig V2'; 
+                        
+                        let areaHTML = '';
+                        const areas = detailAreaPaket[baseNameForArea];
+                        
+                        if (areas) {
+                            areaHTML = `<div class="mt-auto pt-4 border-t border-[#1a3245] relative z-10 flex flex-col gap-1">`;
+                            areas.forEach(a => {
+                                areaHTML += `
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] text-gray-400 font-medium tracking-wide">${a.area}</span>
+                                        <span class="text-[#e8b923] text-[11px] font-bold tracking-wide">${a.quota}</span>
+                                    </div>
+                                `;
+                            });
+                            areaHTML += `</div>`;
+                        } else {
+                            areaHTML = `
+                                <div class="mt-auto pt-3 border-t border-[#1a3245] relative z-10 flex justify-between items-center">
+                                    <span class="text-xs text-gray-500 font-semibold tracking-wider">KODE</span>
+                                    <span class="text-[#e8b923] text-sm font-bold tracking-wider">${item.code}</span>
+                                </div>
+                            `;
+                        }
+
+                        // Desain Kartu Grid
                         const card = `
                             <div class="bg-dark-input p-4 md:p-5 rounded-[20px] border border-dark-border ${bgHover} transition-all shadow-lg flex flex-col h-full relative overflow-hidden group">
                                 <div class="absolute inset-0 bg-brand-main/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                                 
-                                <div class="flex justify-between items-start mb-4 relative z-10 gap-2">
+                                <div class="flex justify-between items-start mb-3 relative z-10 gap-2">
                                     <h3 class="font-bold text-white text-base md:text-lg tracking-tight leading-tight">${item.name}</h3>
                                     <div class="shrink-0 mt-0.5">${checkIcon}</div>
                                 </div>
                                 
-                                <div class="mb-5 relative z-10">
+                                <div class="mb-4 relative z-10">
                                     <div class="flex items-baseline gap-1.5">
                                         <span class="text-white font-bold text-sm md:text-base">Stok:</span>
-                                        <span class="text-lg md:text-[22px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
+                                        <span class="text-xl md:text-[22px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
                                     </div>
                                     ${emptyText}
                                 </div>
                                 
-                                <div class="mt-auto pt-3 border-t border-[#1a3245] relative z-10 flex justify-between items-center">
-                                    <span class="text-[10px] md:text-xs text-gray-500 font-semibold tracking-wider">KODE</span>
-                                    <span class="text-[#e8b923] text-xs md:text-sm font-bold tracking-wider">${item.code}</span>
-                                </div>
+                                ${areaHTML}
                             </div>
                         `;
                         stokGrid.insertAdjacentHTML('beforeend', card);
@@ -588,28 +674,27 @@
                 btnCekStok.classList.remove('opacity-70', 'cursor-not-allowed');
                 btnIcon.classList.remove('fa-spin');
             }
+        }
+
+        // Jalankan fetch saat tombol diklik
+        document.getElementById('btnCekStok').addEventListener('click', loadStokData);
+
+        // Auto-load saat halaman pertama kali dibuka
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStokData();
         });
 
-        // Trigger otomatis tombol Load Stok pertama kali halaman dibuka
-        window.addEventListener('DOMContentLoaded', () => {
-             document.getElementById('btnCekStok').click();
-        });
 
         // ==============================================
         // Logika Fake Running Text Transaksi
         // ==============================================
         function generateFakeTransactions() {
-            const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra", "Tari", "Bayu", "Rini", "Fajar", "Maya", "Iwan", "Sari", "Gilang", "Nisa", "Rio", "Dina", "Kevin", "Indah", "Aris", "Wulan", "Surya", "Suci", "Rafi", "Intan", "Yudi", "Mega", "Aditya", "Nurul", "Farhan", "Nadia", "Fikri", "Siska", "Ilham", "Kiki", "Ari", "Ratih"];
+            const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra", "Tari", "Bayu", "Rini"];
             
-            // Nama paket mutlak sesuai daftar stok (Sesuai List Anda)
-            const packages = [
-                "SuperMini", "SuperMini V2", "Mini", "Big (Promo)", "Big", 
-                "Big V2 (Promo)", "Big V2", "Jumbo V2 (Promo)", "Jumbo V2", 
-                "Jumbo V3 (Promo)", "Jumbo V3", "MegaBig v2 (Promo)", 
-                "Megabig V2", "MegaBig (Promo)", "JUMBO", "MegaBig"
-            ]; 
+            // Menggunakan List Nama Paket Valid
+            const packages = ["SuperMini", "SuperMini V2", "Mini", "Big", "Big V2", "Jumbo V2", "Jumbo V3", "JUMBO", "Megabig V2", "MegaBig"]; 
             
-            // Prefix Nomor Telepon Mutlak sesuai permintaan (XL & AXIS Saja)
+            // Prefix khusus XL/Axis yang diminta
             const prefixes = ["0817", "0818", "0819", "0859", "0877", "0878", "0831", "0832", "0833", "0838"];
 
             let marqueeHTML = "";
@@ -624,11 +709,11 @@
                 let phone = `${prefix}****${suffix}`;
                 
                 marqueeHTML += `
-                    <span class="mx-4 md:mx-6 text-[10px] md:text-xs text-gray-400 font-medium tracking-wide">
+                    <span class="mx-6 text-[10px] sm:text-[11px] md:text-xs text-gray-400 font-medium tracking-wide">
                         <i class="fa-solid fa-cart-shopping text-brand-main mr-2"></i>
                         <span class="text-gray-200">${maskedName}</span> <span class="opacity-70">(${phone})</span> sukses membeli <span class="text-brand-main font-bold">${pkg}</span>
                     </span>
-                    <span class="text-dark-border text-[8px] md:text-[10px]">●</span>
+                    <span class="text-dark-border text-[10px]">●</span>
                 `;
             }
             
