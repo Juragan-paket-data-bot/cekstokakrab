@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport mengizinkan zoom jika user memaksa via mode desktop -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- Viewport mengunci zoom secara mutlak (tidak bisa di-zoom out/in) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#041016">
     <title>Sistem Juragan Paket Data</title>
     
@@ -60,14 +60,17 @@
             appearance: textfield;
         }
 
-        /* PERBAIKAN: Mencegah scroll Kiri Kanan & Pull-to-refresh, tapi biarkan scroll vertikal normal */
+        /* PERBAIKAN: Mencegah scroll Kiri Kanan mutlak & larang Zoom/Swipe horizontal */
         body, html {
             width: 100%; 
             max-width: 100%;
-            overflow-x: hidden; /* Kunci scroll horizontal */
+            overflow-x: hidden !important; /* Kunci mutlak agar tidak bisa geser kiri-kanan */
+            overflow-y: auto; /* Pastikan scroll atas-bawah tetap berfungsi */
             margin: 0;
             padding: 0;
+            overscroll-behavior-x: none; /* Anti gestur swipe back/forward di HP */
             overscroll-behavior-y: none; /* Anti pull-to-refresh */
+            touch-action: pan-y; /* Gestur sentuh HANYA diizinkan untuk atas-bawah (memblokir cubit/zoom dan geser horizontal) */
         }
         
         /* Modifikasi Scrollbar Custom */
