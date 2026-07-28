@@ -2,46 +2,15 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta tag lebih agresif untuk mencegah zoom dan memastikan fullscreen di mobile -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no">
+    <!-- Meta tag khusus Mobile Web App: Mencegah zoom, support notch (layar poni) iPhone -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no, viewport-fit=cover">
+    <meta name="theme-color" content="#041016">
     <title>Sistem Juragan Paket Data</title>
     
-    <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- CSS Tambahan untuk Mobile Web App Experience -->
-    <style>
-        /* Mencegah double-tap to zoom & pull-to-refresh */
-        html {
-            touch-action: manipulation;
-            max-width: 100vw;
-            overflow-x: hidden;
-        }
-        body {
-            overscroll-behavior-y: none;
-            max-width: 100vw;
-            overflow-x: hidden;
-        }
-        /* Menghilangkan panah (spinner) pada input tipe number */
-        /* Chrome, Safari, Edge, Opera */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        /* Firefox */
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-    </style>
-
-    <!-- Memuat Font Google (Poppins) untuk kesan premium -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Memuat Ikon FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Konfigurasi Kustom Tailwind (Warna Juragan Paket Data) -->
     <script>
         tailwind.config = {
             theme: {
@@ -51,18 +20,15 @@
                         brand: {
                             main: '#00f47e',   // Hijau Neon Terang
                             dark: '#00c765',   // Hijau Hover
-                            glow: 'rgba(0, 244, 126, 0.3)'
                         },
                         dark: {
-                            bg: '#041016',     // Latar belakang paling gelap
-                            card: '#0b1a24',   // Latar kotak/kartu utama
-                            input: '#122533',  // Latar input dan kartu dalam
-                            border: '#1a3245'  // Garis batas gelap
+                            bg: '#041016',     // Latar belakang utama
+                            card: '#0b1a24',   // Latar kotak/kartu
+                            input: '#122533',  // Latar input
+                            border: '#1a3245'  // Garis batas
                         }
                     },
-                    animation: {
-                        'marquee': 'marquee 800s linear infinite',
-                    },
+                    animation: { 'marquee': 'marquee 800s linear infinite' },
                     keyframes: {
                         marquee: {
                             '0%': { transform: 'translateX(0)' },
@@ -73,29 +39,55 @@
             }
         }
     </script>
+
+    <style>
+        /* Fondasi utama agar tidak bisa digeser ke samping (scroll horizontal) dan anti membal */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden !important; 
+            -webkit-text-size-adjust: 100%;
+            touch-action: pan-y; /* Mengizinkan scroll vertikal, mematikan double-tap/pinch zoom */
+            overscroll-behavior-y: none; /* Mematikan efek bounce/pull-to-refresh */
+            -webkit-tap-highlight-color: transparent; /* Menghilangkan efek blok biru saat tap di HP */
+            background-color: #041016;
+        }
+
+        /* Menghilangkan panah (spinner) pada input tipe number */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* Mencegah tumpahan elemen PRE code dari hasil RAW jika kepanjangan */
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 
-<body class="bg-dark-bg min-h-screen text-gray-200 antialiased flex flex-col font-sans selection:bg-brand-main selection:text-black">
+<!-- min-h-[100dvh] memastikan tinggi layar pas menutupi hingga area menu browser HP terbawah -->
+<body class="bg-dark-bg text-gray-200 antialiased flex flex-col font-sans w-full min-h-[100dvh] overflow-x-hidden selection:bg-brand-main selection:text-black">
 
-    <!-- Top Bar Status -->
-    <div class="bg-[#022214] text-brand-main text-[10px] md:text-xs font-bold text-center py-2 tracking-widest border-b border-brand-main/20">
+    <div class="w-full bg-[#022214] text-brand-main text-[10px] md:text-xs font-bold text-center py-2 tracking-widest border-b border-brand-main/20 flex-shrink-0">
         <i class="fa-solid fa-circle text-[8px] mr-1.5 animate-pulse"></i> SISTEM AKTIF 24 JAM 
         <i class="fa-solid fa-circle text-[8px] mx-1.5 opacity-50"></i> PROSES INSTAN DETIK ITU JUGA!
     </div>
 
-    <!-- Running Text Transaksi (Fake Marquee) -->
-    <div class="w-full bg-dark-bg/80 border-b border-dark-border overflow-hidden py-2.5 flex items-center relative">
+    <div class="w-full bg-dark-bg/80 border-b border-dark-border overflow-hidden py-2.5 flex items-center relative flex-shrink-0">
         <div class="absolute left-0 w-12 h-full bg-gradient-to-r from-dark-bg to-transparent z-10 pointer-events-none"></div>
         <div class="absolute right-0 w-12 h-full bg-gradient-to-l from-dark-bg to-transparent z-10 pointer-events-none"></div>
-        
-        <div class="flex whitespace-nowrap animate-marquee" id="runningTextContainer">
-            <!-- Data transaksi di-generate oleh JS -->
-        </div>
+        <div class="flex whitespace-nowrap animate-marquee" id="runningTextContainer"></div>
     </div>
 
-    <!-- Navigasi / Header -->
-    <nav class="w-full max-w-5xl mx-auto px-4 py-6 flex justify-between items-center">
-        <!-- Logo Area -->
+    <nav class="w-full max-w-5xl mx-auto px-4 py-5 flex justify-between items-center flex-shrink-0">
         <div class="flex items-center gap-3.5">
             <div class="w-11 h-11 bg-brand-main rounded-xl flex items-center justify-center text-dark-bg shadow-[0_0_15px_rgba(0,244,126,0.5)] transform -rotate-6">
                 <i class="fa-solid fa-bolt text-2xl transform rotate-6"></i>
@@ -105,15 +97,13 @@
                 <span class="text-brand-main text-[9px] md:text-[10px] font-bold tracking-[0.15em] opacity-80 uppercase">PPOB Automations</span>
             </div>
         </div>
-        
         <div class="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-main/30 bg-brand-main/10 text-brand-main text-sm font-semibold shadow-[0_0_10px_rgba(0,244,126,0.1)]">
             <i class="fa-solid fa-bolt text-xs"></i>
             Engine Online
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <div class="text-center mt-6 md:mt-12 mb-10 px-4">
+    <div class="text-center mt-4 md:mt-10 mb-8 px-4 flex-shrink-0 w-full overflow-hidden">
         <h1 class="text-3xl md:text-5xl font-extrabold text-white leading-tight tracking-tight max-w-3xl mx-auto">
             Cek Stok Akrab dan Kuota <br class="hidden md:block">
             <span class="text-brand-main">Juragan Paket Data</span>
@@ -123,44 +113,122 @@
         </p>
     </div>
 
-    <!-- Kontainer Aplikasi Utama -->
-    <div class="w-full max-w-5xl mx-auto px-4 pb-20">
-        <div class="bg-dark-card rounded-3xl shadow-2xl border border-dark-border overflow-hidden">
+    <div class="w-full max-w-5xl mx-auto px-3 sm:px-4 pb-24 flex-grow">
+        <div class="bg-dark-card rounded-[24px] shadow-2xl border border-dark-border overflow-hidden w-full">
             
-            <!-- Tab Navigasi -->
-            <div class="flex flex-col sm:flex-row border-b border-dark-border bg-dark-bg/50">
-                <button id="tabBtnStok" class="flex-1 py-4 text-sm md:text-base font-semibold text-brand-main border-b-2 border-brand-main bg-brand-main/5 transition-all">
+            <div class="flex border-b border-dark-border bg-dark-bg/50">
+                <button id="tabBtnStok" class="flex-1 py-4 text-sm md:text-base font-semibold text-brand-main border-b-2 border-brand-main bg-brand-main/5 transition-all outline-none">
                     <i class="fa-solid fa-boxes-stacked mr-2"></i>Stok Akrab
                 </button>
-                <button id="tabBtnKuota" class="flex-1 py-4 text-sm md:text-base font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-300 hover:bg-white/5 transition-all">
+                <button id="tabBtnKuota" class="flex-1 py-4 text-sm md:text-base font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-300 hover:bg-white/5 transition-all outline-none">
                     <i class="fa-solid fa-mobile-screen mr-2"></i>Cek Kuota
                 </button>
             </div>
 
-            <!-- ============================================== -->
-            <!-- TAB: STOK AKRAB -->
-            <!-- ============================================== -->
-            <div id="tabContentStok" class="block p-4 md:p-8">
-                <!-- Animasi Loading Stok -->
-                <div id="loadingStok" class="hidden my-12 flex flex-col items-center justify-center gap-3">
+            <div id="tabContentKuota" class="hidden">
+                <div class="p-4 sm:p-6 md:p-8 w-full overflow-hidden">
+                    <form id="cekForm" class="relative max-w-lg mx-auto w-full">
+                        <div class="flex flex-col sm:flex-row gap-3 md:gap-4 w-full">
+                            <!-- text-[16px] ditambahkan spesifik agar Safari iOS TIDAK auto-zoom saat form diklik -->
+                            <input type="number" id="inputNomor" placeholder="Contoh: 087812345678" required
+                                class="flex-1 w-full px-5 py-4 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main/50 focus:border-brand-main transition-all font-medium text-white placeholder-gray-500 appearance-none text-[16px]">
+                            <button type="submit" id="btnSubmit" 
+                                class="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-4 px-6 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center min-w-[140px] outline-none">
+                                <span>Cek Nomor</span>
+                                <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                
+                    <div id="loading" class="hidden mt-10 flex-col items-center justify-center gap-3">
+                        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-main"></i>
+                        <span class="text-brand-main font-medium animate-pulse tracking-wide">Menghubungkan ke server...</span>
+                    </div>
+                    
+                    <div id="errorMsg" class="hidden mt-6 max-w-lg mx-auto bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm items-center gap-3 w-full">
+                        <i class="fa-solid fa-circle-exclamation text-lg flex-shrink-0"></i>
+                        <span id="errorText">Terjadi kesalahan. Silakan coba lagi.</span>
+                    </div>
+                </div>
+
+                <div id="resultArea" class="hidden border-t border-dark-border bg-dark-card w-full">
+                    <!-- Info Kartu & Tenggang -->
+                    <div class="p-4 sm:p-6 md:p-8 border-b border-dark-border bg-dark-bg/30">
+                        <div class="flex items-center gap-2 mb-4 md:mb-6">
+                            <i class="fa-solid fa-address-card text-brand-main text-xl"></i>
+                            <h2 class="text-lg md:text-xl font-bold text-white">Informasi Kartu</h2>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 w-full">
+                            <div class="bg-dark-input p-3 sm:p-4 rounded-2xl border border-dark-border flex flex-col justify-center">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-solid fa-phone text-xs"></i>
+                                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">Nomor</span>
+                                </div>
+                                <span id="resNomor" class="font-bold text-white text-sm sm:text-base break-all">-</span>
+                            </div>
+                            
+                            <div class="bg-dark-input p-3 sm:p-4 rounded-2xl border border-dark-border flex flex-col justify-center">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-solid fa-tower-broadcast text-xs"></i>
+                                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">Operator</span>
+                                </div>
+                                <span id="resOperator" class="font-bold text-brand-main text-sm sm:text-base break-words">-</span>
+                            </div>
+                            
+                            <div class="bg-dark-input p-3 sm:p-4 rounded-2xl border border-dark-border flex flex-col justify-center">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-solid fa-wifi text-xs"></i>
+                                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">Jaringan</span>
+                                </div>
+                                <span id="resNet" class="inline-flex w-fit items-center px-2 py-0.5 rounded-md text-xs font-bold bg-brand-main/10 text-brand-main border border-brand-main/20 mt-0.5">-</span>
+                            </div>
+                            
+                            <div class="bg-dark-input p-3 sm:p-4 rounded-2xl border border-dark-border flex flex-col justify-center">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-regular fa-calendar-check text-xs"></i>
+                                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">Masa Aktif</span>
+                                </div>
+                                <span id="resExp" class="font-bold text-white text-xs sm:text-sm">-</span>
+                            </div>
+                            
+                            <div class="bg-dark-input p-3 sm:p-4 rounded-2xl border border-red-500/20 col-span-2 md:col-span-1 flex flex-col justify-center">
+                                <div class="flex items-center gap-2 text-gray-500 mb-1">
+                                    <i class="fa-regular fa-calendar-xmark text-xs text-red-400/80"></i>
+                                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-400/80">Masa Tenggang</span>
+                                </div>
+                                <span id="resGrace" class="font-bold text-red-400 text-xs sm:text-sm">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 sm:p-6 md:p-8 w-full">
+                        <div class="flex items-center gap-2 mb-6">
+                            <i class="fa-solid fa-box-open text-brand-main text-xl"></i>
+                            <h2 class="text-lg md:text-xl font-bold text-white">Detail Paket & Kuota</h2>
+                        </div>
+                        <div id="packagesContainer" class="flex flex-col gap-6 md:gap-8 w-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tabContentStok" class="block p-4 sm:p-6 md:p-8 w-full overflow-hidden">
+                <div id="loadingStok" class="hidden my-12 flex-col items-center justify-center gap-3">
                     <i class="fa-solid fa-boxes-packing fa-bounce text-4xl text-brand-main"></i>
                     <span class="text-brand-main font-medium animate-pulse tracking-wide">Mengambil data stok...</span>
                 </div>
 
-                <!-- Notifikasi Error Stok -->
-                <div id="errorMsgStok" class="hidden mb-6 bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm flex items-center gap-3">
-                    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+                <div id="errorMsgStok" class="hidden mb-6 bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm items-center gap-3 w-full">
+                    <i class="fa-solid fa-circle-exclamation text-lg flex-shrink-0"></i>
                     <span id="errorTextStok">Gagal mengambil data stok.</span>
                 </div>
 
-                <!-- Area Hasil Stok -->
-                <div id="resultAreaStok" class="block mb-8">
-                    <!-- Mengubah layout list menjadi Grid Kotak -->
-                    <div id="stokGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-                        <!-- Item stok disisipkan di sini -->
+                <div id="resultAreaStok" class="block mb-8 w-full">
+                    <div id="stokGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 w-full">
+                        <!-- Grid Kartu Stok -->
                     </div>
                     
-                    <div id="stokRawContainer" class="hidden bg-dark-bg rounded-xl p-4 overflow-x-auto border border-dark-border mt-4">
+                    <div id="stokRawContainer" class="hidden bg-dark-bg rounded-xl p-4 overflow-x-auto border border-dark-border mt-4 w-full">
                         <div class="flex items-center gap-2 mb-2">
                             <i class="fa-solid fa-code text-gray-500 text-xs"></i>
                             <span class="text-xs text-gray-500 font-medium uppercase tracking-wider">Respons Server (Raw)</span>
@@ -169,142 +237,39 @@
                     </div>
                 </div>
 
-                <!-- Tombol Load Data dipindah ke bawah list -->
-                <div class="text-center pt-6 border-t border-dark-border/50">
-                    <button id="btnCekStok" class="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-8 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto">
+                <!-- Posisi Tombol Load Stok (Dipindah ke bawah list paket) -->
+                <div class="text-center pt-6 border-t border-dark-border/50 w-full">
+                    <button id="btnCekStok" class="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-4 px-8 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto outline-none">
                         <i class="fa-solid fa-rotate"></i>
                         <span>Muat Data Stok Realtime</span>
                     </button>
-                    <p class="text-gray-500 text-xs mt-4"><i class="fa-solid fa-shield-halved mr-1 text-brand-main/70"></i> Terhubung langsung dengan server Juragan</p>
+                    <p class="text-gray-500 text-[11px] sm:text-xs mt-4"><i class="fa-solid fa-shield-halved mr-1 text-brand-main/70"></i> Terhubung langsung dengan server Juragan</p>
                 </div>
             </div>
-
-            <!-- ============================================== -->
-            <!-- TAB: CEK KUOTA -->
-            <!-- ============================================== -->
-            <div id="tabContentKuota" class="hidden">
-                <div class="p-4 md:p-8">
-                    <form id="cekForm" class="relative max-w-lg mx-auto">
-                        <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
-                            <!-- Menambahkan 'text-base' agar iPhone/iOS Safari tidak melakukan zoom otomatis saat input diklik -->
-                            <input type="number" id="inputNomor" placeholder="Contoh: 087812345678" required
-                                class="flex-1 w-full px-5 py-3.5 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main/50 focus:border-brand-main transition-all font-medium text-white placeholder-gray-500 appearance-none text-base">
-                            <button type="submit" id="btnSubmit" 
-                                class="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-3.5 px-6 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center min-w-[140px]">
-                                <span>Cek Nomor</span>
-                                <i class="fa-solid fa-arrow-right ml-2"></i>
-                            </button>
-                        </div>
-                    </form>
-                
-                    <!-- Animasi Loading -->
-                    <div id="loading" class="hidden mt-8 flex flex-col items-center justify-center gap-3">
-                        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-main"></i>
-                        <span class="text-brand-main font-medium animate-pulse tracking-wide">Menghubungkan ke server...</span>
-                    </div>
-                    
-                    <!-- Notifikasi Error -->
-                    <div id="errorMsg" class="hidden mt-6 max-w-lg mx-auto bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm flex items-center gap-3">
-                        <i class="fa-solid fa-circle-exclamation text-lg"></i>
-                        <span id="errorText">Terjadi kesalahan. Silakan coba lagi.</span>
-                    </div>
-                </div>
-
-                <!-- Area Hasil Kuota -->
-                <div id="resultArea" class="hidden border-t border-dark-border bg-dark-card">
-                    
-                    <!-- Bagian Info Kartu -->
-                    <div class="p-4 md:p-8 border-b border-dark-border bg-dark-bg/30">
-                        <div class="flex items-center gap-2 mb-4 md:mb-6">
-                            <i class="fa-solid fa-address-card text-brand-main text-xl"></i>
-                            <h2 class="text-lg md:text-xl font-bold text-white">Informasi Kartu</h2>
-                        </div>
-                        
-                        <!-- Grid 5 Kolom (Termasuk Masa Tenggang) -->
-                        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
-                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
-                                <div class="flex items-center gap-2 text-gray-500 mb-1">
-                                    <i class="fa-solid fa-phone text-xs"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Nomor</span>
-                                </div>
-                                <span id="resNomor" class="font-bold text-white text-base md:text-lg break-all">-</span>
-                            </div>
-                            
-                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
-                                <div class="flex items-center gap-2 text-gray-500 mb-1">
-                                    <i class="fa-solid fa-tower-broadcast text-xs"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Operator</span>
-                                </div>
-                                <span id="resOperator" class="font-bold text-brand-main text-base md:text-lg">-</span>
-                            </div>
-                            
-                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
-                                <div class="flex items-center gap-2 text-gray-500 mb-1">
-                                    <i class="fa-solid fa-wifi text-xs"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Jaringan</span>
-                                </div>
-                                <span id="resNet" class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-brand-main/10 text-brand-main border border-brand-main/20 mt-0.5">-</span>
-                            </div>
-                            
-                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-dark-border">
-                                <div class="flex items-center gap-2 text-gray-500 mb-1">
-                                    <i class="fa-regular fa-calendar-check text-xs"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Masa Aktif</span>
-                                </div>
-                                <span id="resExp" class="font-bold text-white text-sm md:text-base">-</span>
-                            </div>
-                            
-                            <div class="bg-dark-input p-3 md:p-4 rounded-2xl border border-red-500/20 col-span-2 lg:col-span-1">
-                                <div class="flex items-center gap-2 text-gray-500 mb-1">
-                                    <i class="fa-regular fa-calendar-xmark text-xs"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-400/80">Masa Tenggang</span>
-                                </div>
-                                <span id="resGrace" class="font-bold text-red-400 text-sm md:text-base">-</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bagian Info Detail Kuota -->
-                    <div class="p-4 md:p-8">
-                        <div class="flex items-center gap-2 mb-6">
-                            <i class="fa-solid fa-box-open text-brand-main text-xl"></i>
-                            <h2 class="text-lg md:text-xl font-bold text-white">Detail Paket & Kuota</h2>
-                        </div>
-                        
-                        <!-- Kontainer Multi-Paket -->
-                        <div id="packagesContainer" class="flex flex-col gap-8">
-                            <!-- Paket-paket disisipkan secara dinamis oleh JavaScript -->
-                        </div>
-                    </div>
-                </div> <!-- Penutup resultArea -->
-            </div> <!-- Penutup tabContentKuota -->
+            
         </div>
     </div>
     
-    <!-- Script Logika Aplikasi -->
     <script>
-        // Data Mock untuk Preview (Termasuk 2 paket untuk menguji fitur multi-paket)
+        // Data Mockup untuk Preview Editor
         const mockDataPreview = {
-            "success":true,"code":"000","message":"Sukses mengambil data","data":{"subs_info":{"msisdn":"6287812345678","operator":"XL","id_verified":"Sudah","net_type":"4G","tenure":"0 Tahun 4 Bulan","exp_date":"06-03-2037","grace_until":"31-12-2035","volte":{"device":false,"area":false,"simcard":false}},"package_info":{"error_message":null,"packages":[
+            "success":true,"code":"000","message":"Sukses","data":{"subs_info":{"msisdn":"6287812345678","operator":"XL","net_type":"4G","exp_date":"06-03-2037","grace_until":"31-12-2035"},"package_info":{"error_message":null,"packages":[
                 {
                     "name":"Akrab Mini 10GB",
                     "expiry":"31-12-2049",
-                    "timestamp":2524582799,
                     "quotas":[
                         {"name":"Kuota Bersama","percent":80,"total":"10GB","remaining":"8GB"},
-                        {"name":"Kuota Pribadi","percent":100,"total":"10GB","remaining":"10GB"},
-                        {"name":"Bonus WhatsApp","percent":100,"total":"Unlim","remaining":"Unlim"}
+                        {"name":"Kuota Pribadi","percent":100,"total":"10GB","remaining":"10GB"}
                     ]
                 },
                 {
                     "name":"Extra Kuota Tiktok",
                     "expiry":"31-12-2024",
-                    "timestamp":1735603199,
                     "quotas":[
                         {"name":"Kuota Tiktok 24 Jam","percent":25,"total":"5GB","remaining":"1.2GB"}
                     ]
                 }
-            ]}},"meta":{"provider":"xl-ku.my.id","normalizedNumber":"087812345678","checkType":"package"}
+            ]}}
         };
 
         const mockStokPreview = {
@@ -323,7 +288,6 @@
             ]
         };
 
-        // Logika Tab Navigasi
         const tabBtnKuota = document.getElementById('tabBtnKuota');
         const tabBtnStok = document.getElementById('tabBtnStok');
         const tabContentKuota = document.getElementById('tabContentKuota');
@@ -337,34 +301,29 @@
             inactiveBtn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-300', 'hover:bg-white/5');
 
             activeContent.classList.remove('hidden');
-            activeContent.classList.add('block');
             inactiveContent.classList.add('hidden');
-            inactiveContent.classList.remove('block');
         }
 
         tabBtnKuota.addEventListener('click', () => switchTab(tabBtnKuota, tabBtnStok, tabContentKuota, tabContentStok));
         tabBtnStok.addEventListener('click', () => switchTab(tabBtnStok, tabBtnKuota, tabContentStok, tabContentKuota));
 
-        // Logika Form Cek Kuota
         document.getElementById('cekForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const nomor = document.getElementById('inputNomor').value;
             const loading = document.getElementById('loading');
             const errorMsg = document.getElementById('errorMsg');
-            const errorText = document.getElementById('errorText');
             const resultArea = document.getElementById('resultArea');
             const btnSubmit = document.getElementById('btnSubmit');
             const btnIcon = btnSubmit.querySelector('i');
 
-            // Reset UI
             errorMsg.classList.add('hidden');
+            errorMsg.classList.remove('flex');
             resultArea.classList.add('hidden');
             loading.classList.remove('hidden');
+            loading.classList.add('flex');
             btnSubmit.disabled = true;
             btnSubmit.classList.add('opacity-70', 'cursor-not-allowed');
-            btnIcon.classList.remove('fa-arrow-right');
-            btnIcon.classList.add('fa-spinner', 'fa-spin');
+            btnIcon.className = 'fa-solid fa-spinner fa-spin ml-2';
 
             try {
                 let responseData;
@@ -372,10 +331,10 @@
                 
                 if (isVercel) {
                     const response = await fetch(`/api/checker?number=${nomor}`);
-                    if (!response.ok) throw new Error("Gagal terhubung ke API.");
+                    if (!response.ok) throw new Error("Gagal terhubung");
                     responseData = await response.json();
                 } else {
-                    await new Promise(r => setTimeout(r, 1500));
+                    await new Promise(r => setTimeout(r, 1000));
                     responseData = mockDataPreview; 
                     responseData.data.subs_info.msisdn = nomor;
                 }
@@ -396,53 +355,47 @@
                     if (packagesArray && packagesArray.length > 0) {
                         packagesArray.forEach(paket => {
                             let packageHTML = `
-                                <div class="package-section bg-dark-bg/40 p-4 md:p-6 rounded-2xl border border-dark-border">
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-dark-border">
+                                <div class="bg-dark-bg/40 p-4 sm:p-5 md:p-6 rounded-2xl border border-dark-border w-full">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-4 border-b border-dark-border">
                                         <div class="flex items-center gap-2">
                                             <i class="fa-solid fa-tag text-brand-main"></i>
-                                            <h3 class="text-base md:text-lg font-bold text-white">${paket.name}</h3>
+                                            <h3 class="text-base md:text-lg font-bold text-white break-words">${paket.name}</h3>
                                         </div>
-                                        <span class="text-xs font-semibold text-gray-500 bg-dark-input px-3 py-1 rounded-full border border-dark-border inline-block w-fit">Exp: <span class="text-gray-300">${paket.expiry}</span></span>
+                                        <span class="text-[11px] font-semibold text-gray-500 bg-dark-input px-3 py-1.5 rounded-full border border-dark-border w-fit whitespace-nowrap">Exp: <span class="text-gray-300">${paket.expiry}</span></span>
                                     </div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 w-full">
                             `;
 
                             if (paket.quotas && paket.quotas.length > 0) {
                                 paket.quotas.forEach(kuota => {
                                     const percent = kuota.percent || 100;
-                                    let barColor = 'bg-brand-main shadow-[0_0_8px_rgba(0,244,126,0.6)]';
-                                    if(percent <= 20) barColor = 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]';
-                                    else if(percent <= 50) barColor = 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]';
+                                    let barColor = percent <= 20 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]' : (percent <= 50 ? 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]' : 'bg-brand-main shadow-[0_0_8px_rgba(0,244,126,0.6)]');
 
                                     packageHTML += `
-                                        <div class="bg-dark-input border border-dark-border rounded-xl p-4 hover:border-brand-main/40 transition-all group shadow-sm">
-                                            <h4 class="text-xs md:text-sm font-semibold text-gray-200 mb-3 group-hover:text-brand-main transition-colors line-clamp-1" title="${kuota.name}">${kuota.name}</h4>
-                                            
-                                            <div class="flex justify-between items-end mb-2">
-                                                <div>
-                                                    <span class="block text-[9px] md:text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Sisa Kuota</span>
-                                                    <span class="text-base md:text-lg font-extrabold text-brand-main leading-none">${kuota.remaining}</span>
+                                        <div class="bg-dark-input border border-dark-border rounded-xl p-4 hover:border-brand-main/40 transition-all shadow-sm flex flex-col justify-between min-h-[100px]">
+                                            <h4 class="text-xs md:text-sm font-semibold text-gray-200 mb-3 break-words line-clamp-2" title="${kuota.name}">${kuota.name}</h4>
+                                            <div>
+                                                <div class="flex justify-between items-end mb-2">
+                                                    <div>
+                                                        <span class="block text-[9px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Sisa Kuota</span>
+                                                        <span class="text-base font-extrabold text-brand-main leading-none">${kuota.remaining}</span>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <span class="block text-[9px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Total</span>
+                                                        <span class="text-xs font-medium text-gray-400">${kuota.total}</span>
+                                                    </div>
                                                 </div>
-                                                <div class="text-right">
-                                                    <span class="block text-[9px] md:text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Total</span>
-                                                    <span class="text-xs md:text-sm font-medium text-gray-400">${kuota.total}</span>
+                                                <div class="w-full bg-dark-bg rounded-full h-1.5 mt-2 overflow-hidden border border-white/5 relative">
+                                                    <div class="absolute left-0 top-0 h-full ${barColor} rounded-full transition-all duration-1000 ease-out" style="width: 0%" data-target-width="${percent}%"></div>
                                                 </div>
-                                            </div>
-                                            
-                                            <div class="w-full bg-dark-bg rounded-full h-1.5 mt-3 border border-white/5">
-                                                <div class="${barColor} h-1.5 rounded-full transition-all duration-1000 ease-out" style="width: 0%" data-target-width="${percent}%"></div>
                                             </div>
                                         </div>
                                     `;
                                 });
                             } else {
-                                packageHTML += `<div class="col-span-full text-sm text-gray-500 italic">Tidak ada rincian kuota di dalam paket ini.</div>`;
+                                packageHTML += `<div class="col-span-full text-xs text-gray-500 italic">Rincian kuota tidak tersedia.</div>`;
                             }
-
-                            packageHTML += `
-                                    </div>
-                                </div>
-                            `;
+                            packageHTML += `</div></div>`;
                             packagesContainer.insertAdjacentHTML('beforeend', packageHTML);
                         });
 
@@ -450,46 +403,40 @@
                             document.querySelectorAll('#packagesContainer .rounded-full[data-target-width]').forEach(bar => {
                                 bar.style.width = bar.getAttribute('data-target-width');
                             });
-                        }, 100);
+                        }, 50);
 
                     } else {
-                        packagesContainer.innerHTML = `
-                            <div class="p-6 text-center border border-dashed border-dark-border rounded-xl bg-dark-input/50 text-gray-500">
-                                <i class="fa-solid fa-inbox text-2xl mb-2 opacity-50"></i>
-                                <p>Tidak ada detail paket atau kuota yang ditemukan untuk nomor ini.</p>
-                            </div>
-                        `;
+                        packagesContainer.innerHTML = `<div class="p-6 text-center border border-dashed border-dark-border rounded-xl bg-dark-input/50 text-gray-500 w-full"><i class="fa-solid fa-inbox text-2xl mb-2 opacity-50"></i><p class="text-sm">Tidak ada detail paket.</p></div>`;
                     }
                     resultArea.classList.remove('hidden');
                 } else {
-                    throw new Error("Data tidak lengkap atau nomor salah.");
+                    throw new Error("Invalid");
                 }
-
             } catch (error) {
-                console.error(error);
-                errorText.textContent = isVercel ? "Gagal mengambil data dari server. Pastikan nomor valid." : "Terjadi kesalahan pada sistem.";
+                document.getElementById('errorText').textContent = isVercel ? "Gagal terhubung ke API. Pastikan nomor valid." : "Terjadi kesalahan sistem.";
                 errorMsg.classList.remove('hidden');
+                errorMsg.classList.add('flex');
             } finally {
                 loading.classList.add('hidden');
+                loading.classList.remove('flex');
                 btnSubmit.disabled = false;
                 btnSubmit.classList.remove('opacity-70', 'cursor-not-allowed');
-                btnIcon.classList.remove('fa-spinner', 'fa-spin');
-                btnIcon.classList.add('fa-arrow-right');
+                btnIcon.className = 'fa-solid fa-arrow-right ml-2';
             }
         });
 
-        // Logika Load / Reload Data Stok
         async function loadStokData() {
             const loadingStok = document.getElementById('loadingStok');
             const errorMsgStok = document.getElementById('errorMsgStok');
-            const errorTextStok = document.getElementById('errorTextStok');
             const resultAreaStok = document.getElementById('resultAreaStok');
             const btnCekStok = document.getElementById('btnCekStok');
             const btnIcon = btnCekStok.querySelector('i');
 
             errorMsgStok.classList.add('hidden');
+            errorMsgStok.classList.remove('flex');
             resultAreaStok.classList.add('hidden');
             loadingStok.classList.remove('hidden');
+            loadingStok.classList.add('flex');
             
             btnCekStok.disabled = true;
             btnCekStok.classList.add('opacity-70', 'cursor-not-allowed');
@@ -501,7 +448,7 @@
                 
                 if (isVercel) {
                     const response = await fetch(`/api/stok-akrab`);
-                    if (!response.ok) throw new Error("Gagal terhubung ke API Vercel (Stok).");
+                    if (!response.ok) throw new Error("Gagal");
                     responseData = await response.json();
                 } else {
                     await new Promise(r => setTimeout(r, 800));
@@ -510,13 +457,11 @@
 
                 const stokGrid = document.getElementById('stokGrid');
                 const stokRawContainer = document.getElementById('stokRawContainer');
-                const stokRawOutput = document.getElementById('stokRawOutput');
-                
                 stokGrid.innerHTML = ''; 
+                
                 let stockItems = [];
                 let dataToParse = responseData.data || responseData;
 
-                // KAMUS PAKET BARU
                 const kamusPaket = {
                     'XLA14': 'SuperMini', 'XLA20': 'SuperMini V2', 'XLA32': 'Mini', 
                     'XLAP39': 'Big (Promo)', 'XLA39': 'Big', 'XLAP48': 'Big V2 (Promo)', 
@@ -525,89 +470,47 @@
                     'XLA77': 'Megabig V2', 'XLAP89': 'MegaBig (Promo)', 'XLA65': 'JUMBO', 'XLA89': 'MegaBig'
                 };
 
-                // DATA CATATAN AREA PAKET SESUAI REFERENSI SCREENSHOT
                 const detailAreaPaket = {
-                    "SuperMini": [
-                        { area: "Area1", quota: "13-15 GB" }, { area: "Area2", quota: "15-17 GB" },
-                        { area: "Area3", quota: "20-22 GB" }, { area: "Area4", quota: "30-32 GB" }
-                    ],
-                    "SuperMini V2": [
-                        { area: "Area1", quota: "19-21 GB" }, { area: "Area2", quota: "21-23 GB" },
-                        { area: "Area3", quota: "26-28 GB" }, { area: "Area4", quota: "36-38 GB" }
-                    ],
-                    "Mini": [
-                        { area: "Area1", quota: "31-32 GB" }, { area: "Area2", quota: "33-34 GB" },
-                        { area: "Area3", quota: "38-39 GB" }, { area: "Area4", quota: "48-49 GB" }
-                    ],
-                    "Big": [
-                        { area: "Area1", quota: "38-40 GB" }, { area: "Area2", quota: "40-42 GB" },
-                        { area: "Area3", quota: "45-47 GB" }, { area: "Area4", quota: "55-57 GB" }
-                    ],
-                    "Big V2": [
-                        { area: "Area1", quota: "48 GB" }, { area: "Area2", quota: "50 GB" },
-                        { area: "Area3", quota: "55 GB" }, { area: "Area4", quota: "65 GB" }
-                    ],
-                    "Jumbo V2": [
-                        { area: "Area1", quota: "55 GB" }, { area: "Area2", quota: "57 GB" },
-                        { area: "Area3", quota: "62 GB" }, { area: "Area4", quota: "72 GB" }
-                    ],
-                    "Jumbo V3": [
-                        { area: "Area1", quota: "63-65 GB" }, { area: "Area2", quota: "65-67 GB" },
-                        { area: "Area3", quota: "70-72 GB" }, { area: "Area4", quota: "80-82 GB" }
-                    ],
-                    "JUMBO": [
-                        { area: "Area1", quota: "65 GB" }, { area: "Area2", quota: "70 GB" },
-                        { area: "Area3", quota: "83 GB" }, { area: "Area4", quota: "123 GB" }
-                    ],
-                    "Megabig V2": [
-                        { area: "Area1", quota: "76-78 GB" }, { area: "Area2", quota: "78-80 GB" },
-                        { area: "Area3", quota: "83-85 GB" }, { area: "Area4", quota: "93-95 GB" }
-                    ],
-                    "MegaBig": [
-                        { area: "Area1", quota: "88-90 GB" }, { area: "Area2", quota: "90-92 GB" },
-                        { area: "Area3", quota: "95-97 GB" }, { area: "Area4", quota: "105-107 GB" }
-                    ]
+                    "SuperMini": [{ area: "Area1", quota: "13-15 GB" }, { area: "Area2", quota: "15-17 GB" }, { area: "Area3", quota: "20-22 GB" }, { area: "Area4", quota: "30-32 GB" }],
+                    "SuperMini V2": [{ area: "Area1", quota: "19-21 GB" }, { area: "Area2", quota: "21-23 GB" }, { area: "Area3", quota: "26-28 GB" }, { area: "Area4", quota: "36-38 GB" }],
+                    "Mini": [{ area: "Area1", quota: "31-32 GB" }, { area: "Area2", quota: "33-34 GB" }, { area: "Area3", quota: "38-39 GB" }, { area: "Area4", quota: "48-49 GB" }],
+                    "Big": [{ area: "Area1", quota: "38-40 GB" }, { area: "Area2", quota: "40-42 GB" }, { area: "Area3", quota: "45-47 GB" }, { area: "Area4", quota: "55-57 GB" }],
+                    "Big V2": [{ area: "Area1", quota: "48 GB" }, { area: "Area2", quota: "50 GB" }, { area: "Area3", quota: "55 GB" }, { area: "Area4", quota: "65 GB" }],
+                    "Jumbo V2": [{ area: "Area1", quota: "55 GB" }, { area: "Area2", quota: "57 GB" }, { area: "Area3", quota: "62 GB" }, { area: "Area4", quota: "72 GB" }],
+                    "Jumbo V3": [{ area: "Area1", quota: "63-65 GB" }, { area: "Area2", quota: "65-67 GB" }, { area: "Area3", quota: "70-72 GB" }, { area: "Area4", quota: "80-82 GB" }],
+                    "JUMBO": [{ area: "Area1", quota: "65 GB" }, { area: "Area2", quota: "70 GB" }, { area: "Area3", quota: "83 GB" }, { area: "Area4", quota: "123 GB" }],
+                    "Megabig V2": [{ area: "Area1", quota: "76-78 GB" }, { area: "Area2", quota: "78-80 GB" }, { area: "Area3", quota: "83-85 GB" }, { area: "Area4", quota: "93-95 GB" }],
+                    "MegaBig": [{ area: "Area1", quota: "88-90 GB" }, { area: "Area2", quota: "90-92 GB" }, { area: "Area3", quota: "95-97 GB" }, { area: "Area4", quota: "105-107 GB" }]
                 };
 
-                // Parsing logic
                 if (Array.isArray(dataToParse)) {
                     stockItems = dataToParse.map(item => {
                         let valCode = item.sku || item.kode || item.code || item.id || '-';
-                        let valStock = item.stok || item.stock || item.qty || item.sisa || item.slot || item.jumlah || null;
-                        let valName = item.nama || item.name || item.paket || item.title || '';
-                        
-                        if (!valName || valName === valStock) {
-                            valName = kamusPaket[valCode] || (valCode !== '-' ? 'Paket ' + valCode : 'Produk Juragan');
-                        }
-                        
+                        let valStock = item.stok || item.stock || item.qty || item.sisa || item.jumlah || null;
+                        let valName = item.nama || item.name || item.paket || '';
+                        if (!valName || valName === valStock) valName = kamusPaket[valCode] || (valCode !== '-' ? 'Paket ' + valCode : 'Produk Juragan');
                         let numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
                         return { code: valCode, name: valName, stock: valStock, numStock: numStock };
                     });
                 } else if (dataToParse && typeof dataToParse === 'object') {
                     for (const [key, value] of Object.entries(dataToParse)) {
-                        let valCode = key;
-                        let valStock = value;
-                        let valName = kamusPaket[key] || 'Paket ' + key;
-                        
+                        let valCode = key, valStock = value, valName = kamusPaket[key] || 'Paket ' + key;
                         if (typeof value === 'object' && value !== null) {
                             valCode = value.sku || value.kode || key;
                             valName = value.nama || value.name || valName;
                             valStock = value.stok || value.stock || value.sisa || 0;
                         }
-                        
                         let numStock = typeof valStock === 'string' ? (parseInt(String(valStock).replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
                         stockItems.push({ code: valCode, name: valName, stock: valStock, numStock: numStock });
                     }
                 }
 
-                // Render UI Stok
                 if (stockItems.length > 0) {
                     stokGrid.classList.remove('hidden');
                     stokRawContainer.classList.add('hidden');
 
                     stockItems.forEach(item => {
                         const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia') || String(item.stock).toLowerCase().includes('open');
-                        
                         const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
                         const bgHover = isAvailable ? 'hover:border-brand-main/50' : 'hover:border-red-500/50';
                         
@@ -617,7 +520,6 @@
                         
                         const emptyText = !isAvailable ? `<span class="block text-red-500 text-[11px] italic font-black tracking-wider mt-1.5">HABIS</span>` : '';
 
-                        // Menyiapkan rincian Area
                         let baseNameForArea = item.name.replace(' (Promo)', '').trim();
                         if(baseNameForArea.toLowerCase() === 'megabig v2') baseNameForArea = 'Megabig V2'; 
                         
@@ -625,10 +527,10 @@
                         const areas = detailAreaPaket[baseNameForArea];
                         
                         if (areas) {
-                            areaHTML = `<div class="mt-4 pt-4 border-t border-[#1a3245] relative z-10 flex flex-col gap-1.5 mb-4">`;
+                            areaHTML = `<div class="mt-4 pt-4 border-t border-[#1a3245] relative z-10 flex flex-col gap-2 mb-4 w-full">`;
                             areas.forEach(a => {
                                 areaHTML += `
-                                    <div class="flex justify-between items-center">
+                                    <div class="flex justify-between items-center w-full">
                                         <span class="text-[11px] text-gray-400 font-medium tracking-wide">${a.area}</span>
                                         <span class="text-[#e8b923] text-[11px] font-bold tracking-wide">${a.quota}</span>
                                     </div>
@@ -636,38 +538,32 @@
                             });
                             areaHTML += `</div>`;
                         } else {
-                            // Memberikan sedikit ruang kosong jika paket tidak ada di daftar area
-                            areaHTML = `<div class="mb-4"></div>`; 
+                            areaHTML = `<div class="mb-4 flex-grow"></div>`; 
                         }
 
-                        // Mengembalikan elemen KODE untuk selalu ditampilkan di bagian bawah kartu
+                        // Garis pemisah KODE selalu ada di dasar
                         const codeBlock = `
-                            <div class="mt-auto pt-3 border-t border-[#1a3245] relative z-10 flex justify-between items-center">
-                                <span class="text-xs text-gray-500 font-semibold tracking-wider">KODE</span>
-                                <span class="text-[#e8b923] text-sm font-bold tracking-wider">${item.code}</span>
+                            <div class="mt-auto pt-3 border-t border-[#1a3245] relative z-10 flex justify-between items-center w-full">
+                                <span class="text-[11px] text-gray-500 font-bold tracking-wider">KODE</span>
+                                <span class="text-brand-main text-xs font-bold tracking-wider">${item.code}</span>
                             </div>
                         `;
 
-                        // Desain Kartu Grid Keseluruhan
                         const card = `
-                            <div class="bg-dark-input p-4 md:p-5 rounded-[20px] border border-dark-border ${bgHover} transition-all shadow-lg flex flex-col h-full relative overflow-hidden group">
+                            <div class="bg-dark-input p-4 md:p-5 rounded-[20px] border border-dark-border ${bgHover} transition-all shadow-lg flex flex-col h-full relative overflow-hidden group w-full">
                                 <div class="absolute inset-0 bg-brand-main/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                                
-                                <div class="flex justify-between items-start mb-3 relative z-10 gap-2">
-                                    <h3 class="font-bold text-white text-base md:text-lg tracking-tight leading-tight">${item.name}</h3>
+                                <div class="flex justify-between items-start mb-3 relative z-10 gap-2 w-full">
+                                    <h3 class="font-bold text-white text-base md:text-lg tracking-tight leading-tight break-words">${item.name}</h3>
                                     <div class="shrink-0 mt-0.5">${checkIcon}</div>
                                 </div>
-                                
-                                <div class="relative z-10">
+                                <div class="relative z-10 w-full flex-grow flex flex-col">
                                     <div class="flex items-baseline gap-1.5">
                                         <span class="text-white font-bold text-sm md:text-base">Stok:</span>
                                         <span class="text-xl md:text-[22px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
                                     </div>
                                     ${emptyText}
+                                    ${areaHTML}
                                 </div>
-                                
-                                ${areaHTML}
-                                
                                 ${codeBlock}
                             </div>
                         `;
@@ -676,44 +572,31 @@
                 } else {
                     stokGrid.classList.add('hidden');
                     stokRawContainer.classList.remove('hidden');
-                    stokRawOutput.textContent = JSON.stringify(responseData, null, 2);
+                    document.getElementById('stokRawOutput').textContent = JSON.stringify(responseData, null, 2);
                 }
-
                 resultAreaStok.classList.remove('hidden');
 
             } catch (error) {
-                console.error(error);
-                errorTextStok.textContent = isVercel ? "Gagal mengambil data stok dari server." : "Terjadi kesalahan sistem.";
+                document.getElementById('errorTextStok').textContent = isVercel ? "Gagal terhubung ke API Server." : "Terjadi kesalahan sistem.";
                 errorMsgStok.classList.remove('hidden');
+                errorMsgStok.classList.add('flex');
             } finally {
                 loadingStok.classList.add('hidden');
+                loadingStok.classList.remove('flex');
                 btnCekStok.disabled = false;
                 btnCekStok.classList.remove('opacity-70', 'cursor-not-allowed');
                 btnIcon.classList.remove('fa-spin');
             }
         }
 
-        // Jalankan fetch saat tombol diklik
         document.getElementById('btnCekStok').addEventListener('click', loadStokData);
-
-        // Auto-load saat halaman pertama kali dibuka
-        window.addEventListener('DOMContentLoaded', () => {
-            loadStokData();
-        });
+        window.addEventListener('DOMContentLoaded', loadStokData);
 
 
-        // ==============================================
-        // Logika Fake Running Text Transaksi
-        // ==============================================
         function generateFakeTransactions() {
             const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra", "Tari", "Bayu", "Rini"];
-            
-            // Menggunakan List Nama Paket Valid
             const packages = ["SuperMini", "SuperMini V2", "Mini", "Big", "Big V2", "Jumbo V2", "Jumbo V3", "JUMBO", "Megabig V2", "MegaBig"]; 
-            
-            // Prefix khusus XL/Axis yang diminta
             const prefixes = ["0817", "0818", "0819", "0859", "0877", "0878", "0831", "0832", "0833", "0838"];
-
             let marqueeHTML = "";
             
             for (let i = 0; i < 150; i++) {
@@ -733,7 +616,6 @@
                     <span class="text-dark-border text-[10px]">●</span>
                 `;
             }
-            
             const container = document.getElementById('runningTextContainer');
             if (container) container.innerHTML = marqueeHTML;
         }
