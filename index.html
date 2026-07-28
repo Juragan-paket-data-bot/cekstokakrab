@@ -60,17 +60,16 @@
             appearance: textfield;
         }
 
-        /* PERBAIKAN: Mencegah scroll Kiri Kanan mutlak & larang Zoom/Swipe horizontal */
+        /* PERBAIKAN: Mengembalikan fungsi scroll sentuh (touch scroll) normal */
         body, html {
             width: 100%; 
             max-width: 100%;
-            overflow-x: hidden !important; /* Kunci mutlak agar tidak bisa geser kiri-kanan */
-            overflow-y: auto; /* Pastikan scroll atas-bawah tetap berfungsi */
+            /* Hanya kunci scroll horizontal (kiri-kanan) */
+            overflow-x: hidden; 
             margin: 0;
             padding: 0;
-            overscroll-behavior-x: none; /* Anti gestur swipe back/forward di HP */
-            overscroll-behavior-y: none; /* Anti pull-to-refresh */
-            touch-action: pan-y; /* Gestur sentuh HANYA diizinkan untuk atas-bawah (memblokir cubit/zoom dan geser horizontal) */
+            /* Aturan overflow-y, overscroll-behavior, dan touch-action telah dihapus 
+               agar usapan (swipe) atas-bawah di layar berfungsi normal */
         }
         
         /* Modifikasi Scrollbar Custom */
@@ -100,7 +99,6 @@
     </div>
 
     <!-- Navigasi -->
-    <!-- Padding horizontal dinaikkan (px-4 md:px-8) agar tidak terlalu mepet tepi layar -->
     <nav class="shrink-0 w-full max-w-5xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
         <div class="flex items-center gap-2">
             <div class="w-9 h-9 md:w-11 md:h-11 bg-brand-main rounded-lg md:rounded-xl flex items-center justify-center text-dark-bg shadow-[0_0_15px_rgba(0,244,126,0.5)] transform -rotate-6">
@@ -118,7 +116,6 @@
     </nav>
 
     <!-- Kontainer Aplikasi -->
-    <!-- REVISI: px-4 (kiri kanan tidak mepet), pb-36 (bawah sangat lega agar tombol muat data muncul & naik), mt-4 (jarak atas) -->
     <div class="flex-1 w-full max-w-5xl mx-auto px-4 md:px-8 pb-36 md:pb-32 flex flex-col mt-4 md:mt-6">
         
         <div class="bg-dark-card rounded-2xl md:rounded-3xl shadow-2xl border border-dark-border flex flex-col overflow-hidden relative w-full mb-8">
@@ -136,7 +133,6 @@
             <!-- ============================================== -->
             <!-- TAB: STOK AKRAB -->
             <!-- ============================================== -->
-            <!-- REVISI: Padding dalam (p-4) diperbesar agar grid juga tidak mepet ke garis kartu -->
             <div id="tabContentStok" class="flex flex-col p-4 md:p-6 w-full relative">
                 
                 <div id="loadingStok" class="hidden absolute inset-0 z-20 bg-dark-card/90 flex-col items-center justify-center gap-3 rounded-b-2xl">
@@ -144,7 +140,7 @@
                     <span class="text-brand-main text-xs font-medium animate-pulse">Memuat...</span>
                 </div>
                 
-                <!-- GRID STOK: 3 Kolom. content-start mencegah kelar. gap disesuaikan agar lega. -->
+                <!-- GRID STOK -->
                 <div class="w-full">
                     <div id="stokGrid" class="grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-5 content-start w-full">
                         <!-- Item stok di-inject via JS -->
@@ -152,7 +148,6 @@
                 </div>
 
                 <!-- Tombol Refresh -->
-                <!-- REVISI: mb-12 memberikan ruang ekstra di bawah tombol agar tombol lebih naik/ke atasan -->
                 <div class="mt-8 mb-12 md:mb-16 px-1 w-full max-w-md mx-auto">
                     <button id="btnCekStok" class="w-full bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.2)] transition-all active:scale-95 flex items-center justify-center gap-2 outline-none">
                         <i class="fa-solid fa-rotate text-sm md:text-base"></i>
@@ -216,7 +211,7 @@
                         </div>
                     </div>
 
-                    <!-- Container Paket Aktif (Support Multi Paket Akrab/Lainnya) -->
+                    <!-- Container Paket Aktif -->
                     <div class="bg-dark-card p-4 rounded-2xl border border-dark-border shadow-lg w-full">
                         <h2 class="text-sm font-bold text-white mb-3 border-b border-dark-border pb-2 flex items-center gap-2">
                             <i class="fa-solid fa-box-open text-brand-main"></i> Rincian Paket Aktif
@@ -470,7 +465,6 @@
                         const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
                         const bgHover = isAvailable ? 'border-dark-border' : 'border-dark-border'; 
                         
-                        // Icon Bulat Sesuai Referensi
                         const checkIcon = isAvailable 
                             ? `<div class="bg-brand-main rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center shadow-[0_0_8px_rgba(0,244,126,0.5)]"><i class="fa-solid fa-check text-[#0b1a24] text-[9px] md:text-[11px] font-black"></i></div>`
                             : `<div class="bg-red-500 rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-xmark text-[#0b1a24] text-[9px] md:text-[11px] font-black"></i></div>`;
@@ -485,7 +479,6 @@
                         const areas = detailAreaPaket[baseNameForArea];
                         if (areas) {
                             areas.forEach(a => {
-                                // Teks Area dibuat sedikit lebih besar
                                 areaHTML += `
                                     <div class="flex justify-between items-center w-full">
                                         <span class="text-[8px] md:text-[11px] text-gray-500 font-medium leading-[1.3] tracking-wide">${a.area}</span>
@@ -494,16 +487,13 @@
                             });
                         }
 
-                        // Mengubah layout agar kompak dan rapi
                         const card = `
                             <div class="bg-dark-input p-2.5 md:p-4 rounded-xl border ${bgHover} flex flex-col w-full relative shadow-sm h-full">
-                                <!-- Judul Paket -->
                                 <div class="flex justify-between items-start gap-1 relative z-10 mb-1.5">
                                     <h3 class="font-bold text-white text-[11px] md:text-[15px] leading-[1.1] md:leading-tight tracking-tight break-words pr-1">${item.name}</h3>
                                     <div class="shrink-0 mt-[1px]">${checkIcon}</div>
                                 </div>
                                 
-                                <!-- Sisa Stok -->
                                 <div class="relative z-10 mb-2.5 md:mb-3">
                                     <div class="flex items-center gap-1">
                                         <span class="text-white font-bold text-[9px] md:text-[12px] leading-none">Stok:</span>
@@ -512,12 +502,10 @@
                                     ${emptyText}
                                 </div>
                                 
-                                <!-- Area Kuota -->
                                 <div class="flex flex-col justify-center gap-1 w-full relative z-10 mt-1 mb-2 md:mb-3">
                                     ${areaHTML}
                                 </div>
                                 
-                                <!-- Kode Paket di bagian bawah (Paling nempel bawah) -->
                                 <div class="pt-1.5 md:pt-2 border-t border-[#1a3245] flex justify-between items-center w-full relative z-10 mt-auto">
                                     <span class="text-[7px] md:text-[11px] text-gray-600 font-bold tracking-wider leading-none">KODE</span>
                                     <span class="text-brand-main text-[8px] md:text-[12px] font-bold tracking-wider leading-none">${item.code}</span>
@@ -543,10 +531,8 @@
         function generateFakeTransactions() {
             const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra"];
             
-            // Nama Paket Sesuai Kamus List Anda
             const packages = ["SuperMini", "SuperMini V2", "Mini", "Big", "Big V2", "Jumbo V2", "Jumbo V3", "JUMBO", "Megabig V2", "MegaBig"]; 
             
-            // Nomor Prefix XL/Axis sesuai list Anda
             const prefixes = ["0817", "0818", "0819", "0859", "0877", "0878", "0831", "0832", "0833", "0838"];
             
             let marqueeHTML = "";
