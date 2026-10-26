@@ -140,15 +140,14 @@
                     <span class="text-brand-main text-xs font-medium animate-pulse">Memuat...</span>
                 </div>
                 
-                <!-- MENU FILTER GRUP -->
+               <!-- MENU FILTER GRUP -->
                 <div class="w-full mb-5 overflow-x-auto pb-2 scrollbar-hide">
                     <div class="flex gap-2 min-w-max" id="groupFilters">
-                        <button class="filter-btn active px-4 py-2 rounded-full bg-brand-main text-dark-bg text-xs font-bold transition-all shadow-[0_0_10px_rgba(0,244,126,0.3)]" data-group="ALL">Semua</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XDA">Grup 1 (XDA)</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XLA">Grup 2 (XLA)</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XM">Grup 3 (XM)</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="KDA">Grup 4 (KDA)</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="ARF">Grup 5 (ARF)</button>
+                        <button class="filter-btn active px-4 py-2 rounded-full bg-brand-main text-dark-bg text-xs font-bold transition-all shadow-[0_0_10px_rgba(0,244,126,0.3)]" data-group="XDA">XDA</button>
+                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XLA">XLA</button>
+                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XM">XM</button>
+                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="KDA">KDA</button>
+                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="ARF">ARF</button>
                     </div>
                 </div>
 
@@ -574,28 +573,19 @@
 
             try {
                 let responseData;
-                
-                // Gunakan Proxy Vercel agar tidak kena blokir CORS dan Header otomatis terisi
                 const isVercel = window.location.hostname.includes('vercel.app');
                 
                 if (isVercel) {
-                    // Jika di Vercel, panggil file proxy /api/stok-akrab.js yang sudah kita buat sebelumnya
                     const response = await fetch('/api/stok-akrab');
                     if (!response.ok) throw new Error("Gagal mengambil data dari API Vercel");
                     responseData = await response.json();
                 } else {
-                    // Jika dibuka di komputer lokal (file://), tembak API langsung
                     const response = await fetch('https://apistokakrab.my.id/api.php', {
                         headers: { 'Accept': 'application/json' }
                     });
                     if (!response.ok) throw new Error("Gagal mengambil data dari Server API");
                     responseData = await response.json();
                 }
-                
-                // ==========================================
-                // BANTUAN DEBUG (Tekan F12 -> tab Console)
-                console.log("Data Asli dari API:", responseData);
-                // ==========================================
 
                 let dataToParse = responseData.data || responseData;
                 globalStockItems = [];
@@ -608,43 +598,51 @@
 
                 if (Array.isArray(dataToParse)) {
                     dataToParse.forEach(item => {
-                        // Antisipasi format bersarang (id_grup: XDA, data: { ... }) atau format langsung
                         let innerData = (item.data && typeof item.data === 'object') ? item.data : item;
                         
-                        // Cari ID atau SKU
                         let valCode = innerData.id_grup || innerData.sku || innerData.kode || innerData.code || innerData.id || '-';
-                        
-                        // Cari angka Stok
                         let valStock = innerData.stok !== undefined ? innerData.stok : (innerData.stock !== undefined ? innerData.stock : (innerData.qty || 0));
-                        
-                        // PERBAIKAN: Membaca key 'Nama kuota' yang memiliki spasi dari JSON Anda
                         let valName = innerData['Nama kuota'] || innerData.Nama_kuota || innerData.nama || innerData.name || '';
+                        let valDesc = innerData.deskripsi || null;
                         
-                        // Jika nama kosong, panggil dari kamus lokal
+                        // HAPUS PRODUK MATI: Jika stok 0, tidak punya deskripsi, dan namanya kosong (null)
+                        if (valStock == 0 && !valDesc && (!valName || valName.trim() === '')) return; // Lewati (jangan dimasukkan ke layar)
+
+                        // Jika nama kosong, cari di kamus fallback
                         if (!valName || valName === valStock || valName === valCode) {
                             valName = kamusPaket[valCode] || valCode;
                         }
                         
                         let numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
                         
-                        // Masukkan ke wadah global
-                        globalStockItems.push({ code: valCode, name: valName, stock: valStock, numStock: numStock });
+                        globalStockItems.push({ 
+                            code: valCode, 
+                            name: valName, 
+                            stock: valStock, 
+                            numStock: numStock,
+                            rawDesc: valDesc // Simpan deskripsi mentah dari API untuk area
+                        });
                     });
                 }
 
-                // Render semua grup saat dimuat
-                renderStockUI('ALL');
+                // SORTING (MENGURUTKAN) DARI TERENDAH KE TERTINGGI (Contoh XDA14 dulu, baru XDA19)
+                globalStockItems.sort((a, b) => {
+                    return a.code.localeCompare(b.code, undefined, { numeric: true, sensitivity: 'base' });
+                });
 
-                // Kembalikan status warna tombol filter ke "Semua"
+                // Tampilkan XDA sebagai tampilan bawaan pertama
                 document.querySelectorAll('.filter-btn').forEach(b => {
                     b.classList.remove('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
                     b.classList.add('bg-dark-input', 'text-gray-400');
                 });
-                const btnAll = document.querySelector('.filter-btn[data-group="ALL"]');
-                if(btnAll) {
-                    btnAll.classList.add('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
-                    btnAll.classList.remove('bg-dark-input', 'text-gray-400');
+                const btnXDA = document.querySelector('.filter-btn[data-group="XDA"]');
+                if(btnXDA) {
+                    btnXDA.classList.add('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
+                    btnXDA.classList.remove('bg-dark-input', 'text-gray-400');
                 }
+
+                // Render tampilan
+                renderStockUI('XDA');
 
             } catch (error) {
                 console.error("Error Detail:", error);
@@ -660,15 +658,7 @@
             const stokContainer = document.getElementById('stokContainer');
             stokContainer.innerHTML = ''; 
 
-            const groupsConfig = [
-                { prefix: 'XDA', title: 'Grup 1 (XDA)' },
-                { prefix: 'XLA', title: 'Grup 2 (XLA)' },
-                { prefix: 'XM', title: 'Grup 3 (XM)' },
-                { prefix: 'KDA', title: 'Grup 4 (KDA)' },
-                { prefix: 'ARF', title: 'Grup 5 (ARF)' }
-            ];
-
-            const detailAreaPaket = {
+            const detailAreaPaketFallback = {
                 "SuperMini": [{ area: "Area 1", quota: "13-15 GB" }, { area: "Area 2", quota: "15-17 GB" }, { area: "Area 3", quota: "20-22 GB" }, { area: "Area 4", quota: "30-32 GB" }],
                 "SuperMini V2": [{ area: "Area 1", quota: "19-21 GB" }, { area: "Area 2", quota: "21-23 GB" }, { area: "Area 3", quota: "26-28 GB" }, { area: "Area 4", quota: "36-38 GB" }],
                 "Mini": [{ area: "Area 1", quota: "31-32 GB" }, { area: "Area 2", quota: "33-34 GB" }, { area: "Area 3", quota: "38-39 GB" }, { area: "Area 4", quota: "48-49 GB" }],
@@ -681,86 +671,97 @@
                 "MegaBig": [{ area: "Area 1", quota: "88-90 GB" }, { area: "Area 2", quota: "90-92 GB" }, { area: "Area 3", quota: "95-97 GB" }, { area: "Area 4", quota: "105-107 GB" }]
             };
 
-            // Filter konfigurasi grup yang akan ditampilkan
-            let groupsToRender = groupsConfig;
-            if (activeGroupPrefix !== 'ALL') {
-                groupsToRender = groupsConfig.filter(g => g.prefix === activeGroupPrefix);
-            }
+            const groupItems = globalStockItems.filter(item => item.code.toUpperCase().startsWith(activeGroupPrefix));
+            
+            if (groupItems.length > 0) {
+                // Tampilan kotak produk TANPA judul header H2
+                let groupHTML = `<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 content-start w-full">`;
 
-            let hasData = false;
+                groupItems.forEach(item => {
+                    const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
+                    const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
+                    
+                    const checkIcon = isAvailable 
+                        ? `<div class="bg-brand-main rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(0,244,126,0.5)]"><i class="fa-solid fa-check text-[#0b1a24] text-[9px] font-black"></i></div>`
+                        : `<div class="bg-red-500 rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-xmark text-[#0b1a24] text-[9px] font-black"></i></div>`;
+                    
+                    const emptyText = !isAvailable ? `<span class="block text-red-500 text-[9px] italic font-black tracking-wider leading-none mt-1">HABIS</span>` : '';
 
-            groupsToRender.forEach(group => {
-                const groupItems = globalStockItems.filter(item => item.code.toUpperCase().startsWith(group.prefix));
-                
-                if (groupItems.length > 0) {
-                    hasData = true;
-                    let groupHTML = `
-                        <div class="w-full bg-dark-card border border-dark-border rounded-xl p-3 md:p-5 shadow-lg">
-                            <h2 class="text-sm md:text-base font-bold text-white mb-4 border-b border-dark-border pb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-layer-group text-brand-main"></i> ${group.title}
-                            </h2>
-                            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 content-start w-full">
-                    `;
+                    let areaHTML = '';
+                    
+                    // PRIORITAS 1: Parsing catatan Area langsung dari API JSON (deskripsi)
+                    if (item.rawDesc) {
+                        try {
+                            const parsedDesc = JSON.parse(item.rawDesc);
+                            for (let key in parsedDesc) {
+                                // Memformat tulisan 'Area1' menjadi 'Area 1'
+                                let areaLabel = key.replace(/([a-zA-Z])(\d)/, '$1 $2');
+                                let quotaVal = parsedDesc[key];
+                                areaHTML += `
+                                    <div class="flex justify-between items-center w-full">
+                                        <span class="text-[9px] md:text-[10px] text-gray-400 font-medium leading-[1.3]">${areaLabel}</span>
+                                        <span class="text-[#e8b923] text-[9px] md:text-[10px] font-bold leading-[1.3]">${quotaVal} GB</span>
+                                    </div>`;
+                            }
+                        } catch(e) {
+                            // Jika format bukan JSON melainkan teks biasa, tampilkan teks tersebut
+                            areaHTML = `<div class="text-[9px] text-[#e8b923] leading-[1.3] text-left">${item.rawDesc}</div>`;
+                        }
+                    }
 
-                    groupItems.forEach(item => {
-                        const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
-                        const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
-                        
-                        const checkIcon = isAvailable 
-                            ? `<div class="bg-brand-main rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(0,244,126,0.5)]"><i class="fa-solid fa-check text-[#0b1a24] text-[9px] font-black"></i></div>`
-                            : `<div class="bg-red-500 rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-xmark text-[#0b1a24] text-[9px] font-black"></i></div>`;
-                        
-                        const emptyText = !isAvailable ? `<span class="block text-red-500 text-[9px] italic font-black tracking-wider leading-none mt-1">HABIS</span>` : '';
-
+                    // PRIORITAS 2: Jika tidak ada deskripsi dari server API, gunakan fallback
+                    if (!areaHTML) {
                         let baseNameForArea = item.name.replace(' (Promo)', '').trim();
                         if(baseNameForArea.toLowerCase() === 'megabig v2') baseNameForArea = 'Megabig V2'; 
                         if(baseNameForArea.toLowerCase() === 'megabig') baseNameForArea = 'MegaBig'; 
                         
-                        let areaHTML = '';
-                        const areas = detailAreaPaket[baseNameForArea];
+                        const areas = detailAreaPaketFallback[baseNameForArea];
                         if (areas) {
                             areas.forEach(a => {
                                 areaHTML += `
                                     <div class="flex justify-between items-center w-full">
-                                        <span class="text-[9px] md:text-[10px] text-gray-500 font-medium leading-[1.3]">${a.area}</span>
+                                        <span class="text-[9px] md:text-[10px] text-gray-400 font-medium leading-[1.3]">${a.area}</span>
                                         <span class="text-[#e8b923] text-[9px] md:text-[10px] font-bold leading-[1.3]">${a.quota}</span>
                                     </div>`;
                             });
                         }
+                    }
 
-                        groupHTML += `
-                            <div class="bg-dark-input p-3 rounded-xl border border-dark-border flex flex-col w-full relative shadow-sm h-full hover:border-brand-main/40 transition-colors">
-                                <div class="flex justify-between items-start gap-1 relative z-10 mb-2">
-                                    <h3 class="font-bold text-white text-[12px] md:text-[14px] leading-tight break-words pr-1">${item.name}</h3>
-                                    <div class="shrink-0 mt-[1px]">${checkIcon}</div>
-                                </div>
-                                
-                                <div class="relative z-10 mb-3">
-                                    <div class="flex items-center gap-1">
-                                        <span class="text-gray-400 font-medium text-[10px] md:text-[11px] leading-none">Sisa Stok:</span>
-                                        <span class="text-[14px] md:text-[16px] font-black ${stockColor} leading-none ml-1">${item.numStock}</span>
-                                    </div>
-                                    ${emptyText}
-                                </div>
-                                
-                                <div class="flex flex-col justify-center gap-1 w-full relative z-10 mt-1 mb-3">
-                                    ${areaHTML}
-                                </div>
-                                
-                                <div class="pt-2 border-t border-[#1a3245] flex justify-between items-center w-full relative z-10 mt-auto">
-                                    <span class="text-[9px] text-gray-600 font-bold tracking-wider">SKU</span>
-                                    <span class="text-brand-main text-[10px] md:text-[11px] font-bold tracking-wider">${item.code}</span>
-                                </div>
+                    // Jika benar-benar kosong
+                    if (!areaHTML) {
+                        areaHTML = `<div class="text-[9px] text-gray-600 italic">Detail kuota area tidak tercantum</div>`;
+                    }
+
+                    groupHTML += `
+                        <div class="bg-dark-input p-3 rounded-xl border border-dark-border flex flex-col w-full relative shadow-sm h-full hover:border-brand-main/40 transition-colors">
+                            <div class="flex justify-between items-start gap-1 relative z-10 mb-2">
+                                <h3 class="font-bold text-white text-[12px] md:text-[14px] leading-tight break-words pr-1">${item.name}</h3>
+                                <div class="shrink-0 mt-[1px]">${checkIcon}</div>
                             </div>
-                        `;
-                    });
+                            
+                            <div class="relative z-10 mb-3">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-gray-400 font-medium text-[10px] md:text-[11px] leading-none">Sisa Stok:</span>
+                                    <span class="text-[14px] md:text-[16px] font-black ${stockColor} leading-none ml-1">${item.numStock}</span>
+                                </div>
+                                ${emptyText}
+                            </div>
+                            
+                            <div class="flex flex-col justify-center gap-1.5 w-full relative z-10 mt-1 mb-3 bg-[#0b1a24] p-2 rounded-lg border border-white/5">
+                                ${areaHTML}
+                            </div>
+                            
+                            <div class="pt-2 border-t border-[#1a3245] flex justify-between items-center w-full relative z-10 mt-auto">
+                                <span class="text-[9px] text-gray-600 font-bold tracking-wider">KODE</span>
+                                <span class="text-brand-main text-[10px] md:text-[11px] font-bold tracking-wider">${item.code}</span>
+                            </div>
+                        </div>
+                    `;
+                });
 
-                    groupHTML += `</div></div>`;
-                    stokContainer.insertAdjacentHTML('beforeend', groupHTML);
-                }
-            });
-
-            if (!hasData) {
+                groupHTML += `</div>`;
+                stokContainer.insertAdjacentHTML('beforeend', groupHTML);
+            } else {
                 stokContainer.innerHTML = `<div class="text-center text-gray-500 text-sm py-8 w-full italic">Stok belum tersedia untuk grup yang dipilih.</div>`;
             }
         }
@@ -768,7 +769,6 @@
         // Listener untuk tombol filter
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                // Ganti styling tombol yang aktif
                 document.querySelectorAll('.filter-btn').forEach(b => {
                     b.classList.remove('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
                     b.classList.add('bg-dark-input', 'text-gray-400');
@@ -776,13 +776,11 @@
                 this.classList.remove('bg-dark-input', 'text-gray-400');
                 this.classList.add('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
                 
-                // Render ulang berdasarkan grup yang dipilih
                 renderStockUI(this.getAttribute('data-group'));
             });
         });
 
-
-        // ==========================================
+        // Trigger Pemuatan Stok Pertama Kali
         document.getElementById('btnCekStok').addEventListener('click', loadStokData);
         window.addEventListener('DOMContentLoaded', loadStokData);
         
