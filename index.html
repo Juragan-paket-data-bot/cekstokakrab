@@ -625,9 +625,17 @@
                     });
                 }
 
-                // SORTING (MENGURUTKAN) DARI TERENDAH KE TERTINGGI (Contoh XDA14 dulu, baru XDA19)
+              // SORTING (MENGURUTKAN) DARI TERENDAH KE TERTINGGI (Contoh XDA14 dulu, baru XDA19)
                 globalStockItems.sort((a, b) => {
-                    return a.code.localeCompare(b.code, undefined, { numeric: true, sensitivity: 'base' });
+                    // Mengekstrak angka dari kode (misal "XDA14" menjadi 14)
+                    let numA = parseInt(a.code.replace(/\D/g, '')) || 0;
+                    let numB = parseInt(b.code.replace(/\D/g, '')) || 0;
+                    
+                    // Jika angkanya sama (atau tidak ada angka), urutkan berdasarkan abjad kodenya
+                    if (numA === numB) {
+                        return a.code.localeCompare(b.code);
+                    }
+                    return numA - numB;
                 });
 
                 // Tampilkan XDA sebagai tampilan bawaan pertama
