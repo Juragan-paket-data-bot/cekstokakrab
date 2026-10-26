@@ -2,9 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport mengizinkan zoom in (sampai 5x), tapi mencegah zoom out melebihi skala awal (1.0) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <meta name="theme-color" content="#041016">
+    <meta name="theme-color" content="#f8fafc">
     <title>Sistem Juragan Paket Data</title>
     
     <!-- Memuat Tailwind CSS -->
@@ -23,15 +22,14 @@
                     fontFamily: { sans: ['Poppins', 'sans-serif'] },
                     colors: { 
                         brand: {
-                            main: '#00f47e',   // Hijau Neon Terang
-                            dark: '#00c765',   // Hijau Hover
-                            glow: 'rgba(0, 244, 126, 0.3)'
+                            main: '#10b981',   // Emerald Green untuk modernitas
+                            dark: '#059669',
+                            light: '#d1fae5'
                         },
-                        dark: {
-                            bg: '#041016',     // Latar belakang paling gelap
-                            card: '#0b1a24',   // Latar kotak/kartu utama
-                            input: '#122533',  // Latar input dan kartu dalam
-                            border: '#1a3245'  // Garis batas gelap
+                        surface: {
+                            bg: '#f8fafc',     // Slate 50 (Sangat terang)
+                            card: '#ffffff',   // Putih bersih
+                            border: '#e2e8f0'  // Slate 200 (Garis lembut)
                         }
                     },
                     animation: {
@@ -49,7 +47,7 @@
     </script>
 
     <style>
-        /* Mematikan Spinner pada input angka (Simbol Putih atas-bawah) */
+        /* Mematikan Spinner pada input angka */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -60,73 +58,72 @@
             appearance: textfield;
         }
 
-        /* PERBAIKAN: Mengembalikan fungsi scroll sentuh (touch scroll) normal */
         body, html {
             width: 100%; 
             max-width: 100%;
-            /* Hanya kunci scroll horizontal (kiri-kanan) */
             overflow-x: hidden; 
             margin: 0;
             padding: 0;
         }
         
-        /* Modifikasi Scrollbar Custom */
-        ::-webkit-scrollbar { width: 4px; }
+        /* Scrollbar Halus */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1a3245; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
     </style>
 </head>
 
-<!-- Menggunakan min-h-[100dvh] agar menyesuaikan tinggi layar HP asli (termasuk address bar) -->
-<body class="bg-dark-bg text-gray-200 antialiased flex flex-col font-sans selection:bg-brand-main selection:text-black w-full relative min-h-[100dvh]">
+<body class="bg-surface-bg text-gray-800 antialiased flex flex-col font-sans selection:bg-brand-light selection:text-brand-dark w-full relative min-h-[100dvh]">
 
     <!-- Top Bar -->
-    <div class="shrink-0 bg-[#022214] text-brand-main text-[8px] md:text-[10px] font-bold text-center py-1 md:py-2 tracking-widest border-b border-brand-main/20 w-full">
+    <div class="shrink-0 bg-[#064e3b] text-brand-main text-[8px] md:text-[10px] font-bold text-center py-1.5 md:py-2 tracking-widest w-full">
         <i class="fa-solid fa-circle text-[6px] md:text-[8px] mr-1.5 animate-pulse"></i> SISTEM AKTIF 24 JAM 
-        <i class="fa-solid fa-circle text-[6px] md:text-[8px] mx-1.5 opacity-50"></i> PROSES INSTAN DETIK ITU JUGA!
+        <i class="fa-solid fa-circle text-[6px] md:text-[8px] mx-1.5 opacity-50 text-white"></i> <span class="text-white">PROSES INSTAN DETIK ITU JUGA!</span>
     </div>
 
     <!-- Running Text Transaksi -->
-    <div class="shrink-0 w-full bg-dark-bg/80 border-b border-dark-border py-1.5 md:py-2 flex items-center relative overflow-hidden">
-        <div class="absolute left-0 w-6 md:w-12 h-full bg-gradient-to-r from-dark-bg to-transparent z-10 pointer-events-none"></div>
-        <div class="absolute right-0 w-6 md:w-12 h-full bg-gradient-to-l from-dark-bg to-transparent z-10 pointer-events-none"></div>
+    <div class="shrink-0 w-full bg-white border-b border-surface-border py-1.5 md:py-2 flex items-center relative overflow-hidden shadow-sm">
+        <div class="absolute left-0 w-6 md:w-12 h-full bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute right-0 w-6 md:w-12 h-full bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
         <div class="flex whitespace-nowrap animate-marquee items-center" id="runningTextContainer">
             <!-- Data dari JS -->
         </div>
     </div>
 
     <!-- Navigasi -->
-    <nav class="shrink-0 w-full max-w-5xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <div class="w-9 h-9 md:w-11 md:h-11 bg-brand-main rounded-lg md:rounded-xl flex items-center justify-center text-dark-bg shadow-[0_0_15px_rgba(0,244,126,0.5)] transform -rotate-6">
-                <i class="fa-solid fa-bolt text-lg md:text-2xl transform rotate-6"></i>
+    <nav class="shrink-0 w-full max-w-6xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-brand-main rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-main/30 transform -rotate-3 transition-transform hover:rotate-0 cursor-pointer">
+                <i class="fa-solid fa-bolt text-lg md:text-2xl transform rotate-3"></i>
             </div>
-            <div class="flex flex-col ml-1">
-                <span class="text-white font-extrabold text-[14px] md:text-xl leading-none md:leading-tight tracking-tight">JURAGAN PAKET DATA</span>
-                <span class="text-brand-main text-[7px] md:text-[10px] font-bold tracking-[0.15em] opacity-80 uppercase mt-0.5">PPOB Automations</span>
+            <div class="flex flex-col">
+                <span class="text-gray-900 font-black text-[15px] md:text-[22px] leading-none tracking-tight">JURAGAN PAKET DATA</span>
+                <span class="text-brand-dark text-[8px] md:text-[11px] font-bold tracking-[0.15em] uppercase mt-0.5">PPOB Automations</span>
             </div>
         </div>
-        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-brand-main/30 bg-brand-main/10 text-brand-main text-[10px] md:text-sm font-semibold">
-            <i class="fa-solid fa-bolt text-[9px] md:text-xs"></i>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-brand-light bg-brand-light/50 text-brand-dark text-[10px] md:text-sm font-semibold shadow-sm">
+            <i class="fa-solid fa-bolt text-[9px] md:text-xs text-brand-main"></i>
             <span>Online</span>
         </div>
     </nav>
 
     <!-- Kontainer Aplikasi -->
-    <div class="flex-1 w-full max-w-5xl mx-auto px-4 md:px-8 pb-36 md:pb-32 flex flex-col mt-4 md:mt-6">
+    <div class="flex-1 w-full max-w-6xl mx-auto px-4 md:px-8 pb-20 flex flex-col mt-2 md:mt-4">
         
-        <div class="bg-dark-card rounded-2xl md:rounded-3xl shadow-2xl border border-dark-border flex flex-col overflow-hidden relative w-full mb-8">
+        <div class="bg-white rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-surface-border flex flex-col overflow-hidden relative w-full mb-8">
             
-            <!-- Tab Navigasi - Ditambahkan Tab ke-3 (Cek Area) -->
-            <div class="flex border-b border-dark-border bg-dark-bg/50 h-12 md:h-14 w-full">
-                <button id="tabBtnStok" class="flex-1 text-[10px] md:text-base font-semibold text-brand-main border-b-2 border-brand-main bg-brand-main/5 transition-all flex items-center justify-center gap-1 md:gap-1.5 outline-none">
-                    <i class="fa-solid fa-boxes-stacked"></i>Stok Akrab
+            <!-- Tab Navigasi -->
+            <div class="flex border-b border-surface-border bg-gray-50 h-12 md:h-14 w-full">
+                <button id="tabBtnStok" class="flex-1 text-[11px] md:text-sm font-bold text-brand-main border-b-[3px] border-brand-main bg-white transition-all flex items-center justify-center gap-1.5 md:gap-2 outline-none">
+                    <i class="fa-solid fa-boxes-stacked text-lg"></i>Stok Akrab
                 </button>
-                <button id="tabBtnKuota" class="flex-1 text-[10px] md:text-base font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-all flex items-center justify-center gap-1 md:gap-1.5 outline-none">
-                    <i class="fa-solid fa-mobile-screen"></i>Cek Kuota
+                <button id="tabBtnKuota" class="flex-1 text-[11px] md:text-sm font-semibold text-gray-400 border-b-[3px] border-transparent hover:text-gray-600 transition-all flex items-center justify-center gap-1.5 md:gap-2 outline-none">
+                    <i class="fa-solid fa-mobile-screen text-lg"></i>Cek Kuota
                 </button>
-                <button id="tabBtnArea" class="flex-1 text-[10px] md:text-base font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-all flex items-center justify-center gap-1 md:gap-1.5 outline-none">
-                    <i class="fa-solid fa-map-location-dot"></i>Cek Area
+                <button id="tabBtnArea" class="flex-1 text-[11px] md:text-sm font-semibold text-gray-400 border-b-[3px] border-transparent hover:text-gray-600 transition-all flex items-center justify-center gap-1.5 md:gap-2 outline-none">
+                    <i class="fa-solid fa-map-location-dot text-lg"></i>Cek Area
                 </button>
             </div>
 
@@ -135,36 +132,35 @@
             <!-- ============================================== -->
             <div id="tabContentStok" class="flex flex-col p-4 md:p-6 w-full relative">
                 
-                <div id="loadingStok" class="hidden absolute inset-0 z-20 bg-dark-card/90 flex-col items-center justify-center gap-3 rounded-b-2xl">
-                    <i class="fa-solid fa-boxes-packing fa-bounce text-3xl text-brand-main"></i>
-                    <span class="text-brand-main text-xs font-medium animate-pulse">Memuat...</span>
+                <div id="loadingStok" class="hidden absolute inset-0 z-20 bg-white/90 backdrop-blur-sm flex-col items-center justify-center gap-3 rounded-b-2xl">
+                    <i class="fa-solid fa-boxes-packing fa-bounce text-4xl text-brand-main"></i>
+                    <span class="text-brand-dark text-xs font-bold animate-pulse tracking-wide">MEMUAT DATA STOK...</span>
                 </div>
                 
-             <!-- MENU FILTER GRUP -->
-                <div class="w-full mb-5 overflow-x-auto pb-2 scrollbar-hide">
+                <!-- MENU FILTER GRUP -->
+                <div class="w-full mb-6 overflow-x-auto pb-3 scrollbar-hide">
                     <div class="flex gap-2 min-w-max" id="groupFilters">
-                        <button class="filter-btn active px-4 py-2 rounded-full bg-brand-main text-dark-bg text-xs font-bold transition-all shadow-[0_0_10px_rgba(0,244,126,0.3)]" data-group="XDA">XDA</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XLA">XLA</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XM">XM</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="KDA">KDA</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="ARF">ARF</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XAD">XAD</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="V">V</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XAX">XAX</button>
-                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="ART">ART</button>
+                        <button class="filter-btn active px-5 py-2 rounded-full bg-brand-main text-white text-xs font-bold transition-all shadow-md shadow-brand-main/30" data-group="XDA">XDA</button>
+                        <button class="filter-btn px-5 py-2 rounded-full bg-gray-100 border border-gray-200 text-gray-500 text-xs font-bold hover:bg-gray-200 transition-all" data-group="XLA">XLA</button>
+                        <button class="filter-btn px-5 py-2 rounded-full bg-gray-100 border border-gray-200 text-gray-500 text-xs font-bold hover:bg-gray-200 transition-all" data-group="XM">XM</button>
+                        <button class="filter-btn px-5 py-2 rounded-full bg-gray-100 border border-gray-200 text-gray-500 text-xs font-bold hover:bg-gray-200 transition-all" data-group="KDA">KDA</button>
+                        <button class="filter-btn px-5 py-2 rounded-full bg-gray-100 border border-gray-200 text-gray-500 text-xs font-bold hover:bg-gray-200 transition-all" data-group="XAD">XAD</button>
+                        <button class="filter-btn px-5 py-2 rounded-full bg-gray-100 border border-gray-200 text-gray-500 text-xs font-bold hover:bg-gray-200 transition-all" data-group="V">V</button>
+                        <button class="filter-btn px-5 py-2 rounded-full bg-gray-100 border border-gray-200 text-gray-500 text-xs font-bold hover:bg-gray-200 transition-all" data-group="XAX">XAX</button>
+                        <button class="filter-btn px-5 py-2 rounded-full bg-gray-100 border border-gray-200 text-gray-500 text-xs font-bold hover:bg-gray-200 transition-all" data-group="ART">ART</button>
                     </div>
                 </div>
 
-                <!-- CONTAINER STOK PER GRUP -->
-                <div id="stokContainer" class="w-full flex flex-col gap-6 md:gap-8">
-                    <!-- Grup dan Item stok di-inject via JS -->
+                <!-- CONTAINER STOK -->
+                <div id="stokContainer" class="w-full">
+                    <!-- Item stok di-inject via JS -->
                 </div>
 
                 <!-- Tombol Refresh -->
-                <div class="mt-8 mb-12 md:mb-16 px-1 w-full max-w-md mx-auto">
-                    <button id="btnCekStok" class="w-full bg-brand-main hover:bg-brand-dark text-dark-bg font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.2)] transition-all active:scale-95 flex items-center justify-center gap-2 outline-none">
+                <div class="mt-10 mb-6 px-1 w-full max-w-sm mx-auto">
+                    <button id="btnCekStok" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 outline-none">
                         <i class="fa-solid fa-rotate text-sm md:text-base"></i>
-                        <span class="text-sm md:text-base">Muat Data Stok Realtime</span>
+                        <span class="text-sm md:text-base">Refresh Stok</span>
                     </button>
                 </div>
             </div>
@@ -172,60 +168,66 @@
             <!-- ============================================== -->
             <!-- TAB: CEK KUOTA -->
             <!-- ============================================== -->
-            <div id="tabContentKuota" class="hidden flex-col p-4 md:p-6 bg-dark-bg/30 w-full relative">
-                <form id="cekForm" class="relative w-full max-w-lg mx-auto mb-4">
-                    <div class="flex gap-2 w-full">
-                        <input type="number" id="inputNomor" placeholder="Contoh: 087812345678" required pattern="\d*"
-                            class="w-full min-w-0 flex-1 px-4 py-3 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-1 focus:ring-brand-main focus:border-brand-main transition-all font-medium text-white placeholder-gray-500 text-base md:text-base">
+            <div id="tabContentKuota" class="hidden flex-col p-4 md:p-8 bg-gray-50/50 w-full relative">
+                <form id="cekForm" class="relative w-full max-w-xl mx-auto mb-6">
+                    <div class="flex flex-col md:flex-row gap-3 w-full">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-mobile-screen-button text-gray-400"></i>
+                            </div>
+                            <input type="number" id="inputNomor" placeholder="Masukkan Nomor HP..." required pattern="\d*"
+                                class="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main/50 focus:border-brand-main transition-all font-medium text-gray-800 placeholder-gray-400 text-base shadow-sm">
+                        </div>
                         <button type="submit" id="btnSubmit" 
-                            class="shrink-0 bg-brand-main hover:bg-brand-dark text-dark-bg font-bold px-4 rounded-xl shadow-[0_0_15px_rgba(0,244,126,0.3)] transition-all active:scale-95 flex items-center justify-center outline-none">
-                            <span class="text-sm">Cek</span>
-                            <i class="fa-solid fa-arrow-right ml-1 text-sm"></i>
+                            class="shrink-0 bg-brand-main hover:bg-brand-dark text-white font-bold px-8 py-3.5 md:py-0 rounded-xl shadow-lg shadow-brand-main/30 transition-all active:scale-95 flex items-center justify-center outline-none">
+                            <span class="text-sm">Cek Kuota</span>
+                            <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
                         </button>
                     </div>
                 </form>
 
                 <div id="loading" class="hidden mt-8 flex-col items-center justify-center gap-3">
                     <i class="fa-solid fa-circle-notch fa-spin text-3xl text-brand-main"></i>
-                    <span class="text-brand-main text-xs animate-pulse tracking-wide">Mencari...</span>
+                    <span class="text-brand-dark text-xs font-bold animate-pulse tracking-wide">MENCARI DATA...</span>
                 </div>
                 
-                <div id="errorMsg" class="hidden mt-4 w-full max-w-lg mx-auto bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-[11px] md:text-xs items-center gap-2">
-                    <i class="fa-solid fa-circle-exclamation shrink-0"></i>
+                <div id="errorMsg" class="hidden mt-4 w-full max-w-xl mx-auto bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-[11px] md:text-sm items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-circle-exclamation shrink-0 text-lg"></i>
                     <span id="errorText">Nomor yang diinput salah atau sistem sedang dalam gangguan.</span>
                 </div>
 
                 <!-- Hasil Cek Kuota -->
-                <div id="resultArea" class="hidden flex-col gap-4 w-full mt-2">
+                <div id="resultArea" class="hidden flex-col gap-5 w-full mt-2">
+                    
                     <!-- Info Kartu -->
-                    <div class="bg-dark-card p-4 rounded-2xl border border-dark-border shadow-lg w-full">
-                        <h2 class="text-sm font-bold text-white mb-3 border-b border-dark-border pb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-address-card text-brand-main"></i> Info Kartu
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-[0_2px_15px_rgb(0,0,0,0.03)] w-full">
+                        <h2 class="text-sm md:text-base font-bold text-gray-800 mb-4 pb-3 border-b border-gray-100 flex items-center gap-2">
+                            <i class="fa-solid fa-address-card text-brand-main"></i> Informasi Kartu
                         </h2>
                         
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
-                            <div class="bg-dark-input p-2.5 rounded-xl border border-dark-border">
-                                <span class="text-[9px] text-gray-500 font-bold uppercase tracking-wider block mb-1">Nomor</span>
-                                <span id="resNomor" class="font-bold text-white text-xs md:text-sm truncate block w-full">-</span>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+                            <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+                                <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block mb-1">Nomor HP</span>
+                                <span id="resNomor" class="font-bold text-gray-800 text-sm md:text-base truncate block w-full">-</span>
                             </div>
-                            <div class="bg-dark-input p-2.5 rounded-xl border border-dark-border">
-                                <span class="text-[9px] text-gray-500 font-bold uppercase tracking-wider block mb-1">Operator</span>
-                                <span id="resOperator" class="font-bold text-brand-main text-xs md:text-sm truncate block w-full">-</span>
+                            <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+                                <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block mb-1">Operator</span>
+                                <span id="resOperator" class="font-black text-brand-main text-sm md:text-base truncate block w-full">-</span>
                             </div>
-                            <div class="bg-dark-input p-2.5 rounded-xl border border-dark-border">
-                                <span class="text-[9px] text-gray-500 font-bold uppercase tracking-wider block mb-1">Masa Aktif</span>
-                                <span id="resExp" class="font-bold text-white text-xs md:text-sm truncate block w-full">-</span>
+                            <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+                                <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block mb-1">Masa Aktif</span>
+                                <span id="resExp" class="font-bold text-gray-800 text-sm md:text-base truncate block w-full">-</span>
                             </div>
-                            <div class="bg-dark-input p-2.5 rounded-xl border border-red-500/20">
-                                <span class="text-[9px] text-red-400/80 font-bold uppercase tracking-wider block mb-1">Masa Tenggang</span>
-                                <span id="resGrace" class="font-bold text-red-400 text-xs md:text-sm truncate block w-full">-</span>
+                            <div class="bg-red-50 p-3.5 rounded-xl border border-red-100">
+                                <span class="text-[10px] text-red-400 font-semibold uppercase tracking-wider block mb-1">Masa Tenggang</span>
+                                <span id="resGrace" class="font-bold text-red-600 text-sm md:text-base truncate block w-full">-</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Container Paket Aktif -->
-                    <div class="bg-dark-card p-4 rounded-2xl border border-dark-border shadow-lg w-full">
-                        <h2 class="text-sm font-bold text-white mb-3 border-b border-dark-border pb-2 flex items-center gap-2">
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-[0_2px_15px_rgb(0,0,0,0.03)] w-full">
+                        <h2 class="text-sm md:text-base font-bold text-gray-800 mb-4 pb-3 border-b border-gray-100 flex items-center gap-2">
                             <i class="fa-solid fa-box-open text-brand-main"></i> Rincian Paket Aktif
                         </h2>
                         <div id="packagesContainer" class="flex flex-col gap-4 w-full">
@@ -237,28 +239,28 @@
             </div> <!-- Akhir Tab Cek Kuota -->
 
             <!-- ============================================== -->
-            <!-- TAB: CEK AREA (FITUR BARU) -->
+            <!-- TAB: CEK AREA -->
             <!-- ============================================== -->
-            <div id="tabContentArea" class="hidden flex-col p-4 md:p-6 bg-dark-bg/30 w-full relative">
+            <div id="tabContentArea" class="hidden flex-col p-4 md:p-8 bg-gray-50/50 w-full relative">
                 
                 <!-- Kolom Pencarian -->
-                <div class="relative w-full max-w-4xl mx-auto mb-4">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                <div class="relative w-full max-w-4xl mx-auto mb-6">
+                    <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
                     <input type="text" id="inputSearchArea" placeholder="Ketik Kota, Kabupaten, atau Provinsi..." 
-                        class="w-full pl-10 pr-4 py-3 bg-dark-input border border-dark-border rounded-xl focus:outline-none focus:ring-1 focus:ring-brand-main focus:border-brand-main transition-all font-medium text-white placeholder-gray-500 text-xs md:text-sm">
+                        class="w-full pl-12 pr-4 py-4 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main/50 focus:border-brand-main transition-all font-medium text-gray-800 placeholder-gray-400 text-sm md:text-base shadow-sm">
                 </div>
 
-                <!-- Container Hasil Pencarian (Berbentuk Tabel Klasik) -->
-                <div class="w-full max-w-4xl mx-auto mt-2 overflow-x-auto rounded-xl border border-dark-border bg-dark-card shadow-lg mb-8">
+                <!-- Container Hasil Pencarian -->
+                <div class="w-full max-w-4xl mx-auto mt-2 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm mb-8">
                     <table class="w-full text-left border-collapse min-w-[600px]">
-                        <thead class="bg-[#122533] border-b border-dark-border">
+                        <thead class="bg-gray-100 border-b border-gray-200">
                             <tr>
-                                <th class="px-4 py-3.5 text-brand-main text-xs font-bold uppercase tracking-wider w-1/4">Provinsi</th>
-                                <th class="px-4 py-3.5 text-brand-main text-xs font-bold uppercase tracking-wider w-2/4">Kota / Kabupaten</th>
-                                <th class="px-4 py-3.5 text-brand-main text-xs font-bold uppercase tracking-wider text-center w-1/4">Area</th>
+                                <th class="px-5 py-4 text-gray-600 text-xs md:text-sm font-bold uppercase tracking-wider w-1/4">Provinsi</th>
+                                <th class="px-5 py-4 text-gray-600 text-xs md:text-sm font-bold uppercase tracking-wider w-2/4">Kota / Kabupaten</th>
+                                <th class="px-5 py-4 text-gray-600 text-xs md:text-sm font-bold uppercase tracking-wider text-center w-1/4">Kategori Area</th>
                             </tr>
                         </thead>
-                        <tbody id="areaTableBody" class="divide-y divide-dark-border/50">
+                        <tbody id="areaTableBody" class="divide-y divide-gray-100">
                             <!-- Item area di-inject via JS -->
                         </tbody>
                     </table>
@@ -296,16 +298,7 @@
             }
         };
 
-        const mockStokPreview = {
-            "success": true,
-            "data": [
-                { "sku": "XLA14", "nama": "SuperMini", "stok": "71" },
-                { "sku": "XLA20", "nama": "SuperMini V2", "stok": "0" },
-                { "sku": "XLA32", "nama": "Mini", "stok": "282" }
-            ]
-        };
-
-        // --- Data Cek Area (Data Asli dari Anda) ---
+        // --- Data Cek Area ---
         const dataArea = [
             {"prov": "Banten", "kota": "Kota Tangerang Selatan, Kota Tangerang, Kab. Tangerang, Kab. Pandeglang, Kab. Lebak, Kab. Serang, Kota Serang, Kota Cilegon", "area": "2"},
             {"prov": "DI Yogyakarta", "kota": "Kab. Kulon Progo, Kota Yogyakarta, Kab. Sleman, Kab. Bantul, Kab. Gunungkidul", "area": "1"},
@@ -387,13 +380,13 @@
         function switchTab(activeBtnId) {
             tabs.forEach(tab => {
                 if (tab.btn.id === activeBtnId) {
-                    tab.btn.classList.add('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
-                    tab.btn.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-300');
+                    tab.btn.classList.add('text-brand-main', 'border-brand-main', 'bg-white');
+                    tab.btn.classList.remove('text-gray-400', 'border-transparent', 'hover:text-gray-600');
                     tab.content.classList.remove('hidden');
                     tab.content.classList.add('flex');
                 } else {
-                    tab.btn.classList.remove('text-brand-main', 'border-brand-main', 'bg-brand-main/5');
-                    tab.btn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-300');
+                    tab.btn.classList.remove('text-brand-main', 'border-brand-main', 'bg-white');
+                    tab.btn.classList.add('text-gray-400', 'border-transparent', 'hover:text-gray-600');
                     tab.content.classList.add('hidden');
                     tab.content.classList.remove('flex');
                 }
@@ -409,35 +402,28 @@
             const container = document.getElementById('areaTableBody');
             
             if (data.length === 0) {
-                container.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500 text-xs py-8 italic">Area tidak ditemukan. Silakan coba kata kunci lain.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500 text-sm py-10 italic font-medium">Area tidak ditemukan. Silakan coba kata kunci lain.</td></tr>`;
                 return;
             }
 
-            // Fungsi untuk mengamankan karakter khusus agar pencarian tidak error (misal jika mengetik tanda kurung)
-            const escapeRegExp = (string) => {
-                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            };
-
-            // Fungsi untuk memberikan warna kuning pada kata yang sedang dicari
+            const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const highlight = (text, kw) => {
                 if (!kw || kw.trim() === '') return text;
                 const safeKw = escapeRegExp(kw);
                 const regex = new RegExp(`(${safeKw})`, 'gi');
-                // Mengganti kata yang cocok dengan span berwarna kuning tebal
-                return text.replace(regex, `<span class="text-yellow-400 font-black bg-yellow-400/10 px-0.5 rounded shadow-sm">$1</span>`);
+                return text.replace(regex, `<span class="bg-yellow-200 text-yellow-900 font-bold px-0.5 rounded">$1</span>`);
             };
             
-            // Render menjadi desain Tabel Klasik
-            container.innerHTML = data.map(item => `
-                <tr class="hover:bg-[#122533]/60 transition-colors">
-                    <td class="px-4 py-4 text-white text-[11.5px] md:text-sm font-bold align-top whitespace-nowrap">
-                        <i class="fa-solid fa-map-location-dot text-gray-500 mr-1.5"></i>${highlight(item.prov, keyword)}
+            container.innerHTML = data.map((item, index) => `
+                <tr class="hover:bg-blue-50/50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}">
+                    <td class="px-5 py-4 text-gray-800 text-xs md:text-sm font-bold align-top whitespace-nowrap">
+                        <i class="fa-solid fa-map-location-dot text-brand-main/70 mr-1.5"></i>${highlight(item.prov, keyword)}
                     </td>
-                    <td class="px-4 py-4 text-gray-300 text-[11px] md:text-xs leading-[1.7] align-top">
+                    <td class="px-5 py-4 text-gray-600 text-xs md:text-sm leading-relaxed align-top">
                         ${highlight(item.kota, keyword)}
                     </td>
-                    <td class="px-4 py-4 align-top text-center">
-                        <span class="inline-block bg-brand-main/10 text-brand-main border border-brand-main/30 px-2.5 py-1 rounded-md text-[11px] md:text-xs font-bold whitespace-nowrap shadow-[0_0_8px_rgba(0,244,126,0.15)]">
+                    <td class="px-5 py-4 align-top text-center">
+                        <span class="inline-block bg-brand-light/40 text-brand-dark border border-brand-light px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap">
                             Area ${highlight(item.area, keyword)}
                         </span>
                     </td>
@@ -445,21 +431,17 @@
             `).join('');
         }
 
-        // 1. Tampilkan semua data saat dimuat pertama kali
         renderTableArea(dataArea);
 
-        // 2. Filter saat pengguna mengetik huruf
         document.getElementById('inputSearchArea').addEventListener('input', (e) => {
-            const keyword = e.target.value; // Simpan kata kunci asli (untuk dikirim ke fungsi highlight)
-            const keywordLower = keyword.toLowerCase(); // Kata kunci huruf kecil (hanya untuk proses filter)
+            const keyword = e.target.value;
+            const keywordLower = keyword.toLowerCase();
             
             const filteredData = dataArea.filter(item => 
                 item.prov.toLowerCase().includes(keywordLower) || 
                 item.kota.toLowerCase().includes(keywordLower) || 
                 item.area.toLowerCase().includes(keywordLower)
             );
-            
-            // Render ulang tabel dengan menyisipkan kata kunci untuk disorot
             renderTableArea(filteredData, keyword);
         });
 
@@ -480,7 +462,7 @@
             loading.classList.add('flex');
             btnSubmit.disabled = true;
             btnSubmit.classList.add('opacity-70');
-            btnIcon.className = 'fa-solid fa-spinner fa-spin ml-1 text-sm';
+            btnIcon.className = 'fa-solid fa-spinner fa-spin ml-2 text-sm';
 
             try {
                 let responseData;
@@ -511,30 +493,29 @@
                     if (packagesArray && packagesArray.length > 0) {
                         packagesArray.forEach(paket => {
                             let packageHTML = `
-                                <div class="bg-dark-input p-3 rounded-xl border border-dark-border w-full">
-                                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-dark-border/50">
-                                        <h3 class="text-xs md:text-sm font-bold text-white flex items-center gap-2 truncate">
-                                            <i class="fa-solid fa-tag text-brand-main text-[10px]"></i> ${paket.name}
+                                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 w-full">
+                                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
+                                        <h3 class="text-sm md:text-base font-bold text-gray-800 flex items-center gap-2 truncate">
+                                            <i class="fa-solid fa-tag text-brand-main"></i> ${paket.name}
                                         </h3>
-                                        <span class="text-[9px] md:text-[10px] text-gray-400 bg-dark-bg px-2 py-1 rounded whitespace-nowrap ml-2">Exp: ${paket.expiry}</span>
+                                        <span class="text-[10px] md:text-xs text-gray-500 bg-white border border-gray-200 px-2 py-1 rounded-md whitespace-nowrap font-medium">Exp: ${paket.expiry}</span>
                                     </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                             `;
                             
                             if (paket.quotas && paket.quotas.length > 0) {
                                 paket.quotas.forEach(kuota => {
                                     const percent = kuota.percent || 100;
-                                    let barColor = percent <= 20 ? 'bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.5)]' : 
-                                                  (percent <= 50 ? 'bg-yellow-400 shadow-[0_0_5px_rgba(250,204,21,0.5)]' : 'bg-brand-main shadow-[0_0_5px_rgba(0,244,126,0.5)]');
+                                    let barColor = percent <= 20 ? 'bg-red-500' : (percent <= 50 ? 'bg-yellow-400' : 'bg-brand-main');
                                     packageHTML += `
-                                        <div class="bg-dark-bg border border-dark-border rounded-lg p-2.5 w-full">
-                                            <h4 class="text-[10px] md:text-xs text-gray-200 mb-1.5 truncate w-full">${kuota.name}</h4>
-                                            <div class="flex justify-between items-end mb-1.5">
-                                                <span class="text-xs md:text-sm font-extrabold text-brand-main leading-none">${kuota.remaining}</span>
-                                                <span class="text-[9px] md:text-[10px] text-gray-400">Total: ${kuota.total}</span>
+                                        <div class="bg-white border border-gray-200 rounded-xl p-3 w-full shadow-sm">
+                                            <h4 class="text-[11px] md:text-xs text-gray-600 font-semibold mb-2 truncate">${kuota.name}</h4>
+                                            <div class="flex justify-between items-end mb-2">
+                                                <span class="text-sm md:text-base font-black text-gray-800 leading-none">${kuota.remaining}</span>
+                                                <span class="text-[10px] md:text-xs text-gray-400 font-medium">Total: ${kuota.total}</span>
                                             </div>
-                                            <div class="w-full bg-dark-input rounded-full h-1.5 border border-white/5">
-                                                <div class="${barColor} h-1.5 rounded-full" style="width: ${percent}%"></div>
+                                            <div class="w-full bg-gray-100 rounded-full h-2">
+                                                <div class="${barColor} h-2 rounded-full transition-all duration-1000" style="width: ${percent}%"></div>
                                             </div>
                                         </div>
                                     `;
@@ -544,7 +525,7 @@
                             packagesContainer.insertAdjacentHTML('beforeend', packageHTML);
                         });
                     } else {
-                        packagesContainer.innerHTML = `<div class="text-xs text-gray-500 italic p-3 text-center w-full">Tidak ada paket aktif terdeteksi.</div>`;
+                        packagesContainer.innerHTML = `<div class="text-sm text-gray-500 italic p-4 text-center w-full">Tidak ada paket aktif terdeteksi.</div>`;
                     }
                     
                     resultArea.classList.remove('hidden');
@@ -559,11 +540,11 @@
                 loading.classList.remove('flex');
                 btnSubmit.disabled = false;
                 btnSubmit.classList.remove('opacity-70');
-                btnIcon.className = 'fa-solid fa-arrow-right ml-1 text-sm';
+                btnIcon.className = 'fa-solid fa-arrow-right ml-2 text-sm';
             }
         });
 
-      // --- Logika Stok Akrab & Filter ---
+        // --- Logika Stok Akrab & Filter ---
         let globalStockItems = []; 
 
         async function loadStokData() {
@@ -682,21 +663,21 @@
                     return numA - numB;
                 });
 
-                // Tampilkan XDA
+                // Set ulang tombol filter ke XDA
                 document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
-                    b.classList.add('bg-dark-input', 'text-gray-400');
+                    b.classList.remove('bg-brand-main', 'text-white', 'shadow-md', 'shadow-brand-main/30');
+                    b.classList.add('bg-gray-100', 'text-gray-500');
                 });
                 const btnXDA = document.querySelector('.filter-btn[data-group="XDA"]');
                 if(btnXDA) {
-                    btnXDA.classList.add('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
-                    btnXDA.classList.remove('bg-dark-input', 'text-gray-400');
+                    btnXDA.classList.add('bg-brand-main', 'text-white', 'shadow-md', 'shadow-brand-main/30');
+                    btnXDA.classList.remove('bg-gray-100', 'text-gray-500');
                 }
                 renderStockUI('XDA');
 
             } catch (error) {
                 console.error("Error Detail:", error);
-                document.getElementById('stokContainer').innerHTML = `<div class="text-center text-red-500 text-sm py-8 w-full font-bold">Gagal memuat data stok.</div>`;
+                document.getElementById('stokContainer').innerHTML = `<div class="text-center text-red-500 text-sm py-10 w-full font-bold bg-red-50 rounded-xl border border-red-100">Gagal memuat data stok. Silakan coba lagi.</div>`;
             } finally {
                 loadingStok.classList.add('hidden');
                 loadingStok.classList.remove('flex');
@@ -711,76 +692,87 @@
             const groupItems = globalStockItems.filter(item => item.code.startsWith(activeGroupPrefix));
             
             if (groupItems.length > 0) {
-                let groupHTML = `<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 content-start w-full">`;
+                // Layout 4 Kolom di Desktop, 2 Kolom di Mobile
+                let groupHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4 content-start w-full">`;
 
                 groupItems.forEach(item => {
                     const isAvailable = item.isChatAdmin || item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
-                    const quotaColor = isAvailable ? 'text-[#e8b923]' : 'text-red-500'; // Deskripsi kuning jika ada stok, merah jika habis
-                    
-                    const checkIcon = item.isChatAdmin
-                        ? `<div class="bg-blue-500 rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(59,130,246,0.5)]"><i class="fa-brands fa-whatsapp text-white text-[10px] font-black"></i></div>`
-                        : (isAvailable 
-                            ? `<div class="bg-brand-main rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(0,244,126,0.5)]"><i class="fa-solid fa-check text-[#0b1a24] text-[9px] font-black"></i></div>`
-                            : `<div class="bg-red-500 rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-xmark text-[#0b1a24] text-[9px] font-black"></i></div>`);
-                    
-                    const emptyText = (!isAvailable && !item.isChatAdmin) ? `<span class="block text-red-500 text-[9px] italic font-black tracking-wider leading-none mt-1">HABIS</span>` : '';
-                    
-                    let stockDisplay = item.isChatAdmin 
-                        ? `<span class="text-[12px] md:text-[14px] font-black text-[#00f47e] ml-1">Chat Admin</span>`
-                        : `<span class="text-[14px] md:text-[16px] font-black ${isAvailable ? 'text-brand-main' : 'text-red-500'} leading-none ml-1">${item.numStock}</span>`;
+                    const isHabis = !isAvailable && !item.isChatAdmin;
 
+                    // TEMA WARNA DINAMIS
+                    let theme = {};
+                    let badgeText = '';
+
+                    if (isHabis) {
+                        // TEMA HABIS (Pinkish)
+                        theme.cardBg = 'bg-[#fff5f5]';
+                        theme.cardBorder = 'border-[#fce8e8]';
+                        theme.badgeClass = 'text-[#e11d48] border-[#fda4af] bg-white/80';
+                        badgeText = 'HABIS';
+                        theme.itemBg = 'bg-white';
+                        theme.itemBorder = 'border-[#fed7aa]'; // Soft Orange Border
+                        theme.areaText = 'text-[#9a3412]'; // Brown/Orange
+                        theme.quotaText = 'text-gray-800';
+                    } else if (item.isChatAdmin) {
+                        // TEMA CHAT ADMIN (Blueish)
+                        theme.cardBg = 'bg-[#eff6ff]';
+                        theme.cardBorder = 'border-[#dbeafe]';
+                        theme.badgeClass = 'text-[#2563eb] border-[#93c5fd] bg-white/80';
+                        badgeText = 'CHAT ADMIN';
+                        theme.itemBg = 'bg-white';
+                        theme.itemBorder = 'border-[#bfdbfe]';
+                        theme.areaText = 'text-[#1e40af]';
+                        theme.quotaText = 'text-gray-800';
+                    } else {
+                        // TEMA READY (Greenish)
+                        theme.cardBg = 'bg-[#f0fdf4]';
+                        theme.cardBorder = 'border-[#dcfce7]';
+                        theme.badgeClass = 'text-[#16a34a] border-[#86efac] bg-white/80';
+                        badgeText = typeof item.stock === 'number' ? `${item.numStock} PCS` : 'READY';
+                        theme.itemBg = 'bg-white';
+                        theme.itemBorder = 'border-[#bbf7d0]';
+                        theme.areaText = 'text-[#166534]';
+                        theme.quotaText = 'text-gray-800';
+                    }
+
+                    // Parsing Area HTML
                     let areaHTML = '';
                     if (item.rawDesc) {
                         try {
                             const parsedDesc = JSON.parse(item.rawDesc);
-                            areaHTML += `<div class="flex flex-col gap-1 w-full">`;
+                            areaHTML += `<div class="flex flex-col gap-2 w-full mt-3">`;
                             for (let key in parsedDesc) {
-                                let areaLabel = key.replace(/([a-zA-Z])(\d)/, '$1 $2');
+                                let areaLabel = key.replace(/([a-zA-Z]+)\s*(\d+)/i, '$1 $2'); // Rapikan "Area1" -> "Area 1"
                                 let quotaVal = String(parsedDesc[key]);
                                 let displayQuota = quotaVal.toLowerCase().includes('gb') ? quotaVal : `${quotaVal} GB`;
                                 
                                 areaHTML += `
-                                    <div class="grid grid-cols-[42px_5px_1fr] md:grid-cols-[48px_5px_1fr] items-center w-full text-left">
-                                        <span class="text-[9px] md:text-[10px] text-gray-400 font-medium">${areaLabel}</span>
-                                        <span class="text-[9px] md:text-[10px] text-gray-500 text-center">:</span>
-                                        <span class="${quotaColor} text-[9px] md:text-[10.5px] font-bold">${displayQuota}</span>
+                                    <div class="${theme.itemBg} ${theme.itemBorder} border rounded-lg px-3 py-1.5 flex justify-between items-center shadow-sm">
+                                        <span class="text-[10px] md:text-[11.5px] font-semibold ${theme.areaText} tracking-wide">${areaLabel}</span>
+                                        <span class="text-[10.5px] md:text-[12px] font-black ${theme.quotaText}">${displayQuota}</span>
                                     </div>`;
                             }
                             areaHTML += `</div>`;
                         } catch(e) {
                             let safeText = item.rawDesc
                                 .replace(/([a-zA-Z])(\d)/g, '$1 $2').replace(/,\s*/g, '<br>').replace(/Area/gi, '<br>Area').replace(/<br>\s*<br>/g, '<br>').replace(/^<br>/, '');
-                            areaHTML = `<div class="text-[9px] md:text-[10px] ${quotaColor} font-bold leading-[1.6] text-left w-full">${safeText}</div>`;
+                            areaHTML = `<div class="text-[11px] ${theme.areaText} font-bold leading-relaxed text-left w-full mt-3">${safeText}</div>`;
                         }
+                    } else {
+                        areaHTML = `<div class="text-[10px] text-gray-400 italic mt-3 text-center">Detail area tidak tersedia</div>`;
                     }
 
-                    if (!areaHTML) {
-                        areaHTML = `<div class="text-[9px] text-gray-600 italic mt-1">Detail area tidak tersedia</div>`;
-                    }
-
+                    // Susun Kartu
                     groupHTML += `
-                        <div class="bg-dark-input p-3 rounded-xl border border-dark-border flex flex-col w-full relative shadow-sm h-full hover:border-brand-main/40 transition-colors">
-                            <div class="flex justify-between items-start gap-1 relative z-10 mb-2">
-                                <h3 class="font-bold text-white text-[12px] md:text-[14px] leading-tight break-words pr-1">${item.name}</h3>
-                                <div class="shrink-0 mt-[1px]">${checkIcon}</div>
-                            </div>
-                            
-                            <div class="relative z-10 mb-3">
-                                <div class="flex items-center gap-1">
-                                    <span class="text-gray-400 font-medium text-[10px] md:text-[11px] leading-none">${item.isChatAdmin ? 'Status:' : 'Sisa Stok:'}</span>
-                                    ${stockDisplay}
+                        <div class="${theme.cardBg} ${theme.cardBorder} p-4 rounded-2xl border flex flex-col w-full relative transition-transform hover:-translate-y-1 duration-200 shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
+                            <div class="flex justify-between items-start gap-2 relative z-10 w-full">
+                                <h3 class="font-black text-[#1e293b] text-[15px] md:text-[17px] leading-none tracking-tight">${item.name}</h3>
+                                <div class="${theme.badgeClass} border px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider shrink-0 shadow-sm text-center">
+                                    ${badgeText}
                                 </div>
-                                ${emptyText}
                             </div>
                             
-                            <div class="flex flex-col justify-center w-full relative z-10 mt-1 mb-3 bg-[#0b1a24] p-2.5 rounded-lg border border-white/5">
-                                ${areaHTML}
-                            </div>
-                            
-                            <div class="pt-2 border-t border-[#1a3245] flex justify-between items-center w-full relative z-10 mt-auto">
-                                <span class="text-[9px] text-gray-600 font-bold tracking-wider">KODE</span>
-                                <span class="text-brand-main text-[10px] md:text-[11px] font-bold tracking-wider">${item.code}</span>
-                            </div>
+                            ${areaHTML}
                         </div>
                     `;
                 });
@@ -788,7 +780,7 @@
                 groupHTML += `</div>`;
                 stokContainer.insertAdjacentHTML('beforeend', groupHTML);
             } else {
-                stokContainer.innerHTML = `<div class="text-center text-gray-500 text-sm py-8 w-full italic">Stok belum tersedia.</div>`;
+                stokContainer.innerHTML = `<div class="text-center text-gray-500 text-sm py-10 w-full font-medium italic bg-gray-50 rounded-xl border border-gray-100">Stok belum tersedia.</div>`;
             }
         }
 
@@ -796,11 +788,11 @@
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
-                    b.classList.add('bg-dark-input', 'text-gray-400');
+                    b.classList.remove('bg-brand-main', 'text-white', 'shadow-md', 'shadow-brand-main/30');
+                    b.classList.add('bg-gray-100', 'text-gray-500');
                 });
-                this.classList.remove('bg-dark-input', 'text-gray-400');
-                this.classList.add('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
+                this.classList.remove('bg-gray-100', 'text-gray-500');
+                this.classList.add('bg-brand-main', 'text-white', 'shadow-md', 'shadow-brand-main/30');
                 
                 renderStockUI(this.getAttribute('data-group'));
             });
@@ -813,7 +805,7 @@
         // --- Logika Animasi Running Text ---
         function generateFakeTransactions() {
             const names = ["Budi", "Andi", "Siti", "Ayu", "Agus", "Dewi", "Reza", "Putri", "Dedi", "Rina", "Eko", "Lia", "Rizky", "Fitri", "Dimas", "Nova", "Hendra"];
-            const packages = ["SuperMini", "SuperMini V2", "Mini", "Big", "Big V2", "Jumbo V2", "Jumbo V3", "JUMBO", "Megabig V2", "MegaBig"]; 
+            const packages = ["XDA14", "SuperMini V2", "Mini", "XDA32", "Big V2", "Jumbo V2", "Jumbo V3", "XLA65", "Megabig V2", "KDA13"]; 
             const prefixes = ["0817", "0818", "0819", "0859", "0877", "0878", "0831", "0832", "0833", "0838"];
             
             let marqueeHTML = "";
@@ -825,7 +817,7 @@
                 let maskedName = name.substring(0, 2) + "**";
                 let phone = `${prefix}****${Math.floor(1000 + Math.random() * 9000)}`;
                 
-                marqueeHTML += `<span class="mx-3 md:mx-4 text-[9px] md:text-[11px] text-gray-400 font-medium tracking-wide flex items-center h-full"><i class="fa-solid fa-cart-shopping text-brand-main mr-1.5"></i><span class="text-gray-200">${maskedName}</span> &nbsp;<span class="opacity-70">(${phone})</span>&nbsp; sukses membeli &nbsp;<span class="text-brand-main font-bold">${pkg}</span></span><span class="text-dark-border text-[7px] flex items-center h-full">●</span>`;
+                marqueeHTML += `<span class="mx-3 md:mx-5 text-[10px] md:text-[12px] text-gray-500 font-medium tracking-wide flex items-center h-full"><i class="fa-solid fa-cart-shopping text-brand-main mr-2"></i><span class="text-gray-800 font-bold">${maskedName}</span> &nbsp;<span class="opacity-60">(${phone})</span>&nbsp; membeli &nbsp;<span class="text-brand-dark font-black">${pkg}</span></span><span class="text-gray-300 text-[6px] flex items-center h-full">●</span>`;
             }
             document.getElementById('runningTextContainer').innerHTML = marqueeHTML;
         }
