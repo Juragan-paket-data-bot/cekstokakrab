@@ -712,40 +712,40 @@
                     const isAvailable = item.isChatAdmin || item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
                     const isHabis = !isAvailable && !item.isChatAdmin;
 
-                    // TEMA WARNA DINAMIS YANG LEBIH CERAH & MENCOLOK
+                    // TEMA WARNA DINAMIS YANG CERAH & MENCOLOK
                     let theme = {};
                     let badgeText = '';
 
                     if (isHabis) {
-                        // TEMA HABIS (Pink Cerah)[cite: 4]
                         theme.cardBg = 'bg-[#fff0f0]';
                         theme.cardBorder = 'border-[#fecaca]';
                         theme.badgeClass = 'text-red-600 border-red-300 bg-white';
                         badgeText = 'HABIS';
-                        theme.itemBorder = 'border-[#fed7aa]'; // Border orange lembut untuk kotak putih[cite: 4]
-                        theme.areaText = 'text-[#b45309]'; // Teks area orange/coklat
-                        theme.quotaText = 'text-gray-900';
+                        theme.itemBg = 'bg-white';
+                        theme.itemBorder = 'border-red-100';
+                        theme.areaText = 'text-red-900';
+                        theme.quotaText = 'text-red-700';
                     } else if (item.isChatAdmin) {
-                        // TEMA CHAT ADMIN (Biru Cerah)
                         theme.cardBg = 'bg-[#eff6ff]';
                         theme.cardBorder = 'border-[#bfdbfe]';
                         theme.badgeClass = 'text-blue-600 border-blue-300 bg-white';
                         badgeText = 'CHAT ADMIN';
-                        theme.itemBorder = 'border-[#bfdbfe]';
-                        theme.areaText = 'text-[#1d4ed8]';
-                        theme.quotaText = 'text-gray-900';
+                        theme.itemBg = 'bg-white';
+                        theme.itemBorder = 'border-blue-100';
+                        theme.areaText = 'text-blue-900';
+                        theme.quotaText = 'text-blue-700';
                     } else {
-                        // TEMA READY (Hijau Cerah)
                         theme.cardBg = 'bg-[#ecfdf5]';
                         theme.cardBorder = 'border-[#a7f3d0]';
                         theme.badgeClass = 'text-[#059669] border-[#6ee7b7] bg-white';
                         badgeText = typeof item.stock === 'number' ? `${item.numStock} PCS` : 'READY';
-                        theme.itemBorder = 'border-[#a7f3d0]';
-                        theme.areaText = 'text-[#047857]';
-                        theme.quotaText = 'text-gray-900';
+                        theme.itemBg = 'bg-white';
+                        theme.itemBorder = 'border-emerald-100';
+                        theme.areaText = 'text-emerald-900';
+                        theme.quotaText = 'text-emerald-700';
                     }
 
-                    // Parsing Area HTML menjadi Persegi Panjang Putih[cite: 4]
+                    // Parsing Area HTML menjadi Kotak Persegi Panjang Putih Terpisah per Area[cite: 4]
                     let areaHTML = '';
                     if (item.rawDesc) {
                         try {
@@ -754,20 +754,20 @@
                             for (let key in parsedDesc) {
                                 let areaLabel = key.replace(/([a-zA-Z]+)\s*(\d+)/i, '$1 $2'); // Rapikan "Area1" -> "Area 1"[cite: 4]
                                 let quotaVal = String(parsedDesc[key]);
-                                let displayQuota = quotaVal.toLowerCase().includes('gb') ? quotaVal : `${quotaVal} GB`; //[cite: 4]
+                                let displayQuota = quotaVal.toLowerCase().includes('gb') ? quotaVal : `${quotaVal} GB`;[cite: 4]
                                 
-                                // Kotak Putih Persegi Panjang[cite: 4]
+                                // Setiap Area memiliki kotak persegi panjang putih sendiri[cite: 4]
                                 areaHTML += `
-                                    <div class="bg-white ${theme.itemBorder} border rounded-lg px-3 py-1.5 flex justify-between items-center shadow-sm">
-                                        <span class="text-[10px] md:text-[11.5px] font-semibold ${theme.areaText}">${areaLabel}</span>
-                                        <span class="text-[10.5px] md:text-[12px] font-black ${theme.quotaText}">${displayQuota}</span>
+                                    <div class="${theme.itemBg} ${theme.itemBorder} border rounded-xl px-3 py-2 flex justify-between items-center shadow-sm">
+                                        <span class="text-[11px] md:text-[12px] font-bold ${theme.areaText}">${areaLabel}</span>
+                                        <span class="text-[11px] md:text-[12.5px] font-black ${theme.quotaText}">${displayQuota}</span>
                                     </div>`;
                             }
                             areaHTML += `</div>`;
                         } catch(e) {
                             let safeText = item.rawDesc
                                 .replace(/([a-zA-Z])(\d)/g, '$1 $2').replace(/,\s*/g, '<br>').replace(/Area/gi, '<br>Area').replace(/<br>\s*<br>/g, '<br>').replace(/^<br>/, '');
-                            areaHTML = `<div class="bg-white ${theme.itemBorder} border rounded-lg px-3 py-2 text-[11px] ${theme.areaText} font-bold leading-relaxed text-left w-full shadow-sm">${safeText}</div>`;
+                            areaHTML = `<div class="bg-white border rounded-xl px-3 py-2 text-[11px] ${theme.areaText} font-bold leading-relaxed text-left w-full shadow-sm">${safeText}</div>`;
                         }
                     } else {
                         areaHTML = `<div class="text-[10px] text-gray-400 italic mt-1 text-center">Detail area tidak tersedia</div>`;
@@ -775,7 +775,7 @@
 
                     // Susun Kartu
                     groupHTML += `
-                        <div class="${theme.cardBg} ${theme.cardBorder} p-3 md:p-4 rounded-2xl border flex flex-col w-full relative transition-transform hover:-translate-y-1 duration-200 shadow-sm">
+                        <div class="${theme.cardBg} ${theme.cardBorder} p-3.5 md:p-4 rounded-2xl border flex flex-col w-full relative transition-transform hover:-translate-y-1 duration-200 shadow-sm">
                             <div class="flex justify-between items-center gap-2 relative z-10 w-full mb-3">
                                 <h3 class="font-black text-[#1e293b] text-[15px] md:text-[17px] leading-none tracking-tight">${item.name}</h3>
                                 <div class="${theme.badgeClass} border px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0 shadow-sm text-center">
