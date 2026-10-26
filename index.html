@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#f8fafc">
-    <title>Sistem Juragan Paket Data</title>
+    <title> Cek Stok Akrab</title>
     
     <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -699,7 +699,6 @@
                     const isAvailable = item.isChatAdmin || item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
                     const isHabis = !isAvailable && !item.isChatAdmin;
 
-                    // TEMA WARNA DINAMIS YANG CERAH & MENCOLOK
                     let theme = {};
                     let badgeText = '';
 
@@ -732,35 +731,35 @@
                         theme.quotaText = 'text-emerald-700';
                     }
 
-                    // Parsing Area HTML menjadi Kotak Persegi Panjang Putih Terpisah per Area
+                    // PERBAIKAN UTAMA: Membuat kotak putih terpisah (masing-masing 1 baris ke bawah untuk tiap area)
                     let areaHTML = '';
                     if (item.rawDesc) {
                         try {
                             const parsedDesc = JSON.parse(item.rawDesc);
-                            areaHTML += `<div class="flex flex-col gap-1.5 w-full">`;
+                            areaHTML += `<div class="flex flex-col gap-2 w-full">`; // gap-2 agar ada jarak antar kotak
                             for (let key in parsedDesc) {
                                 let areaLabel = key.replace(/([a-zA-Z]+)\s*(\d+)/i, '$1 $2'); 
                                 let quotaVal = String(parsedDesc[key]);
                                 let displayQuota = quotaVal.toLowerCase().includes('gb') ? quotaVal : `${quotaVal} GB`;
                                 
-                                // Setiap Area memiliki kotak persegi panjang putih sendiri
+                                // Kotak persegi panjang putih mandiri untuk setiap area
                                 areaHTML += `
-                                    <div class="${theme.itemBg} ${theme.itemBorder} border rounded-xl px-3 py-2 flex justify-between items-center shadow-sm">
-                                        <span class="text-[11px] md:text-[12px] font-bold ${theme.areaText}">${areaLabel}</span>
-                                        <span class="text-[11px] md:text-[12.5px] font-black ${theme.quotaText}">${displayQuota}</span>
+                                    <div class="${theme.itemBg} ${theme.itemBorder} border rounded-xl px-3.5 py-2.5 flex justify-between items-center shadow-sm">
+                                        <span class="text-[11px] md:text-[12.5px] font-bold ${theme.areaText}">${areaLabel}</span>
+                                        <span class="text-[11px] md:text-[13px] font-black ${theme.quotaText}">${displayQuota}</span>
                                     </div>`;
                             }
                             areaHTML += `</div>`;
                         } catch(e) {
                             let safeText = item.rawDesc
                                 .replace(/([a-zA-Z])(\d)/g, '$1 $2').replace(/,\s*/g, '<br>').replace(/Area/gi, '<br>Area').replace(/<br>\s*<br>/g, '<br>').replace(/^<br>/, '');
-                            areaHTML = `<div class="bg-white border rounded-xl px-3 py-2 text-[11px] ${theme.areaText} font-bold leading-relaxed text-left w-full shadow-sm">${safeText}</div>`;
+                            areaHTML = `<div class="bg-white border rounded-xl px-3.5 py-2.5 text-[11px] ${theme.areaText} font-bold leading-relaxed text-left w-full shadow-sm">${safeText}</div>`;
                         }
                     } else {
                         areaHTML = `<div class="text-[10px] text-gray-400 italic mt-1 text-center">Detail area tidak tersedia</div>`;
                     }
 
-                    // Susun Kartu
+                    // Susun Kartu Utama
                     groupHTML += `
                         <div class="${theme.cardBg} ${theme.cardBorder} p-3.5 md:p-4 rounded-2xl border flex flex-col w-full relative transition-transform hover:-translate-y-1 duration-200 shadow-sm">
                             <div class="flex justify-between items-center gap-2 relative z-10 w-full mb-3">
