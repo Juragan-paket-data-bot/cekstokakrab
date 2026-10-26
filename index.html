@@ -601,44 +601,50 @@
                         let innerData = (item.data && typeof item.data === 'object') ? item.data : item;
                         
                         let valCode = innerData.id_grup || innerData.sku || innerData.kode || innerData.code || innerData.id || '-';
+                        let valCodeUpper = valCode.toUpperCase();
+
+                        // 1. FILTER: Hapus produk yang kodenya berakhiran 'M' atau 'A' (Contoh: KDA63M, KDA19A)
+                        if (/[0-9][MA]$/i.test(valCodeUpper)) {
+                            return; // Lewati produk ini, jangan dimasukkan ke daftar
+                        }
+
                         let valStock = innerData.stok !== undefined ? innerData.stok : (innerData.stock !== undefined ? innerData.stock : (innerData.qty || 0));
                         let valName = innerData['Nama kuota'] || innerData.Nama_kuota || innerData.nama || innerData.name || '';
                         let valDesc = innerData.deskripsi || null;
                         
-                        // HAPUS PRODUK MATI: Jika stok 0, tidak punya deskripsi, dan namanya kosong (null)
-                        if (valStock == 0 && !valDesc && (!valName || valName.trim() === '')) return; // Lewati (jangan dimasukkan ke layar)
+                        // 2. HAPUS PRODUK MATI (Stok 0, tanpa deskripsi, tanpa nama)
+                        if (valStock == 0 && !valDesc && (!valName || valName.trim() === '')) return;
 
-                        // Jika nama kosong, cari di kamus fallback
-                        if (!valName || valName === valStock || valName === valCode) {
-                            valName = kamusPaket[valCode] || valCode;
+                        // 3. ATURAN NAMA PRODUK: XM, KDA, ARF mengikuti Kode Produk
+                        if (valCodeUpper.startsWith('XM') || valCodeUpper.startsWith('KDA') || valCodeUpper.startsWith('ARF')) {
+                            valName = valCodeUpper;
+                        } else {
+                            if (!valName || valName === valStock || valName === valCode) {
+                                valName = kamusPaket[valCodeUpper] || valCode;
+                            }
                         }
                         
                         let numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
                         
                         globalStockItems.push({ 
-                            code: valCode, 
+                            code: valCodeUpper, 
                             name: valName, 
                             stock: valStock, 
                             numStock: numStock,
-                            rawDesc: valDesc // Simpan deskripsi mentah dari API untuk area
+                            rawDesc: valDesc
                         });
                     });
                 }
 
-              // SORTING (MENGURUTKAN) DARI TERENDAH KE TERTINGGI (Contoh XDA14 dulu, baru XDA19)
+                // 4. SORTING: Mengurutkan angka dari yang terkecil ke terbesar secara akurat (XDA14 -> XDA19)
                 globalStockItems.sort((a, b) => {
-                    // Mengekstrak angka dari kode (misal "XDA14" menjadi 14)
                     let numA = parseInt(a.code.replace(/\D/g, '')) || 0;
                     let numB = parseInt(b.code.replace(/\D/g, '')) || 0;
-                    
-                    // Jika angkanya sama (atau tidak ada angka), urutkan berdasarkan abjad kodenya
-                    if (numA === numB) {
-                        return a.code.localeCompare(b.code);
-                    }
+                    if (numA === numB) return a.code.localeCompare(b.code);
                     return numA - numB;
                 });
 
-                // Tampilkan XDA sebagai tampilan bawaan pertama
+                // Reset tombol dan tampilkan grup default (XDA)
                 document.querySelectorAll('.filter-btn').forEach(b => {
                     b.classList.remove('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
                     b.classList.add('bg-dark-input', 'text-gray-400');
@@ -649,7 +655,6 @@
                     btnXDA.classList.remove('bg-dark-input', 'text-gray-400');
                 }
 
-                // Render tampilan
                 renderStockUI('XDA');
 
             } catch (error) {
@@ -679,10 +684,10 @@
                 "MegaBig": [{ area: "Area 1", quota: "88-90 GB" }, { area: "Area 2", quota: "90-92 GB" }, { area: "Area 3", quota: "95-97 GB" }, { area: "Area 4", quota: "105-107 GB" }]
             };
 
-            const groupItems = globalStockItems.filter(item => item.code.toUpperCase().startsWith(activeGroupPrefix));
+            const groupItems = globalStockItems.filter(item => item.code.startsWith(activeGroupPrefix));
             
             if (groupItems.length > 0) {
-                // Tampilan kotak produk TANPA judul header H2
+                // Tampilan kotak produk TANPA judul header
                 let groupHTML = `<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 content-start w-full">`;
 
                 groupItems.forEach(item => {
@@ -697,27 +702,36 @@
 
                     let areaHTML = '';
                     
-                    // PRIORITAS 1: Parsing catatan Area langsung dari API JSON (deskripsi)
+                    // 5. PARSING DESKRIPSI (Grid Baris Kebawah)
                     if (item.rawDesc) {
                         try {
                             const parsedDesc = JSON.parse(item.rawDesc);
+                            areaHTML += `<div class="flex flex-col gap-1 w-full">`;
                             for (let key in parsedDesc) {
-                                // Memformat tulisan 'Area1' menjadi 'Area 1'
                                 let areaLabel = key.replace(/([a-zA-Z])(\d)/, '$1 $2');
                                 let quotaVal = parsedDesc[key];
                                 areaHTML += `
-                                    <div class="flex justify-between items-center w-full">
-                                        <span class="text-[9px] md:text-[10px] text-gray-400 font-medium leading-[1.3]">${areaLabel}</span>
-                                        <span class="text-[#e8b923] text-[9px] md:text-[10px] font-bold leading-[1.3]">${quotaVal} GB</span>
+                                    <div class="grid grid-cols-[42px_5px_1fr] md:grid-cols-[48px_5px_1fr] items-center w-full text-left">
+                                        <span class="text-[9px] md:text-[10px] text-gray-400 font-medium">${areaLabel}</span>
+                                        <span class="text-[9px] md:text-[10px] text-gray-500 text-center">:</span>
+                                        <span class="text-[#e8b923] text-[9px] md:text-[10.5px] font-bold">${quotaVal} GB</span>
                                     </div>`;
                             }
+                            areaHTML += `</div>`;
                         } catch(e) {
-                            // Jika format bukan JSON melainkan teks biasa, tampilkan teks tersebut
-                            areaHTML = `<div class="text-[9px] text-[#e8b923] leading-[1.3] text-left">${item.rawDesc}</div>`;
+                            // Jika format bukan JSON melainkan teks biasa, bersihkan dan susun ke bawah
+                            let safeText = item.rawDesc
+                                .replace(/([a-zA-Z])(\d)/g, '$1 $2') // Area1 -> Area 1
+                                .replace(/,\s*/g, '<br>') // Koma jadi baris baru
+                                .replace(/Area/gi, '<br>Area') 
+                                .replace(/<br>\s*<br>/g, '<br>')
+                                .replace(/^<br>/, '');
+                            
+                            areaHTML = `<div class="text-[9px] md:text-[10px] text-[#e8b923] font-bold leading-[1.6] text-left w-full">${safeText}</div>`;
                         }
                     }
 
-                    // PRIORITAS 2: Jika tidak ada deskripsi dari server API, gunakan fallback
+                    // Fallback jika tidak ada deskripsi
                     if (!areaHTML) {
                         let baseNameForArea = item.name.replace(' (Promo)', '').trim();
                         if(baseNameForArea.toLowerCase() === 'megabig v2') baseNameForArea = 'Megabig V2'; 
@@ -725,19 +739,21 @@
                         
                         const areas = detailAreaPaketFallback[baseNameForArea];
                         if (areas) {
+                            areaHTML += `<div class="flex flex-col gap-1 w-full">`;
                             areas.forEach(a => {
                                 areaHTML += `
-                                    <div class="flex justify-between items-center w-full">
-                                        <span class="text-[9px] md:text-[10px] text-gray-400 font-medium leading-[1.3]">${a.area}</span>
-                                        <span class="text-[#e8b923] text-[9px] md:text-[10px] font-bold leading-[1.3]">${a.quota}</span>
+                                    <div class="grid grid-cols-[42px_5px_1fr] md:grid-cols-[48px_5px_1fr] items-center w-full text-left">
+                                        <span class="text-[9px] md:text-[10px] text-gray-400 font-medium">${a.area}</span>
+                                        <span class="text-[9px] md:text-[10px] text-gray-500 text-center">:</span>
+                                        <span class="text-[#e8b923] text-[9px] md:text-[10.5px] font-bold">${a.quota}</span>
                                     </div>`;
                             });
+                            areaHTML += `</div>`;
                         }
                     }
 
-                    // Jika benar-benar kosong
                     if (!areaHTML) {
-                        areaHTML = `<div class="text-[9px] text-gray-600 italic">Detail kuota area tidak tercantum</div>`;
+                        areaHTML = `<div class="text-[9px] text-gray-600 italic mt-1">Detail area tidak tersedia</div>`;
                     }
 
                     groupHTML += `
@@ -755,7 +771,7 @@
                                 ${emptyText}
                             </div>
                             
-                            <div class="flex flex-col justify-center gap-1.5 w-full relative z-10 mt-1 mb-3 bg-[#0b1a24] p-2 rounded-lg border border-white/5">
+                            <div class="flex flex-col justify-center w-full relative z-10 mt-1 mb-3 bg-[#0b1a24] p-2.5 rounded-lg border border-white/5">
                                 ${areaHTML}
                             </div>
                             
