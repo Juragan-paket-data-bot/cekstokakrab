@@ -137,7 +137,7 @@
                     <span class="text-brand-dark text-xs font-bold animate-pulse tracking-wide">MEMUAT DATA STOK...</span>
                 </div>
                 
-                <!-- MENU FILTER GRUP -->
+               <!-- MENU FILTER GRUP -->
                 <div class="w-full mb-6 overflow-x-auto pb-3 scrollbar-hide">
                     <div class="flex gap-2 min-w-max" id="groupFilters">
                         <button class="filter-btn active px-5 py-2 rounded-full bg-brand-main text-white text-xs font-bold transition-all shadow-md shadow-brand-main/30" data-group="XDA">XDA</button>
@@ -151,7 +151,7 @@
                     </div>
                 </div>
 
-                <!-- CONTAINER STOK -->
+                <!-- CONTAINER STOK PER GRUP -->
                 <div id="stokContainer" class="w-full">
                     <!-- Item stok di-inject via JS -->
                 </div>
@@ -313,7 +313,7 @@
             {"prov": "Jawa Tengah", "kota": "Kota Pekalongan, Kab. Pekalongan, Kab. Batang, Kab. Purbalingga, Kab. Kudus, Kab. Sukoharjo, Kab. Klaten, Kota Magelang, Kab. Banyumas, Kab. Magelang, Kab. Temanggung, Kab. Sragen, Kab. Banjarnegara, Kab. Karanganyar, Kab. Wonosobo, Kab. Jepara, Kab. Demak, Kab. Purworejo, Kab. Blora, Kab. Wonogiri, Kab. Pati", "area": "4"},
             {"prov": "Jawa Timur", "kota": "Kota Probolinggo, Kab. Bangkalan, Kab. Sidoarjo, Kab. Banyuwangi, Kota Surabaya, Kab. Sampang, Kab. Pamekasan, Kab. Sumenep, Kab. Pacitan", "area": "2"},
             {"prov": "Jawa Timur", "kota": "Kab. Lumajang, Kab. Probolinggo", "area": "3"},
-            {"prov": "Jawa Timur", "kota": "Kab. Jombang, Kota Blitar, Kab. Blitar, Kota Kediri, Kab. Lamongan, Kab. Kediri, Kab. Ngawi, Kab. Mojokerto, Kota Mojokerto, Kab. Magetan, Kab. Gresik, Kab. Tulungagung, Kab. Nganjuk, Kab. Pasuruan, Kota Pasuruan, Kab. Bojonegoro, Kab. Madiun, Kab. Bondowoso, Kab. Tuban, Kota Madiun, Kab. Situbondo, Kab. Jember, Kota Malang, Kab. Malang, Kab. Ponorogo, Kota Batu, Kab. Trenggalek", "area": "4"},
+            {"prov": "Jawa Timur", "kota": "Kab. Jombang, Kota Blitar, Kab. Blitar, Kab. Kediri, Kab. Lamongan, Kab. Kediri, Kab. Ngawi, Kab. Mojokerto, Kota Mojokerto, Kab. Magetan, Kab. Gresik, Kab. Tulungagung, Kab. Nganjuk, Kab. Pasuruan, Kota Pasuruan, Kab. Bojonegoro, Kab. Madiun, Kab. Bondowoso, Kab. Tuban, Kota Madiun, Kab. Situbondo, Kab. Jember, Kota Malang, Kab. Malang, Kab. Ponorogo, Kota Batu, Kab. Trenggalek", "area": "4"},
             {"prov": "Bengkulu", "kota": "Kab. Seluma", "area": "3"},
             {"prov": "Bengkulu", "kota": "Kab. Bengkulu Selatan, Kab. Kaur, Kab. Lebong, Kab. Rejang Lebong, Kab. Bengkulu Tengah, Kota Bengkulu, Kab. Bengkulu Utara, Kab. Kepahiang, Kab. Muko Muko", "area": "4"},
             {"prov": "Jambi", "kota": "Kab. Batanghari, Kota Jambi, Kab. Tanjung Jabung Barat, Kab. Muaro Jambi, Kab. Sarolangun", "area": "3"},
@@ -689,19 +689,6 @@
             const stokContainer = document.getElementById('stokContainer');
             stokContainer.innerHTML = ''; 
 
-            const detailAreaPaketFallback = {
-                "SuperMini": [{ area: "Area 1", quota: "13-15 GB" }, { area: "Area 2", quota: "15-17 GB" }, { area: "Area 3", quota: "20-22 GB" }, { area: "Area 4", quota: "30-32 GB" }],
-                "SuperMini V2": [{ area: "Area 1", quota: "19-21 GB" }, { area: "Area 2", quota: "21-23 GB" }, { area: "Area 3", quota: "26-28 GB" }, { area: "Area 4", quota: "36-38 GB" }],
-                "Mini": [{ area: "Area 1", quota: "31-32 GB" }, { area: "Area 2", quota: "33-34 GB" }, { area: "Area 3", quota: "38-39 GB" }, { area: "Area 4", quota: "48-49 GB" }],
-                "Big": [{ area: "Area 1", quota: "38-40 GB" }, { area: "Area 2", quota: "40-42 GB" }, { area: "Area 3", quota: "45-47 GB" }, { area: "Area 4", quota: "55-57 GB" }],
-                "Big V2": [{ area: "Area 1", quota: "48 GB" }, { area: "Area 2", quota: "50 GB" }, { area: "Area 3", quota: "55 GB" }, { area: "Area 4", quota: "65 GB" }],
-                "Jumbo V2": [{ area: "Area 1", quota: "55 GB" }, { area: "Area 2", quota: "57 GB" }, { area: "Area 3", quota: "62 GB" }, { area: "Area 4", quota: "72 GB" }],
-                "Jumbo V3": [{ area: "Area 1", quota: "63-65 GB" }, { area: "Area 2", quota: "65-67 GB" }, { area: "Area 3", quota: "70-72 GB" }, { area: "Area 4", quota: "80-82 GB" }],
-                "JUMBO": [{ area: "Area 1", quota: "65 GB" }, { area: "Area 2", quota: "70 GB" }, { area: "Area 3", quota: "83 GB" }, { area: "Area 4", quota: "123 GB" }],
-                "Megabig V2": [{ area: "Area 1", quota: "76-78 GB" }, { area: "Area 2", quota: "78-80 GB" }, { area: "Area 3", quota: "83-85 GB" }, { area: "Area 4", quota: "93-95 GB" }],
-                "MegaBig": [{ area: "Area 1", quota: "88-90 GB" }, { area: "Area 2", quota: "90-92 GB" }, { area: "Area 3", quota: "95-97 GB" }, { area: "Area 4", quota: "105-107 GB" }]
-            };
-
             const groupItems = globalStockItems.filter(item => item.code.startsWith(activeGroupPrefix));
             
             if (groupItems.length > 0) {
@@ -745,18 +732,18 @@
                         theme.quotaText = 'text-emerald-700';
                     }
 
-                    // Parsing Area HTML menjadi Kotak Persegi Panjang Putih Terpisah per Area[cite: 4]
+                    // Parsing Area HTML menjadi Kotak Persegi Panjang Putih Terpisah per Area
                     let areaHTML = '';
                     if (item.rawDesc) {
                         try {
                             const parsedDesc = JSON.parse(item.rawDesc);
                             areaHTML += `<div class="flex flex-col gap-1.5 w-full">`;
                             for (let key in parsedDesc) {
-                                let areaLabel = key.replace(/([a-zA-Z]+)\s*(\d+)/i, '$1 $2'); // Rapikan "Area1" -> "Area 1"[cite: 4]
+                                let areaLabel = key.replace(/([a-zA-Z]+)\s*(\d+)/i, '$1 $2'); 
                                 let quotaVal = String(parsedDesc[key]);
-                                let displayQuota = quotaVal.toLowerCase().includes('gb') ? quotaVal : `${quotaVal} GB`;[cite: 4]
+                                let displayQuota = quotaVal.toLowerCase().includes('gb') ? quotaVal : `${quotaVal} GB`;
                                 
-                                // Setiap Area memiliki kotak persegi panjang putih sendiri[cite: 4]
+                                // Setiap Area memiliki kotak persegi panjang putih sendiri
                                 areaHTML += `
                                     <div class="${theme.itemBg} ${theme.itemBorder} border rounded-xl px-3 py-2 flex justify-between items-center shadow-sm">
                                         <span class="text-[11px] md:text-[12px] font-bold ${theme.areaText}">${areaLabel}</span>
@@ -794,7 +781,6 @@
                 stokContainer.innerHTML = `<div class="text-center text-gray-500 text-sm py-10 w-full font-medium italic bg-gray-50 rounded-xl border border-gray-100">Stok belum tersedia.</div>`;
             }
         }
-
         
         // Listener untuk tombol filter
         document.querySelectorAll('.filter-btn').forEach(btn => {
