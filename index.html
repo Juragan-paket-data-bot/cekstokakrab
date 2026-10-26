@@ -140,11 +140,9 @@
                     <span class="text-brand-main text-xs font-medium animate-pulse">Memuat...</span>
                 </div>
                 
-                <!-- GRID STOK -->
-                <div class="w-full">
-                    <div id="stokGrid" class="grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-5 content-start w-full">
-                        <!-- Item stok di-inject via JS -->
-                    </div>
+               <!-- CONTAINER STOK PER GRUP -->
+                <div id="stokContainer" class="w-full flex flex-col gap-6 md:gap-8">
+                    <!-- Grup dan Item stok di-inject via JS -->
                 </div>
 
                 <!-- Tombol Refresh -->
@@ -550,7 +548,6 @@
             }
         });
 
-        // --- Logika Stok Akrab ---
         async function loadStokData() {
             const loadingStok = document.getElementById('loadingStok');
             const btnCekStok = document.getElementById('btnCekStok');
@@ -573,8 +570,10 @@
                     responseData = mockStokPreview; 
                 }
 
-                const stokGrid = document.getElementById('stokGrid');
-                stokGrid.innerHTML = ''; 
+                // Gunakan stokContainer yang baru
+                const stokContainer = document.getElementById('stokContainer');
+                stokContainer.innerHTML = ''; 
+                
                 let stockItems = [];
                 let dataToParse = responseData.data || responseData;
 
@@ -609,70 +608,108 @@
                 }
 
                 if (stockItems.length > 0) {
-                    stockItems.forEach(item => {
-                        const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
-                        const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
-                        const bgHover = isAvailable ? 'border-dark-border' : 'border-dark-border'; 
-                        
-                        const checkIcon = isAvailable 
-                            ? `<div class="bg-brand-main rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center shadow-[0_0_8px_rgba(0,244,126,0.5)]"><i class="fa-solid fa-check text-[#0b1a24] text-[9px] md:text-[11px] font-black"></i></div>`
-                            : `<div class="bg-red-500 rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-xmark text-[#0b1a24] text-[9px] md:text-[11px] font-black"></i></div>`;
-                        
-                        const emptyText = !isAvailable ? `<span class="block text-red-500 text-[9px] md:text-[10px] italic font-black tracking-wider leading-none mt-1">HABIS</span>` : '';
+                    // Konfigurasi 5 Grup
+                    const groupsConfig = [
+                        { prefix: 'XDA', title: 'Grup 1 (XDA)' },
+                        { prefix: 'XLA', title: 'Grup 2 (XLA)' },
+                        { prefix: 'XM', title: 'Grup 3 (XM)' },
+                        { prefix: 'KDA', title: 'Grup 4 (KDA)' },
+                        { prefix: 'ARF', title: 'Grup 5 (ARF)' }
+                    ];
 
-                        let baseNameForArea = item.name.replace(' (Promo)', '').trim();
-                        if(baseNameForArea.toLowerCase() === 'megabig v2') baseNameForArea = 'Megabig V2'; 
-                        if(baseNameForArea.toLowerCase() === 'megabig') baseNameForArea = 'MegaBig'; 
-                        
-                        let areaHTML = '';
-                        const areas = detailAreaPaket[baseNameForArea];
-                        if (areas) {
-                            areas.forEach(a => {
-                                areaHTML += `
-                                    <div class="flex justify-between items-center w-full">
-                                        <span class="text-[8px] md:text-[11px] text-gray-500 font-medium leading-[1.3] tracking-wide">${a.area}</span>
-                                        <span class="text-[#e8b923] text-[8px] md:text-[11px] font-bold leading-[1.3]">${a.quota}</span>
-                                    </div>`;
-                            });
-                        }
+                    let hasData = false;
 
-                        const card = `
-                            <div class="bg-dark-input p-2.5 md:p-4 rounded-xl border ${bgHover} flex flex-col w-full relative shadow-sm h-full">
-                                <div class="flex justify-between items-start gap-1 relative z-10 mb-1.5">
-                                    <h3 class="font-bold text-white text-[11px] md:text-[15px] leading-[1.1] md:leading-tight tracking-tight break-words pr-1">${item.name}</h3>
-                                    <div class="shrink-0 mt-[1px]">${checkIcon}</div>
-                                </div>
+                    groupsConfig.forEach(group => {
+                        // Filter produk yang kodenya diawali dengan prefix grup (misal: "XDA")
+                        const groupItems = stockItems.filter(item => item.code.toUpperCase().startsWith(group.prefix));
+                        
+                        if (groupItems.length > 0) {
+                            hasData = true;
+                            // Buat Header Grup dan Grid
+                            let groupHTML = `
+                                <div class="w-full">
+                                    <h2 class="text-sm md:text-base font-bold text-white mb-3 border-b border-dark-border pb-2 flex items-center gap-2">
+                                        <i class="fa-solid fa-layer-group text-brand-main"></i> ${group.title}
+                                    </h2>
+                                    <div class="grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-5 content-start w-full">
+                            `;
+
+                            // Masukkan Kartu ke dalam Grup
+                            groupItems.forEach(item => {
+                                const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
+                                const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
+                                const bgHover = isAvailable ? 'border-dark-border' : 'border-dark-border'; 
                                 
-                                <div class="relative z-10 mb-2.5 md:mb-3">
-                                    <div class="flex items-center gap-1">
-                                        <span class="text-white font-bold text-[9px] md:text-[12px] leading-none">Stok:</span>
-                                        <span class="text-[13px] md:text-[18px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
+                                const checkIcon = isAvailable 
+                                    ? `<div class="bg-brand-main rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center shadow-[0_0_8px_rgba(0,244,126,0.5)]"><i class="fa-solid fa-check text-[#0b1a24] text-[9px] md:text-[11px] font-black"></i></div>`
+                                    : `<div class="bg-red-500 rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-xmark text-[#0b1a24] text-[9px] md:text-[11px] font-black"></i></div>`;
+                                
+                                const emptyText = !isAvailable ? `<span class="block text-red-500 text-[9px] md:text-[10px] italic font-black tracking-wider leading-none mt-1">HABIS</span>` : '';
+
+                                let baseNameForArea = item.name.replace(' (Promo)', '').trim();
+                                if(baseNameForArea.toLowerCase() === 'megabig v2') baseNameForArea = 'Megabig V2'; 
+                                if(baseNameForArea.toLowerCase() === 'megabig') baseNameForArea = 'MegaBig'; 
+                                
+                                let areaHTML = '';
+                                const areas = detailAreaPaket[baseNameForArea];
+                                if (areas) {
+                                    areas.forEach(a => {
+                                        areaHTML += `
+                                            <div class="flex justify-between items-center w-full">
+                                                <span class="text-[8px] md:text-[11px] text-gray-500 font-medium leading-[1.3] tracking-wide">${a.area}</span>
+                                                <span class="text-[#e8b923] text-[8px] md:text-[11px] font-bold leading-[1.3]">${a.quota}</span>
+                                            </div>`;
+                                    });
+                                }
+
+                                groupHTML += `
+                                    <div class="bg-dark-input p-2.5 md:p-4 rounded-xl border ${bgHover} flex flex-col w-full relative shadow-sm h-full">
+                                        <div class="flex justify-between items-start gap-1 relative z-10 mb-1.5">
+                                            <h3 class="font-bold text-white text-[11px] md:text-[15px] leading-[1.1] md:leading-tight tracking-tight break-words pr-1">${item.name}</h3>
+                                            <div class="shrink-0 mt-[1px]">${checkIcon}</div>
+                                        </div>
+                                        
+                                        <div class="relative z-10 mb-2.5 md:mb-3">
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-white font-bold text-[9px] md:text-[12px] leading-none">Stok:</span>
+                                                <span class="text-[13px] md:text-[18px] font-extrabold ${stockColor} leading-none">${item.numStock}</span>
+                                            </div>
+                                            ${emptyText}
+                                        </div>
+                                        
+                                        <div class="flex flex-col justify-center gap-1 w-full relative z-10 mt-1 mb-2 md:mb-3">
+                                            ${areaHTML}
+                                        </div>
+                                        
+                                        <div class="pt-1.5 md:pt-2 border-t border-[#1a3245] flex justify-between items-center w-full relative z-10 mt-auto">
+                                            <span class="text-[7px] md:text-[11px] text-gray-600 font-bold tracking-wider leading-none">KODE</span>
+                                            <span class="text-brand-main text-[8px] md:text-[12px] font-bold tracking-wider leading-none">${item.code}</span>
+                                        </div>
                                     </div>
-                                    ${emptyText}
-                                </div>
-                                
-                                <div class="flex flex-col justify-center gap-1 w-full relative z-10 mt-1 mb-2 md:mb-3">
-                                    ${areaHTML}
-                                </div>
-                                
-                                <div class="pt-1.5 md:pt-2 border-t border-[#1a3245] flex justify-between items-center w-full relative z-10 mt-auto">
-                                    <span class="text-[7px] md:text-[11px] text-gray-600 font-bold tracking-wider leading-none">KODE</span>
-                                    <span class="text-brand-main text-[8px] md:text-[12px] font-bold tracking-wider leading-none">${item.code}</span>
-                                </div>
-                            </div>
-                        `;
-                        stokGrid.insertAdjacentHTML('beforeend', card);
+                                `;
+                            });
+
+                            groupHTML += `</div></div>`;
+                            stokContainer.insertAdjacentHTML('beforeend', groupHTML);
+                        }
                     });
+
+                    // Tampilkan pesan jika sama sekali tidak ada data di 5 grup
+                    if (!hasData) {
+                        stokContainer.innerHTML = `<div class="text-center text-gray-500 text-sm py-8 w-full italic">Stok belum tersedia untuk grup ini.</div>`;
+                    }
+
                 }
             } catch (error) {
                 console.error(error);
+                document.getElementById('stokContainer').innerHTML = `<div class="text-center text-red-500 text-sm py-8 w-full font-bold">Gagal memuat data stok.</div>`;
             } finally {
                 loadingStok.classList.add('hidden');
                 loadingStok.classList.remove('flex');
                 btnIcon.classList.remove('fa-spin');
             }
         }
-
+        
         document.getElementById('btnCekStok').addEventListener('click', loadStokData);
         window.addEventListener('DOMContentLoaded', loadStokData);
 
