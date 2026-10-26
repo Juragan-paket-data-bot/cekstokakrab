@@ -560,8 +560,8 @@
             }
         });
 
-       // --- Logika Stok Akrab & Filter ---
-        let globalStockItems = []; // Menyimpan data agar filter tidak perlu fetch ulang
+      // --- Logika Stok Akrab & Filter ---
+        let globalStockItems = []; 
 
         async function loadStokData() {
             const loadingStok = document.getElementById('loadingStok');
@@ -573,12 +573,32 @@
             btnIcon.classList.add('fa-spin');
 
             try {
-                // MENGGUNAKAN API BARU
-                const response = await fetch('https://apistokakrab.my.id/api.php');
-                if (!response.ok) throw new Error("Gagal mengambil data dari API");
-                const responseData = await response.json();
+                let responseData;
                 
+                // Gunakan Proxy Vercel agar tidak kena blokir CORS dan Header otomatis terisi
+                const isVercel = window.location.hostname.includes('vercel.app');
+                
+                if (isVercel) {
+                    // Jika di Vercel, panggil file proxy /api/stok-akrab.js yang sudah kita buat sebelumnya
+                    const response = await fetch('/api/stok-akrab');
+                    if (!response.ok) throw new Error("Gagal mengambil data dari API Vercel");
+                    responseData = await response.json();
+                } else {
+                    // Jika dibuka di komputer lokal (file://), tembak API langsung
+                    const response = await fetch('https://apistokakrab.my.id/api.php', {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (!response.ok) throw new Error("Gagal mengambil data dari Server API");
+                    responseData = await response.json();
+                }
+                
+                // ==========================================
+                // BANTUAN DEBUG (Tekan F12 -> tab Console)
+                console.log("Data Asli dari API:", responseData);
+                // ==========================================
+
                 let dataToParse = responseData.data || responseData;
+                globalStockItems = [];
 
                 const kamusPaket = {
                     'XLA14': 'SuperMini', 'XLA20': 'SuperMini V2', 'XLA32': 'Mini', 
@@ -586,27 +606,36 @@
                     'XLA64': 'Jumbo V3', 'XLA65': 'JUMBO', 'XLA77': 'Megabig V2', 'XLA89': 'MegaBig'
                 };
 
-                // Proses data API mentah ke format array standar
-                globalStockItems = [];
                 if (Array.isArray(dataToParse)) {
-                    // API baru memiliki struktur bersarang { id_grup: "XDA", data: { id_grup: "XDA47", stok: 0 } }
                     dataToParse.forEach(item => {
-                        let innerData = item.data || item; // Mendukung format lama atau baru
-                        let valCode = innerData.sku || innerData.kode || innerData.code || innerData.id_grup || innerData.id || '-';
-                        let valStock = innerData.stok || innerData.stock || innerData.qty || 0;
-                        let valName = innerData.Nama_kuota || innerData.nama || innerData.name || '';
+                        // Antisipasi format bersarang (id_grup: XDA, data: { ... }) atau format langsung
+                        let innerData = (item.data && typeof item.data === 'object') ? item.data : item;
                         
-                        if (!valName || valName === valStock) valName = kamusPaket[valCode] || valCode;
+                        // Cari ID atau SKU
+                        let valCode = innerData.id_grup || innerData.sku || innerData.kode || innerData.code || innerData.id || '-';
+                        
+                        // Cari angka Stok
+                        let valStock = innerData.stok !== undefined ? innerData.stok : (innerData.stock !== undefined ? innerData.stock : (innerData.qty || 0));
+                        
+                        // PERBAIKAN: Membaca key 'Nama kuota' yang memiliki spasi dari JSON Anda
+                        let valName = innerData['Nama kuota'] || innerData.Nama_kuota || innerData.nama || innerData.name || '';
+                        
+                        // Jika nama kosong, panggil dari kamus lokal
+                        if (!valName || valName === valStock || valName === valCode) {
+                            valName = kamusPaket[valCode] || valCode;
+                        }
+                        
                         let numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
                         
+                        // Masukkan ke wadah global
                         globalStockItems.push({ code: valCode, name: valName, stock: valStock, numStock: numStock });
                     });
                 }
 
-                // Render semua grup saat pertama kali dimuat
+                // Render semua grup saat dimuat
                 renderStockUI('ALL');
 
-                // Reset status tombol filter ke "Semua"
+                // Kembalikan status warna tombol filter ke "Semua"
                 document.querySelectorAll('.filter-btn').forEach(b => {
                     b.classList.remove('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
                     b.classList.add('bg-dark-input', 'text-gray-400');
@@ -618,7 +647,7 @@
                 }
 
             } catch (error) {
-                console.error(error);
+                console.error("Error Detail:", error);
                 document.getElementById('stokContainer').innerHTML = `<div class="text-center text-red-500 text-sm py-8 w-full font-bold">Gagal memuat data stok dari server.</div>`;
             } finally {
                 loadingStok.classList.add('hidden');
