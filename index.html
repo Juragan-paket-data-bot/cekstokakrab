@@ -140,7 +140,7 @@
                     <span class="text-brand-main text-xs font-medium animate-pulse">Memuat...</span>
                 </div>
                 
-               <!-- MENU FILTER GRUP -->
+             <!-- MENU FILTER GRUP -->
                 <div class="w-full mb-5 overflow-x-auto pb-2 scrollbar-hide">
                     <div class="flex gap-2 min-w-max" id="groupFilters">
                         <button class="filter-btn active px-4 py-2 rounded-full bg-brand-main text-dark-bg text-xs font-bold transition-all shadow-[0_0_10px_rgba(0,244,126,0.3)]" data-group="XDA">XDA</button>
@@ -148,6 +148,10 @@
                         <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XM">XM</button>
                         <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="KDA">KDA</button>
                         <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="ARF">ARF</button>
+                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XAD">XAD</button>
+                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="V">V</button>
+                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="XAX">XAX</button>
+                        <button class="filter-btn px-4 py-2 rounded-full bg-dark-input border border-dark-border text-gray-400 text-xs font-bold hover:text-white transition-all" data-group="ART">ART</button>
                     </div>
                 </div>
 
@@ -596,6 +600,7 @@
                     'XLA64': 'Jumbo V3', 'XLA65': 'JUMBO', 'XLA77': 'Megabig V2', 'XLA89': 'MegaBig'
                 };
 
+                // 1. DATA DARI API
                 if (Array.isArray(dataToParse)) {
                     dataToParse.forEach(item => {
                         let innerData = (item.data && typeof item.data === 'object') ? item.data : item;
@@ -603,19 +608,19 @@
                         let valCode = innerData.id_grup || innerData.sku || innerData.kode || innerData.code || innerData.id || '-';
                         let valCodeUpper = valCode.toUpperCase();
 
-                        // 1. FILTER: Hapus produk yang kodenya berakhiran 'M' atau 'A' (Contoh: KDA63M, KDA19A)
-                        if (/[0-9][MA]$/i.test(valCodeUpper)) {
-                            return; // Lewati produk ini, jangan dimasukkan ke daftar
+                        // Hapus produk berakhiran M atau A, dan hapus ARF55
+                        if (/[0-9][MA]$/i.test(valCodeUpper) || valCodeUpper === 'ARF55') {
+                            return; 
                         }
 
                         let valStock = innerData.stok !== undefined ? innerData.stok : (innerData.stock !== undefined ? innerData.stock : (innerData.qty || 0));
                         let valName = innerData['Nama kuota'] || innerData.Nama_kuota || innerData.nama || innerData.name || '';
                         let valDesc = innerData.deskripsi || null;
                         
-                        // 2. HAPUS PRODUK MATI (Stok 0, tanpa deskripsi, tanpa nama)
+                        // Hapus produk mati
                         if (valStock == 0 && !valDesc && (!valName || valName.trim() === '')) return;
 
-                        // 3. ATURAN NAMA PRODUK: XM, KDA, ARF mengikuti Kode Produk
+                        // Nama sama dengan kode untuk grup tertentu
                         if (valCodeUpper.startsWith('XM') || valCodeUpper.startsWith('KDA') || valCodeUpper.startsWith('ARF')) {
                             valName = valCodeUpper;
                         } else {
@@ -627,16 +632,49 @@
                         let numStock = typeof valStock === 'string' ? (parseInt(valStock.replace(/\D/g, '')) || 0) : parseInt(valStock || 0);
                         
                         globalStockItems.push({ 
-                            code: valCodeUpper, 
-                            name: valName, 
-                            stock: valStock, 
-                            numStock: numStock,
-                            rawDesc: valDesc
+                            code: valCodeUpper, name: valName, stock: valStock, numStock: numStock,
+                            rawDesc: valDesc, isChatAdmin: false
                         });
                     });
                 }
 
-                // 4. SORTING: Mengurutkan angka dari yang terkecil ke terbesar secara akurat (XDA14 -> XDA19)
+                // 2. DATA TAMBAHAN (Khusus Slot & Status Chat Admin)
+                const extraItems = {
+                    'XAD13': {'Area 1': '13 GB', 'Area 2': '15 GB', 'Area 3': '20 GB', 'Area 4': '30 GB'},
+                    'XAD28': {'Area 1': '28 GB', 'Area 2': '30 GB', 'Area 3': '35 GB', 'Area 4': '45 GB'},
+                    'XAD31': {'Area 1': '31 GB', 'Area 2': '33 GB', 'Area 3': '38 GB', 'Area 4': '48 GB'},
+                    'XAD38': {'Area 1': '38 GB', 'Area 2': '40 GB', 'Area 3': '45 GB', 'Area 4': '55 GB'},
+                    'XAD50': {'Area 1': '50 GB', 'Area 2': '52 GB', 'Area 3': '57 GB', 'Area 4': '67 GB'},
+                    'XAD58': {'Area 1': '53 GB', 'Area 2': '60 GB', 'Area 3': '65 GB', 'Area 4': '75 GB'},
+                    'XAD63': {'Area 1': '63 GB', 'Area 2': '65 GB', 'Area 3': '70 GB', 'Area 4': '80 GB'},
+                    'XAD69': {'Area 1': '69 GB', 'Area 2': '71 GB', 'Area 3': '76 GB', 'Area 4': '86 GB'},
+                    'XAD88': {'Area 1': '88 GB', 'Area 2': '90 GB', 'Area 3': '95 GB', 'Area 4': '105 GB'},
+                    'V1': {'Area 1': '13-15 GB', 'Area 2': '15-17 GB', 'Area 3': '20-22 GB', 'Area 4': '30-32 GB'},
+                    'V2': {'Area 1': '31-33 GB', 'Area 2': '33-35 GB', 'Area 3': '38-40 GB', 'Area 4': '48-50 GB'},
+                    'V3': {'Area 1': '38-40 GB', 'Area 2': '40-42 GB', 'Area 3': '45-47 GB', 'Area 4': '55-57 GB'},
+                    'V4': {'Area 1': '50-52 GB', 'Area 2': '52-54 GB', 'Area 3': '57-59 GB', 'Area 4': '67-69 GB'},
+                    'V5': {'Area 1': '88-90 GB', 'Area 2': '90-92 GB', 'Area 3': '95-97 GB', 'Area 4': '105-107 GB'},
+                    'XAX14': {'Area 1': '13 - 15 GB', 'Area 2': '15 - 17 GB', 'Area 3': '20 - 22 GB', 'Area 4': '30 - 32 GB'},
+                    'XAX32': {'Area 1': '31 - 33 GB', 'Area 2': '33 - 35 GB', 'Area 3': '38 - 40 GB', 'Area 4': '48 - 50 GB'},
+                    'XAX39': {'Area 1': '38 - 40 GB', 'Area 2': '40 - 45 GB', 'Area 3': '45 - 47 GB', 'Area 4': '55 - 57 GB'},
+                    'XAX50': {'Area 1': '50.5 - 52.5 GB', 'Area 2': '52.5 - 54.5 GB', 'Area 3': '57.5 - 59.5 GB', 'Area 4': '67.5 - 69.5 GB'},
+                    'XAX65': {'Area 1': '63 - 65 GB', 'Area 2': '65 - 67 GB', 'Area 3': '70 - 72 GB', 'Area 4': '80 - 82 GB'},
+                    'XAX70': {'Area 1': '70 - 72 GB', 'Area 2': '72 - 74 GB', 'Area 3': '77 - 79 GB', 'Area 4': '87 - 89 GB'},
+                    'XAX89': {'Area 1': '88 - 90 GB', 'Area 2': '90 - 92 GB', 'Area 3': '92 - 95 GB', 'Area 4': '105 - 107 GB'},
+                    'XAX123': {'Area 1': '65 GB', 'Area 2': '70 GB', 'Area 3': '83 GB', 'Area 4': '123 GB'},
+                    'ART13': {'Area 1': '13-15 GB', 'Area 2': '15-17 GB', 'Area 3': '20-22 GB', 'Area 4': '30-32 GB'},
+                    'ART38': {'Area 1': '38-40 GB', 'Area 2': '40-42 GB', 'Area 3': '45-47 GB', 'Area 4': '55-57 GB'},
+                    'ART88': {'Area 1': '88-90 GB', 'Area 2': '90-92 GB', 'Area 3': '95-97 GB', 'Area 4': '105-107 GB'}
+                };
+
+                for (const [kCode, vDesc] of Object.entries(extraItems)) {
+                    globalStockItems.push({
+                        code: kCode, name: kCode, stock: 'Chat Admin', numStock: 999, 
+                        rawDesc: JSON.stringify(vDesc), isChatAdmin: true
+                    });
+                }
+
+                // 3. SORTING DARI TERKECIL KE TERBESAR
                 globalStockItems.sort((a, b) => {
                     let numA = parseInt(a.code.replace(/\D/g, '')) || 0;
                     let numB = parseInt(b.code.replace(/\D/g, '')) || 0;
@@ -644,7 +682,7 @@
                     return numA - numB;
                 });
 
-                // Reset tombol dan tampilkan grup default (XDA)
+                // Tampilkan XDA
                 document.querySelectorAll('.filter-btn').forEach(b => {
                     b.classList.remove('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
                     b.classList.add('bg-dark-input', 'text-gray-400');
@@ -654,12 +692,11 @@
                     btnXDA.classList.add('bg-brand-main', 'text-dark-bg', 'shadow-[0_0_10px_rgba(0,244,126,0.3)]');
                     btnXDA.classList.remove('bg-dark-input', 'text-gray-400');
                 }
-
                 renderStockUI('XDA');
 
             } catch (error) {
                 console.error("Error Detail:", error);
-                document.getElementById('stokContainer').innerHTML = `<div class="text-center text-red-500 text-sm py-8 w-full font-bold">Gagal memuat data stok dari server.</div>`;
+                document.getElementById('stokContainer').innerHTML = `<div class="text-center text-red-500 text-sm py-8 w-full font-bold">Gagal memuat data stok.</div>`;
             } finally {
                 loadingStok.classList.add('hidden');
                 loadingStok.classList.remove('flex');
@@ -671,84 +708,49 @@
             const stokContainer = document.getElementById('stokContainer');
             stokContainer.innerHTML = ''; 
 
-            const detailAreaPaketFallback = {
-                "SuperMini": [{ area: "Area 1", quota: "13-15 GB" }, { area: "Area 2", quota: "15-17 GB" }, { area: "Area 3", quota: "20-22 GB" }, { area: "Area 4", quota: "30-32 GB" }],
-                "SuperMini V2": [{ area: "Area 1", quota: "19-21 GB" }, { area: "Area 2", quota: "21-23 GB" }, { area: "Area 3", quota: "26-28 GB" }, { area: "Area 4", quota: "36-38 GB" }],
-                "Mini": [{ area: "Area 1", quota: "31-32 GB" }, { area: "Area 2", quota: "33-34 GB" }, { area: "Area 3", quota: "38-39 GB" }, { area: "Area 4", quota: "48-49 GB" }],
-                "Big": [{ area: "Area 1", quota: "38-40 GB" }, { area: "Area 2", quota: "40-42 GB" }, { area: "Area 3", quota: "45-47 GB" }, { area: "Area 4", quota: "55-57 GB" }],
-                "Big V2": [{ area: "Area 1", quota: "48 GB" }, { area: "Area 2", quota: "50 GB" }, { area: "Area 3", quota: "55 GB" }, { area: "Area 4", quota: "65 GB" }],
-                "Jumbo V2": [{ area: "Area 1", quota: "55 GB" }, { area: "Area 2", quota: "57 GB" }, { area: "Area 3", quota: "62 GB" }, { area: "Area 4", quota: "72 GB" }],
-                "Jumbo V3": [{ area: "Area 1", quota: "63-65 GB" }, { area: "Area 2", quota: "65-67 GB" }, { area: "Area 3", quota: "70-72 GB" }, { area: "Area 4", quota: "80-82 GB" }],
-                "JUMBO": [{ area: "Area 1", quota: "65 GB" }, { area: "Area 2", quota: "70 GB" }, { area: "Area 3", quota: "83 GB" }, { area: "Area 4", quota: "123 GB" }],
-                "Megabig V2": [{ area: "Area 1", quota: "76-78 GB" }, { area: "Area 2", quota: "78-80 GB" }, { area: "Area 3", quota: "83-85 GB" }, { area: "Area 4", quota: "93-95 GB" }],
-                "MegaBig": [{ area: "Area 1", quota: "88-90 GB" }, { area: "Area 2", quota: "90-92 GB" }, { area: "Area 3", quota: "95-97 GB" }, { area: "Area 4", quota: "105-107 GB" }]
-            };
-
             const groupItems = globalStockItems.filter(item => item.code.startsWith(activeGroupPrefix));
             
             if (groupItems.length > 0) {
-                // Tampilan kotak produk TANPA judul header
                 let groupHTML = `<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 content-start w-full">`;
 
                 groupItems.forEach(item => {
-                    const isAvailable = item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
-                    const stockColor = isAvailable ? 'text-brand-main' : 'text-red-500';
+                    const isAvailable = item.isChatAdmin || item.numStock > 0 || String(item.stock).toLowerCase().includes('tersedia');
+                    const quotaColor = isAvailable ? 'text-[#e8b923]' : 'text-red-500'; // Deskripsi kuning jika ada stok, merah jika habis
                     
-                    const checkIcon = isAvailable 
-                        ? `<div class="bg-brand-main rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(0,244,126,0.5)]"><i class="fa-solid fa-check text-[#0b1a24] text-[9px] font-black"></i></div>`
-                        : `<div class="bg-red-500 rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-xmark text-[#0b1a24] text-[9px] font-black"></i></div>`;
+                    const checkIcon = item.isChatAdmin
+                        ? `<div class="bg-blue-500 rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(59,130,246,0.5)]"><i class="fa-brands fa-whatsapp text-white text-[10px] font-black"></i></div>`
+                        : (isAvailable 
+                            ? `<div class="bg-brand-main rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(0,244,126,0.5)]"><i class="fa-solid fa-check text-[#0b1a24] text-[9px] font-black"></i></div>`
+                            : `<div class="bg-red-500 rounded-full w-4 h-4 flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.5)]"><i class="fa-solid fa-xmark text-[#0b1a24] text-[9px] font-black"></i></div>`);
                     
-                    const emptyText = !isAvailable ? `<span class="block text-red-500 text-[9px] italic font-black tracking-wider leading-none mt-1">HABIS</span>` : '';
+                    const emptyText = (!isAvailable && !item.isChatAdmin) ? `<span class="block text-red-500 text-[9px] italic font-black tracking-wider leading-none mt-1">HABIS</span>` : '';
+                    
+                    let stockDisplay = item.isChatAdmin 
+                        ? `<span class="text-[12px] md:text-[14px] font-black text-[#00f47e] ml-1">Chat Admin</span>`
+                        : `<span class="text-[14px] md:text-[16px] font-black ${isAvailable ? 'text-brand-main' : 'text-red-500'} leading-none ml-1">${item.numStock}</span>`;
 
                     let areaHTML = '';
-                    
-                    // 5. PARSING DESKRIPSI (Grid Baris Kebawah)
                     if (item.rawDesc) {
                         try {
                             const parsedDesc = JSON.parse(item.rawDesc);
                             areaHTML += `<div class="flex flex-col gap-1 w-full">`;
                             for (let key in parsedDesc) {
                                 let areaLabel = key.replace(/([a-zA-Z])(\d)/, '$1 $2');
-                                let quotaVal = parsedDesc[key];
+                                let quotaVal = String(parsedDesc[key]);
+                                let displayQuota = quotaVal.toLowerCase().includes('gb') ? quotaVal : `${quotaVal} GB`;
+                                
                                 areaHTML += `
                                     <div class="grid grid-cols-[42px_5px_1fr] md:grid-cols-[48px_5px_1fr] items-center w-full text-left">
                                         <span class="text-[9px] md:text-[10px] text-gray-400 font-medium">${areaLabel}</span>
                                         <span class="text-[9px] md:text-[10px] text-gray-500 text-center">:</span>
-                                        <span class="text-[#e8b923] text-[9px] md:text-[10.5px] font-bold">${quotaVal} GB</span>
+                                        <span class="${quotaColor} text-[9px] md:text-[10.5px] font-bold">${displayQuota}</span>
                                     </div>`;
                             }
                             areaHTML += `</div>`;
                         } catch(e) {
-                            // Jika format bukan JSON melainkan teks biasa, bersihkan dan susun ke bawah
                             let safeText = item.rawDesc
-                                .replace(/([a-zA-Z])(\d)/g, '$1 $2') // Area1 -> Area 1
-                                .replace(/,\s*/g, '<br>') // Koma jadi baris baru
-                                .replace(/Area/gi, '<br>Area') 
-                                .replace(/<br>\s*<br>/g, '<br>')
-                                .replace(/^<br>/, '');
-                            
-                            areaHTML = `<div class="text-[9px] md:text-[10px] text-[#e8b923] font-bold leading-[1.6] text-left w-full">${safeText}</div>`;
-                        }
-                    }
-
-                    // Fallback jika tidak ada deskripsi
-                    if (!areaHTML) {
-                        let baseNameForArea = item.name.replace(' (Promo)', '').trim();
-                        if(baseNameForArea.toLowerCase() === 'megabig v2') baseNameForArea = 'Megabig V2'; 
-                        if(baseNameForArea.toLowerCase() === 'megabig') baseNameForArea = 'MegaBig'; 
-                        
-                        const areas = detailAreaPaketFallback[baseNameForArea];
-                        if (areas) {
-                            areaHTML += `<div class="flex flex-col gap-1 w-full">`;
-                            areas.forEach(a => {
-                                areaHTML += `
-                                    <div class="grid grid-cols-[42px_5px_1fr] md:grid-cols-[48px_5px_1fr] items-center w-full text-left">
-                                        <span class="text-[9px] md:text-[10px] text-gray-400 font-medium">${a.area}</span>
-                                        <span class="text-[9px] md:text-[10px] text-gray-500 text-center">:</span>
-                                        <span class="text-[#e8b923] text-[9px] md:text-[10.5px] font-bold">${a.quota}</span>
-                                    </div>`;
-                            });
-                            areaHTML += `</div>`;
+                                .replace(/([a-zA-Z])(\d)/g, '$1 $2').replace(/,\s*/g, '<br>').replace(/Area/gi, '<br>Area').replace(/<br>\s*<br>/g, '<br>').replace(/^<br>/, '');
+                            areaHTML = `<div class="text-[9px] md:text-[10px] ${quotaColor} font-bold leading-[1.6] text-left w-full">${safeText}</div>`;
                         }
                     }
 
@@ -765,8 +767,8 @@
                             
                             <div class="relative z-10 mb-3">
                                 <div class="flex items-center gap-1">
-                                    <span class="text-gray-400 font-medium text-[10px] md:text-[11px] leading-none">Sisa Stok:</span>
-                                    <span class="text-[14px] md:text-[16px] font-black ${stockColor} leading-none ml-1">${item.numStock}</span>
+                                    <span class="text-gray-400 font-medium text-[10px] md:text-[11px] leading-none">${item.isChatAdmin ? 'Status:' : 'Sisa Stok:'}</span>
+                                    ${stockDisplay}
                                 </div>
                                 ${emptyText}
                             </div>
@@ -786,7 +788,7 @@
                 groupHTML += `</div>`;
                 stokContainer.insertAdjacentHTML('beforeend', groupHTML);
             } else {
-                stokContainer.innerHTML = `<div class="text-center text-gray-500 text-sm py-8 w-full italic">Stok belum tersedia untuk grup yang dipilih.</div>`;
+                stokContainer.innerHTML = `<div class="text-center text-gray-500 text-sm py-8 w-full italic">Stok belum tersedia.</div>`;
             }
         }
 
@@ -804,7 +806,7 @@
             });
         });
 
-        // Trigger Pemuatan Stok Pertama Kali
+        // Trigger
         document.getElementById('btnCekStok').addEventListener('click', loadStokData);
         window.addEventListener('DOMContentLoaded', loadStokData);
         
